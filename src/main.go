@@ -1,8 +1,8 @@
 package main
 
 import (
+	"./hooks"
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -15,55 +15,6 @@ import (
 var (
 	laddr = flag.String("l", ":8080", "HTTP service address (e.g.address, ':8080')")
 )
-
-type Record interface {
-	GetGitURL() string
-	GetName() string
-}
-
-type BitbucketRecord struct {
-	Repository struct {
-		Slug string `json:"slug"`
-		Name string `json:"name"`
-		URL  string `json:"absolute_url"`
-	} `json:"repository"`
-	BaseURL string `json:"canon_url"`
-	User    string `json:"user"`
-}
-
-func (r BitbucketRecord) GetGitURL() string {
-	return fmt.Sprintf("%s%s", r.BaseURL, r.Repository.URL)
-}
-
-func (r BitbucketRecord) GetName() string {
-	return r.Repository.Name
-}
-
-type GithubRecord struct {
-	Repository struct {
-		Name string `json:"name"`
-		URL  string `json:"git_url"`
-	} `json:"repository"`
-}
-
-func (r GithubRecord) GetGitURL() string {
-	return r.Repository.URL
-}
-
-func (r GithubRecord) GetName() string {
-	return r.Repository.Name
-}
-
-func RecordFactory(hookname string) (Record, error) {
-	switch hookname {
-	case "bitbucket":
-		return new(BitbucketRecord), nil
-	case "github":
-		return new(GithubRecord), nil
-	default:
-		return nil, errors.New("Unknown hookname.")
-	}
-}
 
 type flushWriter struct {
 	f http.Flusher
@@ -98,7 +49,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Hook name: ", hookname)
 
-	var record, err = RecordFactory(hookname)
+	var record, err = hooks.RecordFactory(hookname)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
