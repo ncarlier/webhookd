@@ -1,5 +1,5 @@
 .SILENT :
-.PHONY : build clean fmt
+.PHONY : build clean
 
 TAG:=`git describe --abbrev=0 --tags`
 LDFLAGS:=-X main.buildVersion $(TAG)
@@ -19,10 +19,10 @@ clean-dist:
 
 dist: clean-dist
 	mkdir -p dist/linux/amd64 && GOOS=linux GOARCH=amd64 go build -o dist/linux/amd64/$(APPNAME) ./src
-#	mkdir -p dist/linux/i386  && GOOS=linux GOARCH=386 go build -o dist/linux/i386/$APPNAME ./src
+#	mkdir -p dist/linux/i386  && GOOS=linux GOARCH=386 go build -o dist/linux/i386/$(APPNAME) ./src
 
 release: dist
 #	godep restore
-	tar -cvzf cloudconfd-linux-amd64-$(TAG).tar.gz -C dist/linux/amd64 $(APPNAME)
-#	tar -cvzf cloudconfd-linux-i386-i386$(TAG).tar.gz -C dist/linux/i386 $(APPNAME)
+	tar -cvzf $(APPNAME)-linux-amd64-$(TAG).tar.gz -C dist/linux/amd64 $(APPNAME)
+#	tar -cvzf $(APPNAME)-linux-i386-i386$(TAG).tar.gz -C dist/linux/i386 $(APPNAME)
 

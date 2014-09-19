@@ -1,0 +1,16 @@
+#!/bin/sh
+
+echo "Test bad URL"
+curl -H "Content-Type: application/json" \
+    --data @assets/bitbucket.json \
+    http://localhost:8080/bad/action
+
+echo "Test Bitbucket hook"
+curl -H "Content-Type: application/json" \
+    --data @assets/bitbucket.json \
+    http://localhost:8080/bitbucket/echo
+
+echo "Test Github hook"
+curl -H "Content-Type: application/json" \
+    --data @assets/github.json \
+    http://localhost:8080/github/echo
