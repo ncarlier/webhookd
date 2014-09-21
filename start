@@ -1,0 +1,7 @@
+#!/bin/sh
+
+export APP_NOTIFIER="http"
+export APP_HTTP_NOTIFIER_URL="http://requestb.in/v9b229v9"
+
+go run src/main.go
+

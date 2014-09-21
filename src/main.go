@@ -2,11 +2,11 @@ package main
 
 import (
 	"./hooks"
+	"./notifications"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
-	"io"
 	"log"
 	"net/http"
 	"os/exec"
@@ -16,40 +16,49 @@ var (
 	laddr = flag.String("l", ":8080", "HTTP service address (e.g.address, ':8080')")
 )
 
-type flushWriter struct {
-	f http.Flusher
-	w io.Writer
+type HookContext struct {
+	Hook   string
+	Action string
+	args   []string
 }
 
-func (fw *flushWriter) Write(p []byte) (n int, err error) {
-	n, err = fw.w.Write(p)
-	if fw.f != nil {
-		fw.f.Flush()
+func Notify(text string, context *HookContext) {
+	var subject = fmt.Sprintf("Action %s executed.", context.Action)
+	var notifier, err = notifications.NotifierFactory()
+	if err != nil {
+		log.Println(err)
+		return
 	}
-	return
+	if notifier == nil {
+		log.Println("Notification provider not found.")
+		return
+	}
+	notifier.Notify(text, subject)
 }
 
-func RunScript(w http.ResponseWriter, hook string, action string, params ...string) {
-	fw := flushWriter{w: w}
-	if f, ok := w.(http.Flusher); ok {
-		fw.f = f
-	}
-	scriptname := fmt.Sprintf("./scripts/%s/%s.sh", hook, action)
+func RunScript(w http.ResponseWriter, context *HookContext) {
+	scriptname := fmt.Sprintf("./scripts/%s/%s.sh", context.Hook, context.Action)
 	log.Println("Exec script: ", scriptname)
-	cmd := exec.Command(scriptname, params...)
-	cmd.Stdout = &fw
-	cmd.Stderr = &fw
-	cmd.Run()
+
+	out, err := exec.Command(scriptname, context.args...).Output()
+	if err != nil {
+		Notify(err.Error(), context)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	Notify(fmt.Sprintf("%s", out), context)
+	fmt.Fprintf(w, "Action '%s' executed!", context.Action)
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	hookname := params["hookname"]
-	action := params["action"]
+	context := new(HookContext)
+	context.Hook = params["hookname"]
+	context.Action = params["action"]
 
-	log.Println("Hook name: ", hookname)
+	log.Println("Hook name: ", context.Hook)
 
-	var record, err = hooks.RecordFactory(hookname)
+	var record, err = hooks.RecordFactory(context.Hook)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -62,7 +71,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	RunScript(w, hookname, action, record.GetGitURL(), record.GetName())
+	context.args = []string{record.GetURL(), record.GetName()}
+
+	RunScript(w, context)
 }
 
 func main() {

@@ -7,7 +7,7 @@ type GithubRecord struct {
 	} `json:"repository"`
 }
 
-func (r GithubRecord) GetGitURL() string {
+func (r GithubRecord) GetURL() string {
 	return r.Repository.URL
 }
 

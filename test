@@ -14,3 +14,8 @@ echo "Test Github hook"
 curl -H "Content-Type: application/json" \
     --data @assets/github.json \
     http://localhost:8080/github/echo
+
+echo "Test Docker hook"
+curl -H "Content-Type: application/json" \
+    --data @assets/docker.json \
+    http://localhost:8080/docker/echo

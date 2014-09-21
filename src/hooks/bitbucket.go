@@ -14,7 +14,7 @@ type BitbucketRecord struct {
 	User    string `json:"user"`
 }
 
-func (r BitbucketRecord) GetGitURL() string {
+func (r BitbucketRecord) GetURL() string {
 	return fmt.Sprintf("%s%s", r.BaseURL, r.Repository.URL)
 }
 

@@ -5,7 +5,7 @@ import (
 )
 
 type Record interface {
-	GetGitURL() string
+	GetURL() string
 	GetName() string
 }
 
@@ -15,6 +15,8 @@ func RecordFactory(hookname string) (Record, error) {
 		return new(BitbucketRecord), nil
 	case "github":
 		return new(GithubRecord), nil
+	case "docker":
+		return new(DockerRecord), nil
 	default:
 		return nil, errors.New("Unknown hookname.")
 	}
