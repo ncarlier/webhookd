@@ -1,0 +1,37 @@
+package tools
+
+import (
+	"bufio"
+	"compress/gzip"
+	"fmt"
+	"log"
+	"os"
+)
+
+func CompressFile(filename string) (zipfile string, err error) {
+	zipfile = fmt.Sprintf("%s.gz", filename)
+	in, err := os.Open(filename)
+	if err != nil {
+		return
+	}
+	out, err := os.Create(zipfile)
+	if err != nil {
+		log.Println("Unable to create zip file", err)
+		return
+	}
+
+	// buffer readers from file, writes to pipe
+	bufin := bufio.NewReader(in)
+
+	// gzip wraps buffer writer and wr
+	gw := gzip.NewWriter(out)
+	defer gw.Close()
+
+	_, err = bufin.WriteTo(gw)
+	if err != nil {
+		log.Println("Unable to write into the zip file", err)
+		return
+	}
+	log.Println("Zip file created: ", zipfile)
+	return
+}

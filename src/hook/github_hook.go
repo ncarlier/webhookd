@@ -1,4 +1,4 @@
-package hooks
+package hook
 
 type GithubRecord struct {
 	Repository struct {

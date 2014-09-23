@@ -1,4 +1,4 @@
-package hooks
+package hook
 
 type DockerRecord struct {
 	Repository struct {

@@ -1,4 +1,4 @@
-package notifications
+package notification
 
 import (
 	"errors"
@@ -6,7 +6,7 @@ import (
 )
 
 type Notifier interface {
-	Notify(text string, subject string)
+	Notify(subject string, text string, attachfile string)
 }
 
 func NotifierFactory() (Notifier, error) {
