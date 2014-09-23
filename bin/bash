@@ -1,0 +1,16 @@
+#!/bin/sh
+
+
+###
+# Simple script to get a shell into the container.
+###
+sudo docker run \
+    --name webhookd \
+    --rm \
+    --env-file="./etc/env.conf" \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v /home/nicolas/.ssh/deploy_rsa:/root/.ssh/id_rsa \
+    -it \
+    --entrypoint="/bin/bash" \
+    ncarlier/webhookd \
+    -c /bin/bash
