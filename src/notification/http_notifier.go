@@ -9,12 +9,14 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type HttpNotifier struct {
 	URL  string
 	From string
 	To   string
+	User []string
 }
 
 func NewHttpNotifier() *HttpNotifier {
@@ -23,6 +25,10 @@ func NewHttpNotifier() *HttpNotifier {
 	if notifier.URL == "" {
 		log.Println("Unable to create HTTP notifier. APP_HTTP_NOTIFIER_URL not set.")
 		return nil
+	}
+	user := os.Getenv("APP_HTTP_NOTIFIER_USER")
+	if user != "" {
+		notifier.User = strings.Split(user, ":")
 	}
 	notifier.From = os.Getenv("APP_NOTIFIER_FROM")
 	if notifier.From == "" {
@@ -35,7 +41,7 @@ func NewHttpNotifier() *HttpNotifier {
 	return notifier
 }
 
-func (n HttpNotifier) Notify(subject string, text string, attachfile string) {
+func (n *HttpNotifier) Notify(subject string, text string, attachfile string) {
 	log.Println("Sending notification '" + subject + "' to " + n.URL + " ...")
 	data := make(url.Values)
 	data.Set("from", n.From)
@@ -75,6 +81,11 @@ func (n HttpNotifier) Notify(subject string, text string, attachfile string) {
 		}
 		defer req.Body.Close()
 		req.Header.Set("Content-Type", writer.FormDataContentType())
+
+		if len(n.User) == 2 {
+			req.SetBasicAuth(n.User[0], n.User[1])
+		}
+
 		// Submit the request
 		client := &http.Client{}
 		res, err := client.Do(req)
@@ -86,6 +97,7 @@ func (n HttpNotifier) Notify(subject string, text string, attachfile string) {
 		// Check the response
 		if res.StatusCode != http.StatusOK {
 			log.Println("bad status: %s", res.Status)
+			log.Println(res.Body)
 			return
 		}
 		log.Println("HTTP notification sended with attachment: ", attachfile)
