@@ -96,17 +96,19 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	context.Hook = params["hookname"]
 	context.Action = params["action"]
 
-	log.Println("Hook name: ", context.Hook)
-
 	var record, err = hook.RecordFactory(context.Hook)
 	if err != nil {
+		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
+	log.Println("Using hook: ", context.Hook)
+
 	decoder := json.NewDecoder(r.Body)
 	err = decoder.Decode(&record)
 	if err != nil {
+		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}

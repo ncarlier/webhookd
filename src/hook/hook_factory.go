@@ -18,6 +18,6 @@ func RecordFactory(hookname string) (Record, error) {
 	case "docker":
 		return new(DockerRecord), nil
 	default:
-		return nil, errors.New("Unknown hookname.")
+		return nil, errors.New("Unknown hookname: " + hookname)
 	}
 }
