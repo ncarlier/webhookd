@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -105,8 +104,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Using hook: ", context.Hook)
 
-	decoder := json.NewDecoder(r.Body)
-	err = decoder.Decode(&record)
+	err = record.Decode(r)
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)

@@ -36,7 +36,7 @@ func NewHttpNotifier() *HttpNotifier {
 }
 
 func (n HttpNotifier) Notify(subject string, text string, attachfile string) {
-	log.Println("HTTP notification: ", subject)
+	log.Println("Sending notification '" + subject + "' to " + n.URL + " ...")
 	data := make(url.Values)
 	data.Set("from", n.From)
 	data.Set("to", n.To)
@@ -88,7 +88,7 @@ func (n HttpNotifier) Notify(subject string, text string, attachfile string) {
 			log.Println("bad status: %s", res.Status)
 			return
 		}
-		log.Println("HTTP notification done with attachment: ", attachfile)
+		log.Println("HTTP notification sended with attachment: ", attachfile)
 	} else {
 		resp, err := http.PostForm(n.URL, data)
 		if err != nil {

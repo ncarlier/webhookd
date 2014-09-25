@@ -2,11 +2,13 @@ package hook
 
 import (
 	"errors"
+	"net/http"
 )
 
 type Record interface {
 	GetURL() string
 	GetName() string
+	Decode(r *http.Request) error
 }
 
 func RecordFactory(hookname string) (Record, error) {
