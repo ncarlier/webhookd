@@ -2,10 +2,12 @@ package notification
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -59,7 +61,11 @@ func (n *HttpNotifier) Notify(subject string, text string, attachfile string) {
 
 		body := &bytes.Buffer{}
 		writer := multipart.NewWriter(body)
-		part, err := writer.CreateFormFile("attachment", filepath.Base(attachfile))
+
+		mh := make(textproto.MIMEHeader)
+		mh.Set("Content-Type", "application/x-gzip")
+		mh.Set("Content-Disposition", fmt.Sprintf("form-data; name=\"attachment\"; filename=\"%s\"", filepath.Base(attachfile)))
+		part, err := writer.CreatePart(mh)
 		if err != nil {
 			log.Println("Unable to create for file", err)
 			return
@@ -72,7 +78,7 @@ func (n *HttpNotifier) Notify(subject string, text string, attachfile string) {
 
 		err = writer.Close()
 		if err != nil {
-			log.Println("Unable to close writer", err)
+			log.Println("Unable to close the gzip writer", err)
 			return
 		}
 		req, err := http.NewRequest("POST", n.URL, body)
