@@ -12,15 +12,15 @@ type DockerRecord struct {
 	} `json:"repository"`
 }
 
-func (r DockerRecord) GetURL() string {
+func (r *DockerRecord) GetURL() string {
 	return r.Repository.URL
 }
 
-func (r DockerRecord) GetName() string {
+func (r *DockerRecord) GetName() string {
 	return r.Repository.Name
 }
 
-func (r DockerRecord) Decode(req *http.Request) error {
+func (r *DockerRecord) Decode(req *http.Request) error {
 	decoder := json.NewDecoder(req.Body)
 	err := decoder.Decode(&r)
 	if err != nil {

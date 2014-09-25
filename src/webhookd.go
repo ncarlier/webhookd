@@ -111,6 +111,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("Extracted data: ", record.GetURL(), record.GetName())
 	context.args = []string{record.GetURL(), record.GetName()}
 
 	RunScript(w, context)

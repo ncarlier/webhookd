@@ -13,15 +13,15 @@ type BitbucketRecord struct {
 	} `json:"repository"`
 }
 
-func (r BitbucketRecord) GetURL() string {
-	return fmt.Sprintf("git@bitbucket.org:%s/%s.git", r.Repository.Owner, r.Repository.Owner)
+func (r *BitbucketRecord) GetURL() string {
+	return fmt.Sprintf("git@bitbucket.org:%s/%s.git", r.Repository.Owner, r.Repository.Slug)
 }
 
-func (r BitbucketRecord) GetName() string {
+func (r *BitbucketRecord) GetName() string {
 	return r.Repository.Slug
 }
 
-func (r BitbucketRecord) Decode(req *http.Request) error {
+func (r *BitbucketRecord) Decode(req *http.Request) error {
 	if err := req.ParseForm(); err != nil {
 		return err
 	}

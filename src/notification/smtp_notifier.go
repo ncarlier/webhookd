@@ -30,7 +30,7 @@ func NewSmtpNotifier() *SmtpNotifier {
 	return notifier
 }
 
-func (n SmtpNotifier) Notify(subject string, text string, attachfile string) {
+func (n *SmtpNotifier) Notify(subject string, text string, attachfile string) {
 	log.Println("SMTP notification: ", subject)
 	// Connect to the remote SMTP server.
 	c, err := smtp.Dial(n.Host)

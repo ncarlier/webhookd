@@ -17,6 +17,6 @@ func NotifierFactory() (Notifier, error) {
 	case "smtp":
 		return NewSmtpNotifier(), nil
 	default:
-		return nil, errors.New("Unknown notification provider.")
+		return nil, errors.New("Unknown notification provider: " + notifier)
 	}
 }
