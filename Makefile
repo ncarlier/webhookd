@@ -1,5 +1,5 @@
 .SILENT :
-.PHONY : volume build clean run shell test
+.PHONY : volume dev build clean run shell test dist
 
 USERNAME:=ncarlier
 APPNAME:=webhookd
@@ -18,15 +18,15 @@ define docker_run_flags
 -i -t
 endef
 
-ifdef DEVMODE
-	docker_run_flags += --volumes-from $(APPNAME)_volumes
-endif
-
 all: build
 
 volume:
 	echo "Building $(APPNAME) volumes..."
 	sudo docker run -v $(PWD):/opt/$(APPNAME) -v ~/var/$(APPNAME):/var/opt/$(APPNAME) --name $(APPNAME)_volumes busybox true
+
+dev:
+	$(eval docker_run_flags += --volumes-from $(APPNAME)_volumes)
+	echo "DEVMODE: Using volumes from $(APPNAME)_volumes"
 
 build:
 	echo "Building $(IMAGE) docker image..."

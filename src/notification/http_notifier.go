@@ -102,7 +102,7 @@ func (n *HttpNotifier) Notify(subject string, text string, attachfile string) {
 
 		// Check the response
 		if res.StatusCode != http.StatusOK {
-			log.Println("bad status: %s", res.Status)
+			log.Println("bad status: ", res.Status)
 			log.Println(res.Body)
 			return
 		}
