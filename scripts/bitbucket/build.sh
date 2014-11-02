@@ -5,15 +5,15 @@ export REF_NAME=$2
 
 if [ -z "$GIT_URL" ]; then
     echo "GIT_URL not defined"
+    exit 1
 fi
 
 if [ -z "$REF_NAME" ]; then
     echo "REF_NAME not defined"
+    exit 1
 fi
 
-IMAGE_NAME=nunux/$REF_NAME
-
-echo "Building $IMAGE_NAME ..."
+echo "Building $REF_NAME ..."
 
 # Check that we've a valid working directory.
 if [ ! -d "$APP_WORKING_DIR" ]; then
@@ -38,8 +38,8 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
-# Build Dockerfile
-docker build --rm -t $IMAGE_NAME $APP_WORKING_DIR/${REF_NAME}
+# Build Docke image
+make -C $APP_WORKING_DIR/$REF_NAME
 if [ $? != 0 ]; then
     echo "Error, unable to build Docker image"
     exit 1
