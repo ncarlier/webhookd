@@ -3,6 +3,8 @@ webhookd
 
 A very simple webhook server to launch shell scripts.
 
+It can be used as a cheap alternative of Docker hub in order to build private Docker images.
+
 Installation
 ------------
 
