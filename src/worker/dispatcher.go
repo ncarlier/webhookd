@@ -22,7 +22,7 @@ func StartDispatcher(nworkers int) {
 		for {
 			select {
 			case work := <-WorkQueue:
-				fmt.Println("Received work requeust")
+				fmt.Println("Received work request")
 				go func() {
 					worker := <-WorkerQueue
 

@@ -42,7 +42,7 @@ func (w Worker) Start() {
 				filename, err := RunScript(&work)
 				if err != nil {
 					subject := fmt.Sprintf("Webhook %s/%s FAILED.", work.Name, work.Action)
-					Notify(subject, err.Error(), "")
+					Notify(subject, err.Error(), filename)
 				} else {
 					subject := fmt.Sprintf("Webhook %s/%s SUCCEEDED.", work.Name, work.Action)
 					Notify(subject, "See attachment.", filename)
@@ -72,7 +72,7 @@ func Notify(subject string, text string, outfilename string) {
 		return
 	}
 	if notifier == nil {
-		fmt.Println("Notification provideri not found.")
+		fmt.Println("Notification provider not found.")
 		return
 	}
 
