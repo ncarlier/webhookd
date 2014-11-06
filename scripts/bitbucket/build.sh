@@ -32,6 +32,7 @@ fi
 rm -rf $APP_WORKING_DIR/$REF_NAME
 
 # Clone repository
+echo "Cloning $GIT_URL into ${APP_WORKING_DIR}/${REF_NAME} ..."
 ssh-agent bash -c 'ssh-add ${DEPLOY_KEY}; git clone --depth 1 ${GIT_URL} ${APP_WORKING_DIR}/${REF_NAME}'
 if [ $? != 0 ]; then
     echo "Error, unable to clone repository"
@@ -39,6 +40,7 @@ if [ $? != 0 ]; then
 fi
 
 # Build Docke image
+echo "Building image ..."
 make -C $APP_WORKING_DIR/$REF_NAME
 if [ $? != 0 ]; then
     echo "Error, unable to build Docker image"
