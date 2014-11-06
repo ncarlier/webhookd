@@ -108,11 +108,30 @@ func (n *HttpNotifier) Notify(subject string, text string, attachfile string) {
 		}
 		log.Println("HTTP notification sended with attachment: ", attachfile)
 	} else {
-		resp, err := http.PostForm(n.URL, data)
+		req, err := http.NewRequest("POST", n.URL, bytes.NewBufferString(data.Encode()))
 		if err != nil {
-			log.Println(err)
+			log.Println("Unable to post request", err)
 		}
-		defer resp.Body.Close()
-		log.Println("HTTP notification done")
+		defer req.Body.Close()
+
+		if len(n.User) == 2 {
+			req.SetBasicAuth(n.User[0], n.User[1])
+		}
+
+		// Submit the request
+		client := &http.Client{}
+		res, err := client.Do(req)
+		if err != nil {
+			log.Println("Unable to do the request", err)
+			return
+		}
+
+		// Check the response
+		if res.StatusCode != http.StatusOK {
+			log.Println("bad status: ", res.Status)
+			log.Println(res.Body)
+			return
+		}
+		log.Println("HTTP notification sended.")
 	}
 }
