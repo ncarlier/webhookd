@@ -21,7 +21,7 @@ func RunScript(work *WorkRequest) (string, error) {
 	}
 
 	scriptname := path.Join(scriptsdir, work.Name, fmt.Sprintf("%s.sh", work.Action))
-	fmt.Println("Exec script: ", scriptname)
+	fmt.Println("Exec script: ", scriptname, "...")
 
 	// Exec script...
 	cmd := exec.Command(scriptname, work.Args...)
@@ -35,16 +35,19 @@ func RunScript(work *WorkRequest) (string, error) {
 
 	defer outfile.Close()
 	cmd.Stdout = outfile
+	cmd.Stderr = outfile
 
 	err = cmd.Start()
 	if err != nil {
-		return "", err
+		return outfilename, err
 	}
 
 	err = cmd.Wait()
 	if err != nil {
-		return "", err
+		fmt.Println("Exec script: ", scriptname, "KO!")
+		return outfilename, err
 	}
 
+	fmt.Println("Exec script: ", scriptname, "OK")
 	return outfilename, nil
 }
