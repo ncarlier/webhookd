@@ -40,6 +40,14 @@ run:
 	echo "Running $(IMAGE) docker image..."
 	sudo docker run $(docker_run_flags) --name $(APPNAME) $(IMAGE)
 
+stop:
+	echo "Stopping container $(APPNAME) ..."
+	-sudo docker stop $(APPNAME)
+
+rm:
+	echo "Deleting container $(APPNAME) ..."
+	-sudo docker rm $(APPNAME)
+
 shell:
 	echo "Running $(IMAGE) docker image with shell access..."
 	sudo docker run $(docker_run_flags) --entrypoint="/bin/bash" $(IMAGE) -c /bin/bash
