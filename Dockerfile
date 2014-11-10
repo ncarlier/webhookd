@@ -8,7 +8,7 @@ FROM golang:1.3
 
 
 # Install ssh-keygen
-RUN apt-get update && apt-get install -y ssh
+RUN apt-get update && apt-get install -y ssh sudo
 
 # Install the latest version of the docker CLI
 RUN curl -L -o /usr/local/bin/docker https://get.docker.io/builds/Linux/x86_64/docker-latest && \
