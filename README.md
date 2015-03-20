@@ -37,6 +37,7 @@ The directory name right under the **scripts** directory defined the hookname.
 For now, supported hooks are:
 
 - GitHub
+- Gitlab
 - Bitbucket
 - Docker Hub
 
