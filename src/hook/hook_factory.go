@@ -17,6 +17,8 @@ func RecordFactory(hookname string) (Record, error) {
 		return new(BitbucketRecord), nil
 	case "github":
 		return new(GithubRecord), nil
+	case "gitlab":
+		return new(GitlabRecord), nil
 	case "docker":
 		return new(DockerRecord), nil
 	default:

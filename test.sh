@@ -22,6 +22,11 @@ curl -H "Content-Type: application/json" \
     --data @assets/github.json \
     http://$IP:8080/github/echo
 
+echo "Test Gitlab hook"
+curl -H "Content-Type: application/json" \
+    --data @assets/gitlab.json \
+    http://$IP:8080/gitlab/echo
+
 echo "Test Docker hook"
 curl -H "Content-Type: application/json" \
     --data @assets/docker.json \
