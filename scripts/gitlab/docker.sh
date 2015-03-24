@@ -43,7 +43,6 @@ if [ $? != 0 ]; then
 fi
 
 cd ${APP_WORKING_DIR}/${REF_NAME};
-#ssh://5510399367c989f6ad00001d@10.34.56.121/~/git/tfcontinuous.git/
 # Build Docke image
 echo "Building image ..."
 make build
