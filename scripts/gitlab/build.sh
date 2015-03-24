@@ -38,22 +38,12 @@ echo "Cloning $GIT_URL into ${APP_WORKING_DIR}/${REF_NAME} ..."
 ssh-agent bash -c 'ssh-add ${DEPLOY_KEY}; \
     git clone ${GIT_URL} ${APP_WORKING_DIR}/${REF_NAME}; \
     cd ${APP_WORKING_DIR}/${REF_NAME}; \
-    git remote add zone52 ssh://5510399367c989f6ad00001d@10.34.56.121/~/git/tfcontinuous.git/; \
-    git push zone52 master'
+    git remote add oo ssh://user@xxxxxxxxxx/~/git/tfcontinuous.git/; \
+    git push oo master'
 if [ $? != 0 ]; then
     echo "Error, unable to clone repository"
     exit 1
 fi
-
-
-#ssh://5510399367c989f6ad00001d@10.34.56.121/~/git/tfcontinuous.git/
-# Build Docke image
-#echo "Building image ..."
-#make -C $APP_WORKING_DIR/$REF_NAME
-#if [ $? != 0 ]; then
-#    echo "Error, unable to build Docker image"
-#    exit 1
-#fi
 
 echo "Remove folder ${APP_WORKING_DIR}/${REF_NAME}..."
 rm -rf ${APP_WORKING_DIR}/${REF_NAME}
