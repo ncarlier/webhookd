@@ -14,7 +14,7 @@ define docker_run_flags
 --rm \
 -v /var/run/docker.sock:/var/run/docker.sock \
 --env-file $(PWD)/etc/env.conf \
--p 8081:8080 \
+-P \
 -i -t
 endef
 
@@ -22,11 +22,11 @@ all: build
 
 volume:
 	echo "Building $(APPNAME) volumes..."
-	sudo docker run -v $(PWD)/scripts:/var/opt/webhookd/scripts --name $(APPNAME)_volumes busybox true
+	sudo docker run -v $(PWD):/var/opt/$(APPNAME) -v ~/var/$(APPNAME):/var/opt/$(APPNAME) --name $(APPNAME)_volumes busybox true
 
 key:
 	$(eval docker_run_flags += -v $(PWD)/ssh:/root/.ssh)
-	echo "Add techKey"
+	echo "Add private deploy key"
 
 dev:
 	$(eval docker_run_flags += --volumes-from $(APPNAME)_volumes)
