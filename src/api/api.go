@@ -1,7 +1,6 @@
-package main
+package api
 
 import (
-	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/ncarlier/webhookd/hook"
@@ -10,12 +9,7 @@ import (
 	"net/http"
 )
 
-var (
-	LAddr    = flag.String("l", ":8080", "HTTP service address (e.g.address, ':8080')")
-	NWorkers = flag.Int("n", 2, "The number of workers to start")
-)
-
-func Handler(w http.ResponseWriter, r *http.Request) {
+func createWebhookHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	hookname := params["hookname"]
 	action := params["action"]
@@ -52,18 +46,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Action %s of hook %s queued.", action, hookname)
 }
 
-func main() {
-	flag.Parse()
-
-	// Start the dispatcher.
-	fmt.Println("Starting the dispatcher")
-	worker.StartDispatcher(*NWorkers)
-
-	rtr := mux.NewRouter()
-	rtr.HandleFunc("/{hookname:[a-z]+}/{action:[a-z]+}", Handler).Methods("POST")
-
-	http.Handle("/", rtr)
-
-	fmt.Println("webhookd server listening...")
-	log.Fatal(http.ListenAndServe(*LAddr, nil))
+func Handlers() *mux.Router{
+	r := mux.NewRouter()
+	r.HandleFunc("/{hookname:[a-z]+}/{action:[a-z]+}", createWebhookHandler).Methods("POST")
+	return r
 }
+
