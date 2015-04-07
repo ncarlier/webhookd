@@ -8,6 +8,9 @@ It can be used as a cheap alternative of Docker hub in order to build private Do
 Installation
 ------------
 
+Binaries
+------
+
 Linux binaries for release [0.0.1](https://github.com/ncarlier/webhookd/releases)
 
 * [amd64](https://github.com/ncarlier/webhookd/releases/download/v0.0.1/webhookd-linux-amd64-v0.0.1.tar.gz)
@@ -18,6 +21,18 @@ Download the version you need, untar, and install to your PATH.
     $ tar xvzf webhookd-linux-amd64-v0.0.1.tar.gz
     $ ./webhookd
 
+Docker
+----
+
+Use the following make command to start docker containers:
+
+- **make build** will build the webhookd image
+- **make volume** (optionnal) will create volume that will contain the scripts *folder* inside the container (usefull for dev)
+- **make run** will run a container from the freshly build image. Optionaly, you can use:
+    - **make dev run** to use the volume container (dev)
+    - **make key dev run** to mount the volume and link the ssh folder containing technical ssh key
+
+
 Usage
 -------
 
@@ -27,12 +42,19 @@ Respect the following structure:
 
     /scripts
     |--> /bitbucket
-      |--> /echo.sh
-      |--> /build.sh
+      |--> /script_1.sh
+      |--> /script_2.sh
     |--> /github
+    |--> /gitlab
     |--> /docker
 
-The directory name right under the **scripts** directory defined the hookname.
+The hookname you will use will be related to the hook you want to use (github, bitbucket, ...) and the script name you want to call:
+For instance if you are **gitlab** and want to call **build.sh** then you will need to use:
+
+    http://webhook_ip:port/gitlab/build
+
+It is important to use the right hook in order for your script to received parameters extract from the hook payload.
+
 
 For now, supported hooks are:
 
@@ -41,9 +63,6 @@ For now, supported hooks are:
 - Bitbucket
 - Docker Hub
 
-The scripts under the **hook** directory defined the actions.
-
-The action script take parameters. These parameters are extract from the payload of the hook. For instance the GitHub hook extract the repository URL and name. Then pass them by parameter to the action script.
 
 Check the scripts directory for samples.
 

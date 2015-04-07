@@ -22,7 +22,11 @@ all: build
 
 volume:
 	echo "Building $(APPNAME) volumes..."
-	sudo docker run -v $(PWD):/opt/$(APPNAME) -v ~/var/$(APPNAME):/var/opt/$(APPNAME) --name $(APPNAME)_volumes busybox true
+	sudo docker run -v $(PWD):/var/opt/$(APPNAME) -v ~/var/$(APPNAME):/var/opt/$(APPNAME) --name $(APPNAME)_volumes busybox true
+
+key:
+	$(eval docker_run_flags += -v $(PWD)/ssh:/root/.ssh)
+	echo "Add private deploy key"
 
 mount:
 	$(eval docker_run_flags += --volumes-from $(APPNAME)_volumes)
