@@ -22,7 +22,10 @@ all: build
 
 volume:
 	echo "Building $(APPNAME) volumes..."
-	sudo docker run -v $(PWD):/var/opt/$(APPNAME) -v ~/var/$(APPNAME):/var/opt/$(APPNAME) --name $(APPNAME)_volumes busybox true
+	sudo docker run \
+		-v $(PWD)/src:/go/src/github.com/$(USERNAME)/$(APPNAME) \
+		-v $(PWD)/scripts:/var/opt/$(APPNAME)/scripts \
+		--name $(APPNAME)_volumes busybox true
 
 key:
 	$(eval docker_run_flags += -v $(PWD)/ssh:/root/.ssh)
@@ -30,7 +33,7 @@ key:
 
 mount:
 	$(eval docker_run_flags += --volumes-from $(APPNAME)_volumes)
-	echo "DEVMODE: Using volumes from $(APPNAME)_volumes"
+	echo "Using volumes from $(APPNAME)_volumes"
 
 build:
 	echo "Building $(IMAGE) docker image..."
