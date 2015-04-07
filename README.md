@@ -11,14 +11,14 @@ Installation
 Binaries
 ------
 
-Linux binaries for release [0.0.1](https://github.com/ncarlier/webhookd/releases)
+Linux binaries for release [0.0.2](https://github.com/ncarlier/webhookd/releases)
 
-* [amd64](https://github.com/ncarlier/webhookd/releases/download/v0.0.1/webhookd-linux-amd64-v0.0.1.tar.gz)
+* [amd64](https://github.com/ncarlier/webhookd/releases/download/v0.0.2/webhookd-linux-amd64-v0.0.2.tar.gz)
 
 Download the version you need, untar, and install to your PATH.
 
-    $ wget https://github.com/ncarlier/webhookd/releases/download/v0.0.1/webhookd-linux-amd64-v0.0.1.tar.gz
-    $ tar xvzf webhookd-linux-amd64-v0.0.1.tar.gz
+    $ wget https://github.com/ncarlier/webhookd/releases/download/v0.0.2/webhookd-linux-amd64-v0.0.2.tar.gz
+    $ tar xvzf webhookd-linux-amd64-v0.0.2.tar.gz
     $ ./webhookd
 
 Docker
