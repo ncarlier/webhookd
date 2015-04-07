@@ -7,7 +7,11 @@ Requires=docker.service
 ExecStartPre=-/usr/bin/docker pull ncarlier/webhookd:latest
 ExecStartPre=-/usr/bin/docker kill %p
 ExecStartPre=-/usr/bin/docker rm %p
-ExecStart=/usr/bin/docker run --rm --name %p -v /var/run/docker.sock:/var/run/docker.sock -v /media/data/webhookd/deploy_rsa:/root/.ssh/id_rsa --env-file /media/data/webhookd/env.conf -P ncarlier/webhookd
+ExecStart=/usr/bin/docker run --rm --name %p \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v /media/data/webhookd/deploy_rsa:/root/.ssh/id_rsa \
+    --env-file /media/data/webhookd/env.conf \
+    -P ncarlier/webhookd
 ExecStop=/usr/bin/docker stop %p
 
 [X-Fleet]
