@@ -1,5 +1,5 @@
 .SILENT :
-.PHONY : volume dev build clean run shell test dist
+.PHONY : volume mount build clean start stop rm shell test dist
 
 USERNAME:=ncarlier
 APPNAME:=webhookd
@@ -24,7 +24,7 @@ volume:
 	echo "Building $(APPNAME) volumes..."
 	sudo docker run -v $(PWD):/opt/$(APPNAME) -v ~/var/$(APPNAME):/var/opt/$(APPNAME) --name $(APPNAME)_volumes busybox true
 
-dev:
+mount:
 	$(eval docker_run_flags += --volumes-from $(APPNAME)_volumes)
 	echo "DEVMODE: Using volumes from $(APPNAME)_volumes"
 
@@ -32,11 +32,11 @@ build:
 	echo "Building $(IMAGE) docker image..."
 	sudo docker build --rm -t $(IMAGE) .
 
-clean:
+clean: stop rm
 	echo "Removing $(IMAGE) docker image..."
 	sudo docker rmi $(IMAGE)
 
-run:
+start:
 	echo "Running $(IMAGE) docker image..."
 	sudo docker run $(docker_run_flags) --name $(APPNAME) $(IMAGE)
 
