@@ -23,7 +23,7 @@ all: build
 volume:
 	echo "Building $(APPNAME) volumes..."
 	sudo docker run \
-		-v $(PWD)/src:/go/src/github.com/$(USERNAME)/$(APPNAME) \
+		-v $(PWD)/src:/go/src/$(ROOTPKG)/$(APPNAME) \
 		-v $(PWD)/scripts:/var/opt/$(APPNAME)/scripts \
 		--name $(APPNAME)_volumes busybox true
 

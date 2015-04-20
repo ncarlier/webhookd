@@ -2,6 +2,7 @@ package worker
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path"
@@ -10,6 +11,7 @@ import (
 var (
 	workingdir = os.Getenv("APP_WORKING_DIR")
 	scriptsdir = os.Getenv("APP_SCRIPTS_DIR")
+	scriptsdebug = os.Getenv("APP_SCRIPTS_DEBUG")
 )
 
 func RunScript(work *WorkRequest) (string, error) {
@@ -34,8 +36,14 @@ func RunScript(work *WorkRequest) (string, error) {
 	}
 
 	defer outfile.Close()
-	cmd.Stdout = outfile
-	cmd.Stderr = outfile
+	if scriptsdebug == "true" {
+		fmt.Println("Logging in console: ", scriptsdebug)
+		cmd.Stdout = io.MultiWriter(os.Stdout, outfile)
+		cmd.Stderr = io.MultiWriter(os.Stderr, outfile)
+	} else {
+		cmd.Stdout = outfile
+		cmd.Stderr = outfile
+	}
 
 	err = cmd.Start()
 	if err != nil {
