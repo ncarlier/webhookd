@@ -1,5 +1,8 @@
 # webhookd
 
+[![Image size](https://img.shields.io/imagelayers/image-size/ncarlier/webhookd/latest.svg)](https://hub.docker.com/r/ncarlier/webhookd/)
+[![Docker pulls](https://img.shields.io/docker/pulls/ncarlier/reader.svg)](https://hub.docker.com/r/ncarlier/webhookd/)
+
 A very simple webhook server to launch shell scripts.
 
 It can be used as a cheap alternative of Docker hub in order to build private Docker images.
