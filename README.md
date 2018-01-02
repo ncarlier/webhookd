@@ -7,25 +7,21 @@ A very simple webhook server to launch shell scripts.
 
 ## Installation
 
-### Using the binary
+Run the following command:
 
-Linux binaries for release [1.0.0](https://github.com/ncarlier/webhookd/releases)
-
-* [amd64](https://github.com/ncarlier/webhookd/releases/download/v1.0.0/webhookd-linux-amd64-v1.0.0.tar.gz)
-
-Download the version you need, untar, and install to your PATH.
-
-```
-$ wget https://github.com/ncarlier/webhookd/releases/download/v1.0.0/webhookd-linux-amd64-v1.0.0.tar.gz
-$ tar xvzf webhookd-linux-amd64-v1.0.0.tar.gz
-$ ./webhookd
+```bash
+$ go get -v github.com/ncarlier/webhookd/webhookd
 ```
 
-### Using Docker
+**Or** download the binary regarding your architecture:
 
-Start the container mounting your scripts directory:
-
+```bash
+$ sudo curl -s https://raw.githubusercontent.com/ncarlier/webhookd/master/install.sh | sh
 ```
+
+**Or** use Docker:
+
+```bash
 $ docker run -d --name=webhookd \
   --env-file .env \
   -v ${PWD}/scripts:/var/opt/webhookd/scripts \
