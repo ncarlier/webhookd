@@ -1,3 +1,2 @@
-dist/
-ssh
-etc/env.conf
+release/
+.vscode/

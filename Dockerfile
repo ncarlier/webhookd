@@ -1,42 +1,39 @@
-# webhookd image.
-#
-# VERSION 0.0.1
-#
-# BUILD-USING: docker build --rm -t ncarlier/webhookd .
+#########################################
+# Build stage
+#########################################
+FROM golang:1.8 AS builder
+MAINTAINER Nicolas Carlier <n.carlier@nunux.org>
 
-FROM golang:1.3
+# Repository location
+ARG REPOSITORY=github.com/ncarlier
 
+# Artifact name
+ARG ARTIFACT=webhookd
 
-# Install ssh-keygen
-RUN apt-get update && apt-get install -y ssh sudo
+# Copy sources into the container
+ADD . /go/src/$REPOSITORY/$ARTIFACT
 
-# Install the latest version of the docker CLI
-RUN curl -L -o /usr/local/bin/docker https://get.docker.io/builds/Linux/x86_64/docker-latest && \
-    chmod +x /usr/local/bin/docker
+# Set working directory
+WORKDIR /go/src/$REPOSITORY/$ARTIFACT
 
-# Install GO application
-WORKDIR /go/src/github.com/ncarlier/webhookd
-ADD ./src /go/src/github.com/ncarlier/webhookd
-RUN go get github.com/ncarlier/webhookd
+# Build the binary
+RUN make
 
-# Add scripts
-ADD ./scripts /var/opt/webhookd/scripts
+#########################################
+# Distribution stage
+#########################################
+FROM docker:dind
+MAINTAINER Nicolas Carlier <n.carlier@nunux.org>
 
-# Create work and ssh directories
-RUN mkdir /var/opt/webhookd/work
+# Repository location
+ARG REPOSITORY=github.com/ncarlier
 
-# Generate SSH deploiment key (should be overwrite by a volume)
-RUN ssh-keygen -N "" -f /root/.ssh/id_rsa
+# Artifact name
+ARG ARTIFACT=webhookd
 
-# Ignor strict host key checking
-RUN echo "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config && \
-    echo "Host bitbucket.org\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
+# Fix lib dep
+RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
 
-# Change workdir
-WORKDIR /var/opt/webhookd
+# Install binary
+COPY --from=builder /go/src/$REPOSITORY/$ARTIFACT/release/$ARTIFACT-linux-amd64 /usr/local/bin/$ARTIFACT
 
-# Port
-EXPOSE 8080
-
-CMD []
-ENTRYPOINT ["/go/bin/webhookd"]

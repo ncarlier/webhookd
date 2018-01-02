@@ -1,0 +1,3 @@
+[submodule "makefiles"]
+	path = makefiles
+	url = https://github.com/ncarlier/makefiles.git
