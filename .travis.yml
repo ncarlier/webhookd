@@ -1,0 +1,11 @@
+language: go
+go:
+- 1.8
+deploy:
+  provider: releases
+  api_key:
+    secure: VATbHmgR1DDXlIHEMpupuTggPU6wgtZk3BFK/eT5L+qqhnfSal1z+ZsypgWMGZN2Ch6WTRFaXqUhpV7N2oo+pQoXAYcDFWTd3BiTUied+pKVoUa8VuZFF2TW1cNcVJ3fnFPMFnpJPTYkld//+8s8zJQitTabE1QZdXNYPU1uUiY=
+  file: release/webhookd-linux-amd64
+  on:
+    repo: ncarlier/webhookd
+    tags: true
