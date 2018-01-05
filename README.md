@@ -26,7 +26,7 @@ $ docker run -d --name=webhookd \
   --env-file .env \
   -v ${PWD}/scripts:/var/opt/webhookd/scripts \
   -p 8080:8080 \
-  ncarlier/webhookd webhookd
+  ncarlier/webhookd
 ```
 
 Check the provided environment file [.env](.env) for details.
