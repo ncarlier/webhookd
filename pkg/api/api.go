@@ -55,10 +55,10 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 	// Put work in queue
 	worker.WorkQueue <- *work
 
-	r.Header.Set("Content-Type", "text/event-stream")
-	r.Header.Set("Cache-Control", "no-cache")
-	r.Header.Set("Connection", "keep-alive")
-	r.Header.Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	log.Println("Work request queued:", script)
 	fmt.Fprintf(w, "data: Hook work request \"%s\" queued...\n\n", work.Name)
