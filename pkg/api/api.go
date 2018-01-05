@@ -43,6 +43,7 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 
 	params := tools.QueryParamsToShellVars(r.URL.Query())
 	log.Printf("Calling hook script \"%s\" with params %s...\n", script, params)
+	params = append(params, tools.HTTPHeadersToShellVars(r.Header)...)
 
 	// Create work
 	work := new(worker.WorkRequest)

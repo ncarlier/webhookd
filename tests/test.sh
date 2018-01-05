@@ -10,5 +10,6 @@ curl -H "Content-Type: application/json" \
 
 echo "Test hook"
 curl -H "Content-Type: application/json" \
+    -H "X-API-Key: test" \
     --data @test.json \
     $URL/test?firstname=obi-wan\&lastname=kenobi

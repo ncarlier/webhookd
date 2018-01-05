@@ -87,11 +87,17 @@ data: done
 
 ### Webhook parameters
 
-You can add query parameters to the webhook URL.
-Those parameters will be available as environment variables into the shell
-script.
-You can also send a payload (text/plain or application/json) as request body.
-This payload will be transmit to the shell script as first parameter.
+You have several way to provide parameters to your webhook script:
+
+- URL query parameters and HTTP headers are converted into environment
+  variables.
+  Variable names follows "snakecase" naming convention.
+  Therefore the name can be altered.
+
+  *ex: `CONTENT-TYPE` will become `content_type`.*
+
+- Body content (text/plain or application/json) is transmit to the script as
+  parameter.
 
 *Example:*
 
@@ -100,7 +106,8 @@ The script:
 ```bash
 #!/bin/bash
 
-echo "Environment parameters: foo=$foo"
+echo "Query parameter: foo=$foo"
+echo "Header parameter: user-agent=$user_agent"
 echo "Script parameters: $1"
 ```
 
@@ -110,9 +117,11 @@ data: Hook work request "echo" queued...
 
 data: Running echo script...
 
-data: Environment parameters: foo=bar
+data: Query parameter: foo=bar
 
-data: Script parameters: {"foo": "bar"}
+data: Header parameter: user-agent=curl/7.52.1
+
+data: Script parameter: {"foo": "bar"}
 
 data: done
 ```
