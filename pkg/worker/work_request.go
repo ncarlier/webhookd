@@ -7,4 +7,5 @@ type WorkRequest struct {
 	Payload     string
 	Args        []string
 	MessageChan chan []byte
+	Timeout     int
 }

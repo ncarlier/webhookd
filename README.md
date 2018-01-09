@@ -126,7 +126,22 @@ data: Script parameter: {"foo": "bar"}
 data: done
 ```
 
-### Notifications
+### Webhook timeout configuration
+
+By default a webhook as a timeout of 10 seconds.
+This timeout is globally configurable by setting the environment variable:
+`APP_HOOK_TIMEOUT` (in seconds).
+
+You can override this global behavior per request by setting the HTTP header:
+`X-Hook-Timeout` (in seconds).
+
+*Example:*
+
+```bash
+$ curl -XPOST -H "X-Hook-Timeout: 5" http://localhost/echo?foo=bar
+```
+
+### Post hook notifications
 
 The script's output is collected and stored into a log file (configured by the
 `APP_WORKING_DIR` environment variable).

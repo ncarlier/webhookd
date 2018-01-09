@@ -3,17 +3,35 @@ package api
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
+	"os"
+	"strconv"
 	"strings"
 
 	"github.com/ncarlier/webhookd/pkg/hook"
+	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/tools"
 	"github.com/ncarlier/webhookd/pkg/worker"
 )
 
-// WebhookHandler is the main handler of the API.
-func WebhookHandler(w http.ResponseWriter, r *http.Request) {
+var (
+	defaultTimeout = atoiFallback(os.Getenv("APP_HOOK_TIMEOUT"), 10)
+)
+
+func atoiFallback(str string, fallback int) int {
+	value, err := strconv.Atoi(str)
+	if err != nil || value < 0 {
+		return fallback
+	}
+	return value
+}
+
+// Index is the main handler of the API.
+func Index() http.Handler {
+	return http.HandlerFunc(webhookHandler)
+}
+
+func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	flusher, ok := w.(http.Flusher)
 	if !ok {
 		http.Error(w, "Streaming unsupported!", http.StatusInternalServerError)
@@ -29,20 +47,20 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 	p := strings.TrimPrefix(r.URL.Path, "/")
 	script, err := hook.ResolveScript(p)
 	if err != nil {
-		log.Println(err.Error())
+		logger.Error.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Printf("Error reading body: %v", err)
+		logger.Error.Printf("Error reading body: %v", err)
 		http.Error(w, "can't read body", http.StatusBadRequest)
 		return
 	}
 
 	params := tools.QueryParamsToShellVars(r.URL.Query())
-	log.Printf("Calling hook script \"%s\" with params %s...\n", script, params)
+	logger.Debug.Printf("Calling hook script \"%s\" with params %s...\n", script, params)
 	params = append(params, tools.HTTPHeadersToShellVars(r.Header)...)
 
 	// Create work
@@ -52,6 +70,7 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 	work.Payload = string(body)
 	work.Args = params
 	work.MessageChan = make(chan []byte)
+	work.Timeout = atoiFallback(r.Header.Get("X-Hook-Timeout"), defaultTimeout)
 
 	// Put work in queue
 	worker.WorkQueue <- *work
@@ -61,7 +80,7 @@ func WebhookHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Connection", "keep-alive")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	log.Println("Work request queued:", script)
+	logger.Debug.Println("Work request queued:", script)
 	fmt.Fprintf(w, "data: Hook work request \"%s\" queued...\n\n", work.Name)
 
 	for {

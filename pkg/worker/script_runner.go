@@ -4,12 +4,12 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 	"path"
 	"time"
 
+	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/tools"
 )
 
@@ -32,7 +32,7 @@ func runScript(work *WorkRequest) (string, error) {
 		workingdir = os.TempDir()
 	}
 
-	log.Println("Starting script:", work.Script, "...")
+	logger.Info.Println("Executing script", work.Script, "...")
 	binary, err := exec.LookPath(work.Script)
 	if err != nil {
 		return "", err
@@ -50,7 +50,7 @@ func runScript(work *WorkRequest) (string, error) {
 		return "", err
 	}
 	defer logFile.Close()
-	log.Println("Writing output to file: ", logFilename, "...")
+	logger.Debug.Println("Writing output to file: ", logFilename, "...")
 
 	wLogFile := bufio.NewWriter(logFile)
 
@@ -73,22 +73,28 @@ func runScript(work *WorkRequest) (string, error) {
 			work.MessageChan <- []byte(line)
 			// writing to outfile
 			if _, err := wLogFile.WriteString(line + "\n"); err != nil {
-				log.Println("Error while writing into the log file:", logFilename, err)
+				logger.Error.Println("Error while writing into the log file:", logFilename, err)
 			}
 			if err = wLogFile.Flush(); err != nil {
-				log.Println("Error while flushing the log file:", logFilename, err)
+				logger.Error.Println("Error while flushing the log file:", logFilename, err)
 			}
 		}
 		if err := scanner.Err(); err != nil {
-			log.Println("Error scanning the script stdout: ", logFilename, err)
+			logger.Error.Println("Error scanning the script stdout: ", logFilename, err)
 		}
 	}(r)
 
+	timer := time.AfterFunc(time.Duration(work.Timeout)*time.Second, func() {
+		logger.Warning.Printf("Timeout reached (%ds). Killing script: %s\n", work.Timeout, work.Script)
+		cmd.Process.Kill()
+	})
 	err = cmd.Wait()
 	if err != nil {
-		log.Println("Starting script:", work.Script, "-> ERROR")
+		timer.Stop()
+		logger.Info.Println("Script", work.Script, "executed with ERROR.")
 		return logFilename, err
 	}
-	log.Println("Starting script:", work.Script, "-> OK")
+	timer.Stop()
+	logger.Info.Println("Script", work.Script, "executed wit SUCCESS")
 	return logFilename, nil
 }
