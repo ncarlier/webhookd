@@ -1,6 +1,8 @@
 package worker
 
-import "log"
+import (
+	"github.com/ncarlier/webhookd/pkg/logger"
+)
 
 var WorkerQueue chan chan WorkRequest
 var WorkQueue = make(chan WorkRequest, 100)
@@ -12,7 +14,7 @@ func StartDispatcher(nworkers int) {
 
 	// Now, create all of our workers.
 	for i := 0; i < nworkers; i++ {
-		log.Println("Starting worker", i+1)
+		logger.Debug.Println("Starting worker", i+1)
 		worker := NewWorker(i+1, WorkerQueue)
 		worker.Start()
 	}
@@ -21,11 +23,11 @@ func StartDispatcher(nworkers int) {
 		for {
 			select {
 			case work := <-WorkQueue:
-				log.Println("Received work request:", work.Name)
+				logger.Debug.Println("Received work request:", work.Name)
 				go func() {
 					worker := <-WorkerQueue
 
-					log.Println("Dispatching work request:", work.Name)
+					logger.Debug.Println("Dispatching work request:", work.Name)
 					worker <- work
 				}()
 			}

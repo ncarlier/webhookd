@@ -3,9 +3,10 @@ package hook
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"path"
+
+	"github.com/ncarlier/webhookd/pkg/logger"
 )
 
 var (
@@ -19,7 +20,7 @@ func ResolveScript(p string) (string, error) {
 	}
 
 	script := path.Join(scriptsdir, fmt.Sprintf("%s.sh", p))
-	log.Println("Resolving script: ", script, "...")
+	logger.Debug.Println("Resolving script: ", script, "...")
 	if _, err := os.Stat(script); os.IsNotExist(err) {
 		return "", errors.New("Script not found: " + script)
 	}

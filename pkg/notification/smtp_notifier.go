@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/smtp"
 	"os"
+
+	"github.com/ncarlier/webhookd/pkg/logger"
 )
 
 // SMTPNotifier is able to send notifcation to a email destination.
@@ -33,7 +35,7 @@ func newSMTPNotifier() *SMTPNotifier {
 
 // Notify send a notification to a email destination.
 func (n *SMTPNotifier) Notify(subject string, text string, attachfile string) {
-	log.Println("SMTP notification: ", subject)
+	logger.Debug.Println("SMTP notification: ", subject)
 	// Connect to the remote SMTP server.
 	c, err := smtp.Dial(n.Host)
 	if err != nil {

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
@@ -12,6 +11,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/ncarlier/webhookd/pkg/logger"
 )
 
 // HTTPNotifier is able to send a notification to a HTTP endpoint.
@@ -26,7 +27,7 @@ func newHTTPNotifier() *HTTPNotifier {
 	notifier := new(HTTPNotifier)
 	notifier.URL = os.Getenv("APP_HTTP_NOTIFIER_URL")
 	if notifier.URL == "" {
-		log.Println("Unable to create HTTP notifier. APP_HTTP_NOTIFIER_URL not set.")
+		logger.Error.Println("Unable to create HTTP notifier. APP_HTTP_NOTIFIER_URL not set.")
 		return nil
 	}
 	user := os.Getenv("APP_HTTP_NOTIFIER_USER")
@@ -46,7 +47,7 @@ func newHTTPNotifier() *HTTPNotifier {
 
 // Notify send a notification to a HTTP endpoint.
 func (n *HTTPNotifier) Notify(subject string, text string, attachfile string) {
-	log.Println("Sending notification '" + subject + "' to " + n.URL + " ...")
+	logger.Debug.Println("Sending notification '" + subject + "' to " + n.URL + " ...")
 	data := make(url.Values)
 	data.Set("from", n.From)
 	data.Set("to", n.To)
@@ -56,7 +57,7 @@ func (n *HTTPNotifier) Notify(subject string, text string, attachfile string) {
 	if attachfile != "" {
 		file, err := os.Open(attachfile)
 		if err != nil {
-			log.Println(err)
+			logger.Error.Println("Unable to open notification attachment file", err)
 			return
 		}
 		defer file.Close()
@@ -69,7 +70,7 @@ func (n *HTTPNotifier) Notify(subject string, text string, attachfile string) {
 		mh.Set("Content-Disposition", fmt.Sprintf("form-data; name=\"attachment\"; filename=\"%s\"", filepath.Base(attachfile)))
 		part, err := writer.CreatePart(mh)
 		if err != nil {
-			log.Println("Unable to create for file", err)
+			logger.Error.Println("Unable to create HTTP notification attachment", err)
 			return
 		}
 		_, err = io.Copy(part, file)
@@ -80,12 +81,12 @@ func (n *HTTPNotifier) Notify(subject string, text string, attachfile string) {
 
 		err = writer.Close()
 		if err != nil {
-			log.Println("Unable to close the gzip writer", err)
+			logger.Error.Println("Unable to close the gzip writer", err)
 			return
 		}
 		req, err := http.NewRequest("POST", n.URL, body)
 		if err != nil {
-			log.Println("Unable to post request", err)
+			logger.Error.Println("Unable to post HTTP notification", err)
 		}
 		defer req.Body.Close()
 		req.Header.Set("Content-Type", writer.FormDataContentType())
@@ -98,21 +99,21 @@ func (n *HTTPNotifier) Notify(subject string, text string, attachfile string) {
 		client := &http.Client{}
 		res, err := client.Do(req)
 		if err != nil {
-			log.Println("Unable to do the request", err)
+			logger.Error.Println("Unable to do HTTP notification request", err)
 			return
 		}
 
 		// Check the response
 		if res.StatusCode != http.StatusOK {
-			log.Println("bad status: ", res.Status)
-			log.Println(res.Body)
+			logger.Error.Println("HTTP notification bad response: ", res.Status)
+			logger.Debug.Println(res.Body)
 			return
 		}
-		log.Println("HTTP notification sended with attachment: ", attachfile)
+		logger.Info.Println("HTTP notification sent with attachment: ", attachfile)
 	} else {
 		req, err := http.NewRequest("POST", n.URL, bytes.NewBufferString(data.Encode()))
 		if err != nil {
-			log.Println("Unable to post request", err)
+			logger.Error.Println("Unable to post HTTP notification request", err)
 		}
 		defer req.Body.Close()
 
@@ -124,16 +125,16 @@ func (n *HTTPNotifier) Notify(subject string, text string, attachfile string) {
 		client := &http.Client{}
 		res, err := client.Do(req)
 		if err != nil {
-			log.Println("Unable to do the request", err)
+			logger.Error.Println("Unable to do the HTTP notification request", err)
 			return
 		}
 
 		// Check the response
 		if res.StatusCode != http.StatusOK {
-			log.Println("bad status: ", res.Status)
-			log.Println(res.Body)
+			logger.Error.Println("HTTP notification bad response: ", res.Status)
+			logger.Debug.Println(res.Body)
 			return
 		}
-		log.Println("HTTP notification sended.")
+		logger.Info.Println("HTTP notification sent.")
 	}
 }

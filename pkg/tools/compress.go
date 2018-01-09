@@ -4,8 +4,9 @@ import (
 	"bufio"
 	"compress/gzip"
 	"fmt"
-	"log"
 	"os"
+
+	"github.com/ncarlier/webhookd/pkg/logger"
 )
 
 // CompressFile is a simple file gzipper.
@@ -17,7 +18,7 @@ func CompressFile(filename string) (zipfile string, err error) {
 	}
 	out, err := os.Create(zipfile)
 	if err != nil {
-		log.Println("Unable to create gzip file", err)
+		logger.Error.Println("Unable to create gzip file", err)
 		return
 	}
 
@@ -30,9 +31,9 @@ func CompressFile(filename string) (zipfile string, err error) {
 
 	_, err = bufin.WriteTo(gw)
 	if err != nil {
-		log.Println("Unable to write into the gzip file", err)
+		logger.Error.Println("Unable to write into the gzip file", err)
 		return
 	}
-	log.Println("Gzip file created: ", zipfile)
+	logger.Debug.Println("Gzip file created: ", zipfile)
 	return
 }

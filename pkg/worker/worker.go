@@ -2,8 +2,8 @@ package worker
 
 import (
 	"fmt"
-	"log"
 
+	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/notification"
 	"github.com/ncarlier/webhookd/pkg/tools"
 )
@@ -41,7 +41,7 @@ func (w Worker) Start() {
 			select {
 			case work := <-w.Work:
 				// Receive a work request.
-				log.Printf("Worker%d received work request: %s\n", w.ID, work.Name)
+				logger.Debug.Printf("Worker%d received work request: %s\n", w.ID, work.Name)
 				filename, err := runScript(&work)
 				if err != nil {
 					subject := fmt.Sprintf("Webhook %s FAILED.", work.Name)
@@ -54,7 +54,7 @@ func (w Worker) Start() {
 				}
 				close(work.MessageChan)
 			case <-w.QuitChan:
-				log.Printf("Stopping worker%d...\n", w.ID)
+				logger.Debug.Printf("Stopping worker%d...\n", w.ID)
 				return
 			}
 		}
@@ -72,11 +72,11 @@ func (w Worker) Stop() {
 func notify(subject string, text string, outfilename string) {
 	var notifier, err = notification.NotifierFactory()
 	if err != nil {
-		log.Println("Unable to get the notifier. Notification skipped:", err)
+		logger.Info.Println("Unable to get the notifier. Notification skipped:", err)
 		return
 	}
 	if notifier == nil {
-		log.Println("Notification provider not found. Notification skipped.")
+		logger.Error.Println("Notification provider not found. Notification skipped.")
 		return
 	}
 
