@@ -16,7 +16,7 @@ $ go get -v github.com/ncarlier/webhookd/webhookd
 **Or** download the binary regarding your architecture:
 
 ```bash
-$ sudo curl -s https://raw.githubusercontent.com/ncarlier/webhookd/master/install.sh | sh
+$ sudo curl -s https://raw.githubusercontent.com/ncarlier/webhookd/master/install.sh | bash
 ```
 
 **Or** use Docker:
