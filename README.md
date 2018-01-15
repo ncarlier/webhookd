@@ -1,6 +1,6 @@
 # webhookd
 
-[![Image size](https://img.shields.io/imagelayers/image-size/ncarlier/webhookd/latest.svg)](https://hub.docker.com/r/ncarlier/webhookd/)
+[![Image size](https://images.microbadger.com/badges/image/ncarlier/webhookd.svg)](https://microbadger.com/images/ncarlier/webhookd)
 [![Docker pulls](https://img.shields.io/docker/pulls/ncarlier/webhookd.svg)](https://hub.docker.com/r/ncarlier/webhookd/)
 
 A very simple webhook server to launch shell scripts.
