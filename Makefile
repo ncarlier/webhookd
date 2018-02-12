@@ -22,7 +22,7 @@ ARTEFACT=release/$(APPNAME)-$(GOOS)-$(GOARCH)$(EXT)
 
 # Extract version infos
 VERSION:=`git describe --tags`
-LDFLAGS=-ldflags "-X $(AUTHOR)/$(APPNAME)/version.App=${VERSION}"
+LDFLAGS=-ldflags "-X $(AUTHOR)/$(APPNAME)/main.Version=${VERSION}"
 
 all: build
 
@@ -52,7 +52,7 @@ $(ARTEFACT): build
 
 ## Run tests
 test:
-	go test
+	cd $(APPBASE)/$(APPNAME) && go test `go list ./... | grep -v vendor`
 .PHONY: test
 
 ## Install executable
@@ -66,4 +66,22 @@ image:
 	echo "Building Docker inage ..."
 	docker build --rm -t ncarlier/$(APPNAME) .
 .PHONY: image
+
+## Generate changelog
+changelog:
+	standard-changelog --first-release
+.PHONY: changelog
+
+## GZIP executable
+gzip:
+	tar cvzf $(ARTEFACT).tgz $(ARTEFACT)
+.PHONY: gzip
+
+## Create distribution binaries
+distribution:
+	GOARCH=amd64 make build gzip
+	GOARCH=arm64 make build gzip
+	GOARCH=arm make build gzip
+	GOOS=darwin make build gzip
+.PHONY: distribution
 
