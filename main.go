@@ -16,6 +16,9 @@ import (
 	"github.com/ncarlier/webhookd/pkg/worker"
 )
 
+// Version of the app
+var Version = "snapshot"
+
 type key int
 
 const (
