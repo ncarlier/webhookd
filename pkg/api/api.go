@@ -64,13 +64,8 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	params = append(params, tools.HTTPHeadersToShellVars(r.Header)...)
 
 	// Create work
-	work := new(worker.WorkRequest)
-	work.Name = p
-	work.Script = script
-	work.Payload = string(body)
-	work.Args = params
-	work.MessageChan = make(chan []byte)
-	work.Timeout = atoiFallback(r.Header.Get("X-Hook-Timeout"), defaultTimeout)
+	timeout := atoiFallback(r.Header.Get("X-Hook-Timeout"), defaultTimeout)
+	work := worker.NewWorkRequest(p, script, string(body), params, timeout)
 
 	// Put work in queue
 	worker.WorkQueue <- *work
@@ -81,7 +76,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	logger.Debug.Println("Work request queued:", script)
-	fmt.Fprintf(w, "data: Hook work request \"%s\" queued...\n\n", work.Name)
+	// fmt.Fprintf(w, "data: Running \"%s\" ...\n\n", work.Name)
 
 	for {
 		msg, open := <-work.MessageChan

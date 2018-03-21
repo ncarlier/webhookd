@@ -52,6 +52,7 @@ func (w Worker) Start() {
 					work.MessageChan <- []byte("done")
 					notify(subject, "See attachment.", filename)
 				}
+				work.Closed = true
 				close(work.MessageChan)
 			case <-w.QuitChan:
 				logger.Debug.Printf("Stopping worker%d...\n", w.ID)
@@ -72,7 +73,7 @@ func (w Worker) Stop() {
 func notify(subject string, text string, outfilename string) {
 	var notifier, err = notification.NotifierFactory()
 	if err != nil {
-		logger.Info.Println("Unable to get the notifier. Notification skipped:", err)
+		logger.Debug.Println("Unable to get the notifier. Notification skipped:", err)
 		return
 	}
 	if notifier == nil {

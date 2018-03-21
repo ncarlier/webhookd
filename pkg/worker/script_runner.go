@@ -68,6 +68,10 @@ func runScript(work *WorkRequest) (string, error) {
 	go func(reader io.Reader) {
 		scanner := bufio.NewScanner(reader)
 		for scanner.Scan() {
+			if work.Closed {
+				logger.Error.Println("Unable to write into the work channel. Work request closed.")
+				return
+			}
 			// writing to the work channel
 			line := scanner.Text()
 			work.MessageChan <- []byte(line)
@@ -95,6 +99,6 @@ func runScript(work *WorkRequest) (string, error) {
 		return logFilename, err
 	}
 	timer.Stop()
-	logger.Info.Println("Script", work.Script, "executed wit SUCCESS")
+	logger.Info.Println("Script", work.Script, "executed with SUCCESS")
 	return logFilename, nil
 }
