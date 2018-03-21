@@ -55,12 +55,9 @@ func main() {
 	}
 
 	server := &http.Server{
-		Addr:         *listenAddr,
-		Handler:      tracing(nextRequestID)(logging(logger.Debug)(router)),
-		ErrorLog:     logger.Error,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  15 * time.Second,
+		Addr:     *listenAddr,
+		Handler:  tracing(nextRequestID)(logging(logger.Debug)(router)),
+		ErrorLog: logger.Error,
 	}
 
 	// Start the dispatcher.
