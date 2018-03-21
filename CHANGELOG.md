@@ -1,5 +1,11 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.2.1...v) (2018-02-12)
+# [](https://github.com/ncarlier/webhookd/compare/v1.2.1...v) (2018-03-21)
+
+
+### Bug Fixes
+
+* **server:** remove global server timeouts ([1e38906](https://github.com/ncarlier/webhookd/commit/1e38906))
+* fix panic due to writing into closed chan ([2a22680](https://github.com/ncarlier/webhookd/commit/2a22680))
 
 
 
