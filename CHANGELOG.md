@@ -1,5 +1,15 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.2.2...v) (2018-03-21)
+# [](https://github.com/ncarlier/webhookd/compare/v1.2.3...v) (2018-05-06)
+
+
+
+<a name="1.2.3"></a>
+## [1.2.3](https://github.com/ncarlier/webhookd/compare/v1.2.2...v1.2.3) (2018-05-06)
+
+
+### Bug Fixes
+
+* **docker:** add bash shell to the Docker image ([d760073](https://github.com/ncarlier/webhookd/commit/d760073))
 
 
 
