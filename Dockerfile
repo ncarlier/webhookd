@@ -40,6 +40,9 @@ RUN apk add --no-cache git openssh-client jq
 # Install binary and default scripts
 COPY --from=builder /go/src/$REPOSITORY/$ARTIFACT/release/$ARTIFACT-linux-amd64 /usr/local/bin/$ARTIFACT
 COPY --from=builder /go/src/$REPOSITORY/$ARTIFACT/scripts /opt/scripts
+COPY docker-entrypoint.sh /
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 # Define command
 CMD webhookd
