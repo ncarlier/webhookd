@@ -29,10 +29,37 @@ $ docker run -d --name=webhookd \
   ncarlier/webhookd
 ```
 
-Check the provided environment file [.env](.env) for details.
+Check the provided environment file [.env](.env) for configuration details.
 
 > Note that this image extends `docker:dind` Docker image. Therefore you are
 > able to interact with a Docker daemon with yours shell scripts.
+
+## Configuration
+
+You can configure the daemon by:
+
+### Setting environment variables:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `APP_HOOK_TIMEOUT` | `10` | Hook maximum delay before timeout (in second) |
+| `APP_SCRIPTS_DIR` | `./scripts` | Scripts directory |
+| `APP_SCRIPTS_GIT_URL` | none | GIT repository that contains scripts (Note: this is only used by the Docker image or by using the Docker entrypoint script) |
+| `APP_SCRIPTS_GIT_KEY` | none | GIT SSH private key used to clone the repository (Note: this is only used by the Docker image or by using the Docker entrypoint script) |
+| `APP_WORKING_DIR` | `/tmp` (OS temp dir) | Working directory (to store execution logs) |
+| `APP_NOTIFIER` | none | Post script notification (`http` or `smtp`) |
+| `APP_NOTIFIER_FROM` | none | Sender of the notification |
+| `APP_NOTIFIER_TO` | none | Recipient of the notification |
+| `APP_HTTP_NOTIFIER_URL` | none | URL of the HTTP notifier |
+| `APP_SMTP_NOTIFIER_HOST` | none | Hostname of the SMTP relay |
+
+### Using command parameters:
+
+| Parameter | Default | Description |
+|----------|---------|-------------|
+| `-l <address>` | `:8080` | HTTP service address |
+| `-n <workers>` | `2` | The number of workers to start |
+| `-d` | false | Output debug logs |
 
 ## Usage
 
