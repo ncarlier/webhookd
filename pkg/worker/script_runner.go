@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"syscall"
 	"time"
 
 	"github.com/ncarlier/webhookd/pkg/logger"
@@ -42,6 +43,8 @@ func runScript(work *WorkRequest) (string, error) {
 	cmd := exec.Command(binary, work.Payload)
 	// with env variables...
 	cmd.Env = append(os.Environ(), work.Args...)
+	// using a process group...
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
 	// Open the out file for writing
 	logFilename := path.Join(workingdir, fmt.Sprintf("%s_%s.txt", tools.ToSnakeCase(work.Name), time.Now().Format("20060102_1504")))
@@ -90,7 +93,7 @@ func runScript(work *WorkRequest) (string, error) {
 
 	timer := time.AfterFunc(time.Duration(work.Timeout)*time.Second, func() {
 		logger.Warning.Printf("Timeout reached (%ds). Killing script: %s\n", work.Timeout, work.Script)
-		cmd.Process.Kill()
+		syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
 	})
 	err = cmd.Wait()
 	if err != nil {
