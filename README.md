@@ -60,8 +60,8 @@ You can configure the daemon by:
 
 | Parameter | Default | Description |
 |----------|---------|-------------|
-| `-l | --listen <address>` | `:8080` | HTTP service address |
-| `-d | --debug` | false | Output debug logs |
+| `-l <address> or --listen <address>` | `:8080` | HTTP service address |
+| `-d or --debug` | false | Output debug logs |
 | `--nb-workers <workers>` | `2` | The number of workers to start |
 | `--scripts <dir>` | `./scripts` | Scripts directory |
 | `--timeout <timeout>` | `10` | Hook maximum delay before timeout (in second) |
