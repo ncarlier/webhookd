@@ -1,5 +1,21 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.2.3...v) (2018-05-06)
+# [](https://github.com/ncarlier/webhookd/compare/v1.2.4...v) (2018-07-23)
+
+
+
+<a name="1.2.4"></a>
+## [1.2.4](https://github.com/ncarlier/webhookd/compare/v1.2.3...v1.2.4) (2018-07-23)
+
+
+### Bug Fixes
+
+* **script:** kill script process and sub process on timeout ([92ef4e4](https://github.com/ncarlier/webhookd/commit/92ef4e4))
+
+
+### Features
+
+* add Docker entrypoint ([4b58677](https://github.com/ncarlier/webhookd/commit/4b58677))
+* **config:** improve configuration flags ([eb699dd](https://github.com/ncarlier/webhookd/commit/eb699dd))
 
 
 
