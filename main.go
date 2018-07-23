@@ -29,17 +29,11 @@ var (
 	healthy int32
 )
 
-var (
-	listenAddr = flag.String("l", ":8080", "HTTP service address (e.g.address, ':8080')")
-	nbWorkers  = flag.Int("n", 2, "The number of workers to start")
-	debug      = flag.Bool("d", false, "Output debug logs")
-)
-
 func main() {
 	flag.Parse()
 
 	level := "info"
-	if *debug {
+	if *config.Debug {
 		level = "debug"
 	}
 	logger.Init(level)
@@ -47,7 +41,7 @@ func main() {
 	logger.Debug.Println("Starting webhookd server...")
 
 	router := http.NewServeMux()
-	router.Handle("/", api.Index())
+	router.Handle("/", api.Index(*config.Timeout, *config.ScriptDir))
 	router.Handle("/healthz", healthz())
 
 	nextRequestID := func() string {
@@ -55,14 +49,14 @@ func main() {
 	}
 
 	server := &http.Server{
-		Addr:     *listenAddr,
+		Addr:     *config.ListenAddr,
 		Handler:  tracing(nextRequestID)(logging(logger.Debug)(router)),
 		ErrorLog: logger.Error,
 	}
 
 	// Start the dispatcher.
-	logger.Debug.Printf("Starting the dispatcher (%d workers)...\n", *nbWorkers)
-	worker.StartDispatcher(*nbWorkers)
+	logger.Debug.Printf("Starting the dispatcher (%d workers)...\n", *config.NbWorkers)
+	worker.StartDispatcher(*config.NbWorkers)
 
 	done := make(chan bool)
 	quit := make(chan os.Signal, 1)
@@ -83,10 +77,10 @@ func main() {
 		close(done)
 	}()
 
-	logger.Info.Println("Server is ready to handle requests at", *listenAddr)
+	logger.Info.Println("Server is ready to handle requests at", *config.ListenAddr)
 	atomic.StoreInt32(&healthy, 1)
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		logger.Error.Fatalf("Could not listen on %s: %v\n", *listenAddr, err)
+		logger.Error.Fatalf("Could not listen on %s: %v\n", *config.ListenAddr, err)
 	}
 
 	<-done
