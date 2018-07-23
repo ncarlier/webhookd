@@ -42,6 +42,8 @@ You can configure the daemon by:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
+| `APP_LISTEN_ADDR` | `:8080` | HTTP service address |
+| `APP_NB_WORKERS` | `2` | The number of workers to start |
 | `APP_HOOK_TIMEOUT` | `10` | Hook maximum delay before timeout (in second) |
 | `APP_SCRIPTS_DIR` | `./scripts` | Scripts directory |
 | `APP_SCRIPTS_GIT_URL` | none | GIT repository that contains scripts (Note: this is only used by the Docker image or by using the Docker entrypoint script) |
@@ -52,14 +54,17 @@ You can configure the daemon by:
 | `APP_NOTIFIER_TO` | none | Recipient of the notification |
 | `APP_HTTP_NOTIFIER_URL` | none | URL of the HTTP notifier |
 | `APP_SMTP_NOTIFIER_HOST` | none | Hostname of the SMTP relay |
+| `APP_DEBUG` | `false` | Output debug logs |
 
 ### Using command parameters:
 
 | Parameter | Default | Description |
 |----------|---------|-------------|
-| `-l <address>` | `:8080` | HTTP service address |
-| `-n <workers>` | `2` | The number of workers to start |
-| `-d` | false | Output debug logs |
+| `-l | --listen <address>` | `:8080` | HTTP service address |
+| `-d | --debug` | false | Output debug logs |
+| `--nb-workers <workers>` | `2` | The number of workers to start |
+| `--scripts <dir>` | `./scripts` | Scripts directory |
+| `--timeout <timeout>` | `10` | Hook maximum delay before timeout (in second) |
 
 ## Usage
 

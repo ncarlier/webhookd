@@ -4,30 +4,30 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 
-	"github.com/ncarlier/webhookd/pkg/hook"
 	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/tools"
 	"github.com/ncarlier/webhookd/pkg/worker"
 )
 
 var (
-	defaultTimeout = atoiFallback(os.Getenv("APP_HOOK_TIMEOUT"), 10)
+	defaultTimeout int
+	scriptDir      string
 )
 
 func atoiFallback(str string, fallback int) int {
-	value, err := strconv.Atoi(str)
-	if err != nil || value < 0 {
-		return fallback
+	if value, err := strconv.Atoi(str); err == nil && value > 0 {
+		return value
 	}
-	return value
+	return fallback
 }
 
 // Index is the main handler of the API.
-func Index() http.Handler {
+func Index(timeout int, scrDir string) http.Handler {
+	defaultTimeout = timeout
+	scriptDir = scrDir
 	return http.HandlerFunc(webhookHandler)
 }
 
@@ -45,7 +45,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get script location
 	p := strings.TrimPrefix(r.URL.Path, "/")
-	script, err := hook.ResolveScript(p)
+	script, err := tools.ResolveScript(scriptDir, p)
 	if err != nil {
 		logger.Error.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusNotFound)
