@@ -23,11 +23,10 @@ func StartDispatcher(nworkers int) {
 		for {
 			select {
 			case work := <-WorkQueue:
-				logger.Debug.Println("Received work request:", work.Name)
 				go func() {
 					worker := <-WorkerQueue
 
-					logger.Debug.Println("Dispatching work request:", work.Name)
+					logger.Debug.Printf("Dispatching work request: %s#%d", work.Name, work.ID)
 					worker <- work
 				}()
 			}

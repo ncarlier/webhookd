@@ -41,21 +41,21 @@ func (w Worker) Start() {
 			select {
 			case work := <-w.Work:
 				// Receive a work request.
-				logger.Debug.Printf("Worker%d received work request: %s\n", w.ID, work.Name)
+				logger.Debug.Printf("Worker #%d received work request: %s#%d\n", w.ID, work.Name, work.ID)
 				filename, err := runScript(&work)
 				if err != nil {
-					subject := fmt.Sprintf("Webhook %s FAILED.", work.Name)
+					subject := fmt.Sprintf("Webhook %s#%d FAILED.", work.Name, work.ID)
 					work.MessageChan <- []byte(fmt.Sprintf("error: %s", err.Error()))
 					notify(subject, err.Error(), filename)
 				} else {
-					subject := fmt.Sprintf("Webhook %s SUCCEEDED.", work.Name)
+					subject := fmt.Sprintf("Webhook %s#%d SUCCEEDED.", work.Name, workID)
 					work.MessageChan <- []byte("done")
 					notify(subject, "See attachment.", filename)
 				}
 				work.Closed = true
 				close(work.MessageChan)
 			case <-w.QuitChan:
-				logger.Debug.Printf("Stopping worker%d...\n", w.ID)
+				logger.Debug.Printf("Stopping worker #%d...\n", w.ID)
 				return
 			}
 		}
@@ -77,7 +77,7 @@ func notify(subject string, text string, outfilename string) {
 		return
 	}
 	if notifier == nil {
-		logger.Error.Println("Notification provider not found. Notification skipped.")
+		logger.Debug.Println("Notification provider not found. Notification skipped.")
 		return
 	}
 
