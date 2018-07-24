@@ -33,7 +33,10 @@ func runScript(work *WorkRequest) (string, error) {
 		workingdir = os.TempDir()
 	}
 
-	logger.Info.Println("Executing script", work.Script, "...")
+	logger.Info.Printf("Work %s#%d started...\n", work.Name, work.ID)
+	logger.Debug.Printf("Work %s#%d script: %s\n", work.Name, work.ID, work.Script)
+	logger.Debug.Printf("Work %s#%d parameter: %v\n", work.Name, work.ID, work.Args)
+
 	binary, err := exec.LookPath(work.Script)
 	if err != nil {
 		return "", err
@@ -47,13 +50,13 @@ func runScript(work *WorkRequest) (string, error) {
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
 	// Open the out file for writing
-	logFilename := path.Join(workingdir, fmt.Sprintf("%s_%s.txt", tools.ToSnakeCase(work.Name), time.Now().Format("20060102_1504")))
+	logFilename := path.Join(workingdir, fmt.Sprintf("%s_%d_%s.txt", tools.ToSnakeCase(work.Name), work.ID, time.Now().Format("20060102_1504")))
 	logFile, err := os.Create(logFilename)
 	if err != nil {
 		return "", err
 	}
 	defer logFile.Close()
-	logger.Debug.Println("Writing output to file: ", logFilename, "...")
+	logger.Debug.Printf("Work %s#%d output to file: %s\n", work.Name, work.ID, logFilename)
 
 	wLogFile := bufio.NewWriter(logFile)
 
@@ -71,37 +74,36 @@ func runScript(work *WorkRequest) (string, error) {
 	go func(reader io.Reader) {
 		scanner := bufio.NewScanner(reader)
 		for scanner.Scan() {
-			if work.Closed {
-				logger.Error.Println("Unable to write into the work channel. Work request closed.")
-				return
-			}
-			// writing to the work channel
 			line := scanner.Text()
-			work.MessageChan <- []byte(line)
+			// writing to the work channel
+			if !work.Closed {
+				work.MessageChan <- []byte(line)
+			} else {
+				logger.Error.Printf("Work %s#%d is closed. Unable to write into the work channel: %s\n", work.Name, work.ID, line)
+			}
 			// writing to outfile
 			if _, err := wLogFile.WriteString(line + "\n"); err != nil {
 				logger.Error.Println("Error while writing into the log file:", logFilename, err)
 			}
-			if err = wLogFile.Flush(); err != nil {
-				logger.Error.Println("Error while flushing the log file:", logFilename, err)
-			}
 		}
 		if err := scanner.Err(); err != nil {
-			logger.Error.Println("Error scanning the script stdout: ", logFilename, err)
+			logger.Error.Printf("Work %s#%d unable to read script stdout: %v\n", work.Name, work.ID, err)
+		}
+		if err = wLogFile.Flush(); err != nil {
+			logger.Error.Println("Error while flushing the log file:", logFilename, err)
 		}
 	}(r)
 
 	timer := time.AfterFunc(time.Duration(work.Timeout)*time.Second, func() {
-		logger.Warning.Printf("Timeout reached (%ds). Killing script: %s\n", work.Timeout, work.Script)
+		logger.Warning.Printf("Work %s#%d has timed out (%ds). Killing process #%d...\n", work.Name, work.ID, work.Timeout, cmd.Process.Pid)
 		syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
 	})
 	err = cmd.Wait()
+	timer.Stop()
 	if err != nil {
-		timer.Stop()
-		logger.Info.Println("Script", work.Script, "executed with ERROR.")
+		logger.Info.Printf("Work %s#%d done [ERROR]\n", work.Name, work.ID)
 		return logFilename, err
 	}
-	timer.Stop()
-	logger.Info.Println("Script", work.Script, "executed with SUCCESS")
+	logger.Info.Printf("Work %s#%d done [SUCCESS]\n", work.Name, work.ID)
 	return logFilename, nil
 }

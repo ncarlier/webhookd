@@ -34,7 +34,7 @@ func Index(timeout int, scrDir string) http.Handler {
 func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	flusher, ok := w.(http.Flusher)
 	if !ok {
-		http.Error(w, "Streaming unsupported!", http.StatusInternalServerError)
+		http.Error(w, "Streaming not supported!", http.StatusInternalServerError)
 		return
 	}
 
@@ -60,8 +60,9 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := tools.QueryParamsToShellVars(r.URL.Query())
-	logger.Debug.Printf("Calling hook script \"%s\" with params %s...\n", script, params)
 	params = append(params, tools.HTTPHeadersToShellVars(r.Header)...)
+
+	// logger.Debug.Printf("API REQUEST: \"%s\" with params %s...\n", p, params)
 
 	// Create work
 	timeout := atoiFallback(r.Header.Get("X-Hook-Timeout"), defaultTimeout)
@@ -74,9 +75,6 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-
-	logger.Debug.Println("Work request queued:", script)
-	// fmt.Fprintf(w, "data: Running \"%s\" ...\n\n", work.Name)
 
 	for {
 		msg, open := <-work.MessageChan
