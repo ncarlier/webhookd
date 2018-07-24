@@ -22,7 +22,7 @@ ARTEFACT=release/$(APPNAME)-$(GOOS)-$(GOARCH)$(EXT)
 
 # Extract version infos
 VERSION:=`git describe --tags`
-LDFLAGS=-ldflags "-X $(AUTHOR)/$(APPNAME)/main.Version=${VERSION}"
+LDFLAGS=-ldflags "-X main.Version=$(VERSION)"
 
 all: build
 
@@ -44,7 +44,7 @@ clean:
 ## Build executable
 build: $(APPBASE)/$(APPNAME)
 	-mkdir -p release
-	echo "Building: $(ARTEFACT) ..."
+	echo "Building: $(ARTEFACT) $(VERSION) ..."
 	GOOS=$(GOOS) GOARCH=$(GOARCH) go build $(LDFLAGS) -o $(ARTEFACT)
 .PHONY: build
 

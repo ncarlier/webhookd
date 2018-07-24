@@ -32,6 +32,11 @@ var (
 func main() {
 	flag.Parse()
 
+	if *config.Version {
+		fmt.Println(Version)
+		return
+	}
+
 	level := "info"
 	if *config.Debug {
 		level = "debug"
