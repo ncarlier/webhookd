@@ -1,5 +1,15 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.2.4...v) (2018-07-23)
+# [](https://github.com/ncarlier/webhookd/compare/v1.2.5...v) (2018-07-24)
+
+
+
+<a name="1.2.5"></a>
+## [1.2.5](https://github.com/ncarlier/webhookd/compare/v1.2.4...v1.2.5) (2018-07-24)
+
+
+### Features
+
+* **logging:** improve log outputs ([25b68d3](https://github.com/ncarlier/webhookd/commit/25b68d3))
 
 
 
