@@ -52,7 +52,6 @@ func (w Worker) Start() {
 					work.MessageChan <- []byte("done")
 					notify(subject, "See attachment.", filename)
 				}
-				work.Closed = true
 				close(work.MessageChan)
 			case <-w.QuitChan:
 				logger.Debug.Printf("Stopping worker #%d...\n", w.ID)

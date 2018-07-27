@@ -1,6 +1,6 @@
 #!/bin/sh
 
-URL=http://localhost:8081
+URL=http://localhost:8080
 
 echo "Test URL: $URL"
 
