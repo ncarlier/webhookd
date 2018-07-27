@@ -1,6 +1,9 @@
 package worker
 
-import "sync/atomic"
+import (
+	"sync"
+	"sync/atomic"
+)
 
 var workID uint64
 
@@ -13,7 +16,8 @@ type WorkRequest struct {
 	Args        []string
 	MessageChan chan []byte
 	Timeout     int
-	Closed      bool
+	Terminated  bool
+	mutex       sync.Mutex
 }
 
 // NewWorkRequest creats new work request
@@ -26,6 +30,22 @@ func NewWorkRequest(name, script, payload string, args []string, timeout int) *W
 		Args:        args,
 		Timeout:     timeout,
 		MessageChan: make(chan []byte),
-		Closed:      false,
+		Terminated:  false,
 	}
+}
+
+// Terminate set work request as terminated
+func (wr *WorkRequest) Terminate() {
+	wr.mutex.Lock()
+	defer wr.mutex.Unlock()
+	if !wr.Terminated {
+		wr.Terminated = true
+	}
+}
+
+// IsTerminated ask if the work request is terminated
+func (wr *WorkRequest) IsTerminated() bool {
+	wr.mutex.Lock()
+	defer wr.mutex.Unlock()
+	return wr.Terminated
 }

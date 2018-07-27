@@ -76,14 +76,16 @@ func runScript(work *WorkRequest) (string, error) {
 		for scanner.Scan() {
 			line := scanner.Text()
 			// writing to the work channel
-			if !work.Closed {
+			if !work.IsTerminated() {
 				work.MessageChan <- []byte(line)
 			} else {
-				logger.Error.Printf("Work %s#%d is closed. Unable to write into the work channel: %s\n", work.Name, work.ID, line)
+				logger.Error.Printf("Work %s#%d is over. Unable to write more data into the channel: %s\n", work.Name, work.ID, line)
+				break
 			}
 			// writing to outfile
 			if _, err := wLogFile.WriteString(line + "\n"); err != nil {
 				logger.Error.Println("Error while writing into the log file:", logFilename, err)
+				break
 			}
 		}
 		if err := scanner.Err(); err != nil {
@@ -100,6 +102,7 @@ func runScript(work *WorkRequest) (string, error) {
 	})
 	err = cmd.Wait()
 	timer.Stop()
+	work.Terminate()
 	if err != nil {
 		logger.Info.Printf("Work %s#%d done [ERROR]\n", work.Name, work.ID)
 		return logFilename, err
