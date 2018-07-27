@@ -11,7 +11,6 @@ type Config struct {
 	ListenAddr *string
 	NbWorkers  *int
 	Debug      *bool
-	Version    *bool
 	Timeout    *int
 	ScriptDir  *string
 }
@@ -20,7 +19,6 @@ var config = &Config{
 	ListenAddr: flag.String("listen", getEnv("LISTEN_ADDR", ":8080"), "HTTP service address (e.g.address, ':8080')"),
 	NbWorkers:  flag.Int("nb-workers", getIntEnv("NB_WORKERS", 2), "The number of workers to start"),
 	Debug:      flag.Bool("debug", getBoolEnv("DEBUG", false), "Output debug logs"),
-	Version:    flag.Bool("version", false, "Output version"),
 	Timeout:    flag.Int("timeout", getIntEnv("HOOK_TIMEOUT", 10), "Hook maximum delay before timeout (in second)"),
 	ScriptDir:  flag.String("scripts", getEnv("SCRIPTS_DIR", "scripts"), "Scripts directory"),
 }
