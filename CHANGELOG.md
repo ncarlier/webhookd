@@ -1,5 +1,20 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.2.5...v) (2018-07-24)
+# [](https://github.com/ncarlier/webhookd/compare/v1.2.6...v) (2018-07-27)
+
+
+
+<a name="1.2.6"></a>
+## [1.2.6](https://github.com/ncarlier/webhookd/compare/v1.2.5...v1.2.6) (2018-07-27)
+
+
+### Bug Fixes
+
+* **runner:** fix concurent access to the work request channel ([6ff847c](https://github.com/ncarlier/webhookd/commit/6ff847c))
+
+
+### Features
+
+* **cli:** add print version command ([2f13ea1](https://github.com/ncarlier/webhookd/commit/2f13ea1))
 
 
 
