@@ -16,9 +16,6 @@ import (
 	"github.com/ncarlier/webhookd/pkg/worker"
 )
 
-// Version of the app
-var Version = "snapshot"
-
 type key int
 
 const (
@@ -32,8 +29,8 @@ var (
 func main() {
 	flag.Parse()
 
-	if *config.Version {
-		fmt.Println(Version)
+	if *version {
+		printVersion()
 		return
 	}
 
