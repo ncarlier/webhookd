@@ -143,6 +143,8 @@ echo "Header parameter: user-agent=$user_agent"
 echo "Script parameters: $1"
 ```
 
+The result:
+
 ```bash
 $ curl --data @test.json http://localhost/echo?foo=bar
 data: Hook work request "echo" queued...
@@ -160,7 +162,7 @@ data: done
 
 ### Webhook timeout configuration
 
-By default a webhook as a timeout of 10 seconds.
+By default a webhook has a timeout of 10 seconds.
 This timeout is globally configurable by setting the environment variable:
 `APP_HOOK_TIMEOUT` (in seconds).
 
