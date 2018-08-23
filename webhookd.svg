@@ -51,19 +51,15 @@
   </defs>
   <title
      id="title4561">integration-tile</title>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:42.66666794px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#008000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
-     x="366.07074"
-     y="119.83498"
-     id="text4593"><tspan
-       sodipodi:role="line"
-       id="tspan4591"
-       x="366.07074"
-       y="119.83498"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:42.66666794px;font-family:Sans;-inkscape-font-specification:'Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#008000;fill-opacity:1;"><tspan
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:42.66666794px;font-family:Sans;-inkscape-font-specification:'Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#008000;"
-         id="tspan4595">d</tspan></tspan></text>
+  <g
+     aria-label="d"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:42.66666794px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#008000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     id="text4593">
+    <path
+       d="m 385.52907,99.918309 v -12.5 h 7.5 v 32.416671 h -7.5 v -3.375 q -1.54166,2.0625 -3.39583,3.02083 -1.85417,0.95833 -4.29167,0.95833 -4.3125,0 -7.08333,-3.41666 -2.77083,-3.4375 -2.77083,-8.83334 0,-5.39583 2.77083,-8.812498 2.77083,-3.4375 7.08333,-3.4375 2.41667,0 4.27084,0.979167 1.875,0.958333 3.41666,3 z m -4.91666,15.104171 q 2.39583,0 3.64583,-1.75 1.27083,-1.75 1.27083,-5.08334 0,-3.33333 -1.27083,-5.08333 -1.25,-1.75 -3.64583,-1.75 -2.375,0 -3.64584,1.75 -1.25,1.75 -1.25,5.08333 0,3.33334 1.25,5.08334 1.27084,1.75 3.64584,1.75 z"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:42.66666794px;font-family:Sans;-inkscape-font-specification:'Sans, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#008000"
+       id="path4639" />
+  </g>
   <path
      class="a"
      d="M128,98.15c-3.78,6.36-7.41,12.52-11.11,18.64a4.87,4.87,0,0,0-.66,4.84A9.06,9.06,0,0,1,109.84,134c-5.24,1.37-10.35-2.07-11.39-7.68-.92-5,2.93-9.84,8.41-10.61.46-.07.93-.07,1.7-.13l8.33-14c-5.24-5.21-8.36-11.3-7.67-18.85A21.42,21.42,0,0,1,115.64,69a21.79,21.79,0,0,1,27.19-2.85c8.3,5.33,12.11,15.73,8.87,24.62l-7.61-2.07c1-4.94.27-9.39-3.07-13.19a13.17,13.17,0,0,0-8.25-4.31,13.41,13.41,0,0,0-14.65,9.49C116,87.87,119.22,93.73,128,98.15Z"
