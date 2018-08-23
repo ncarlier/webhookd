@@ -5,6 +5,8 @@
 
 A very simple webhook server to launch shell scripts.
 
+![Logo](webhookd.svg)
+
 ## Installation
 
 Run the following command:
