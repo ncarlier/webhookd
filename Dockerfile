@@ -1,8 +1,7 @@
 #########################################
 # Build stage
 #########################################
-FROM golang:1.8 AS builder
-MAINTAINER Nicolas Carlier <n.carlier@nunux.org>
+FROM golang:1.10 AS builder
 
 # Repository location
 ARG REPOSITORY=github.com/ncarlier
@@ -23,7 +22,6 @@ RUN make
 # Distribution stage
 #########################################
 FROM docker:dind
-MAINTAINER Nicolas Carlier <n.carlier@nunux.org>
 
 # Repository location
 ARG REPOSITORY=github.com/ncarlier
