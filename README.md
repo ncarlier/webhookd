@@ -1,5 +1,6 @@
 # webhookd
 
+[![Build Status](https://travis-ci.org/ncarlier/webhookd.svg?branch=master)](https://travis-ci.org/ncarlier/webhookd)
 [![Image size](https://images.microbadger.com/badges/image/ncarlier/webhookd.svg)](https://microbadger.com/images/ncarlier/webhookd)
 [![Docker pulls](https://img.shields.io/docker/pulls/ncarlier/webhookd.svg)](https://hub.docker.com/r/ncarlier/webhookd/)
 
@@ -108,10 +109,6 @@ echo "bar bar bar"
 
 ```bash
 $ curl -XPOST http://localhost/foo/bar
-data: Hook work request "foo/bar" queued...
-
-data: Running foo/bar script...
-
 data: foo foo foo
 
 data: bar bar bar
@@ -149,10 +146,6 @@ The result:
 
 ```bash
 $ curl --data @test.json http://localhost/echo?foo=bar
-data: Hook work request "echo" queued...
-
-data: Running echo script...
-
 data: Query parameter: foo=bar
 
 data: Header parameter: user-agent=curl/7.52.1

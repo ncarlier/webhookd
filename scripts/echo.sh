@@ -1,8 +1,13 @@
 #!/bin/bash
 
-echo "Echo from script..."
+# Usage: http POST :8080/echo msg==hello foo=bar
 
-echo "hostname: `hostname`"
+echo "Echo script:"
 
-echo "user-agent: $user_agent"
+echo "Command result: hostname=`hostname`"
 
+echo "Header variable: User-Agent=$user_agent"
+
+echo "Query parameter: msg=$msg"
+
+echo "Body payload: $1"

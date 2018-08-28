@@ -28,7 +28,7 @@ var (
 	workingdir = os.Getenv("APP_WORKING_DIR")
 )
 
-func runScript(work *WorkRequest) (string, error) {
+func run(work *WorkRequest) (string, error) {
 	if workingdir == "" {
 		workingdir = os.TempDir()
 	}
@@ -70,7 +70,7 @@ func runScript(work *WorkRequest) (string, error) {
 		return logFilename, err
 	}
 
-	// Write script output to log file and the work message cahnnel.
+	// Write script output to log file and the work message channel.
 	go func(reader io.Reader) {
 		scanner := bufio.NewScanner(reader)
 		for scanner.Scan() {

@@ -42,7 +42,7 @@ func (w Worker) Start() {
 			case work := <-w.Work:
 				// Receive a work request.
 				logger.Debug.Printf("Worker #%d received work request: %s#%d\n", w.ID, work.Name, work.ID)
-				filename, err := runScript(&work)
+				filename, err := run(&work)
 				if err != nil {
 					subject := fmt.Sprintf("Webhook %s#%d FAILED.", work.Name, work.ID)
 					work.MessageChan <- []byte(fmt.Sprintf("error: %s", err.Error()))
