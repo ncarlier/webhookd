@@ -8,7 +8,7 @@ type noAuth struct {
 }
 
 func (c *noAuth) Usage() string {
-	return "No Auth. Usage: --auth none"
+	return "No Auth. Usage: -auth none"
 }
 
 func (c *noAuth) Init(_ bool) {}

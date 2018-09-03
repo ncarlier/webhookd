@@ -2,9 +2,7 @@ package main
 
 import (
 	"bytes"
-	"errors"
 	"flag"
-	"fmt"
 	"os"
 	"strconv"
 
@@ -20,19 +18,6 @@ type Config struct {
 	ScriptDir           *string
 	Authentication      *string
 	AuthenticationParam *string
-}
-
-type authFlag struct {
-	selectedMethod auth.Method
-}
-
-func (c authFlag) Set(arg string) error {
-	fmt.Println(arg)
-	return errors.New("fall")
-}
-
-func (c authFlag) String() string {
-	return "test"
 }
 
 var config = &Config{

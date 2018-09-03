@@ -18,7 +18,9 @@ type basicAuth struct {
 
 func (c *basicAuth) Init(debug bool) {
 	c.debug = debug
-	logger.Warning.Println("\u001B[33mBasic Auth: Debug mode enabled. Might Leak sentitive information in log output.\u001B[0m")
+	if debug {
+		logger.Warning.Println("\u001B[33mBasic Auth: Debug mode enabled. Might Leak sentitive information in log output.\u001B[0m")
+	}
 }
 
 func (c *basicAuth) Usage() string {
