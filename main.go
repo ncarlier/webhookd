@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/ncarlier/webhookd/pkg/api"
+	"github.com/ncarlier/webhookd/pkg/auth"
 	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/worker"
 )
@@ -34,6 +35,20 @@ func main() {
 		return
 	}
 
+	var authmethod auth.Method
+	name := *config.Authentication
+	if _, ok := auth.AvailableMethods[name]; ok {
+		authmethod = auth.AvailableMethods[name]
+		if err := authmethod.ParseParam(*config.AuthenticationParam); err != nil {
+			fmt.Println("Authentication parameter is not valid:", err.Error())
+			fmt.Println(authmethod.Usage())
+			os.Exit(2)
+		}
+	} else {
+		fmt.Println("Authentication name is not valid:", name)
+		os.Exit(2)
+	}
+
 	level := "info"
 	if *config.Debug {
 		level = "debug"
@@ -41,6 +56,8 @@ func main() {
 	logger.Init(level)
 
 	logger.Debug.Println("Starting webhookd server...")
+	logger.Debug.Println("Using Authentication:", name)
+	authmethod.Init(*config.Debug)
 
 	router := http.NewServeMux()
 	router.Handle("/", api.Index(*config.Timeout, *config.ScriptDir))
@@ -52,7 +69,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:     *config.ListenAddr,
-		Handler:  tracing(nextRequestID)(logging(logger.Debug)(router)),
+		Handler:  authmethod.Middleware()(tracing(nextRequestID)(logging(logger.Debug)(router))),
 		ErrorLog: logger.Error,
 	}
 
