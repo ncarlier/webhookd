@@ -12,19 +12,13 @@ import (
 type basicAuth struct {
 	username   string
 	password   string
-	debug      bool
 	authheader string
 }
 
-func (c *basicAuth) Init(debug bool) {
-	c.debug = debug
-	if debug {
-		logger.Warning.Println("\u001B[33mBasic Auth: Debug mode enabled. Might Leak sentitive information in log output.\u001B[0m")
-	}
-}
+func (c *basicAuth) Init(_ bool) {}
 
 func (c *basicAuth) Usage() string {
-	return "HTTP Basic Auth. Usage: -auth basic -authparam <username>:<password>[:<realm>]  (example: -auth basic -authparam foo:bar)"
+	return "HTTP Basic Auth. Usage: -auth basic -authparam <username>:<password>[:<realm>]  (example: -auth basic -auth-param foo:bar)"
 }
 
 func (c *basicAuth) ParseParam(param string) error {
@@ -48,21 +42,15 @@ func (c *basicAuth) Middleware() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if username, password, ok := r.BasicAuth(); ok && username == c.username && password == c.password {
-				if c.debug {
-					logger.Debug.Printf("HTTP Basic Auth: %s:%s PASSED\n", username, password)
-				}
+				logger.Info.Printf("HTTP Basic Auth: %s PASSED\n", username)
 				next.ServeHTTP(w, r)
 			} else if !ok {
-				if c.debug {
-					logger.Debug.Println("HTTP Basic Auth: Auth header not present.")
-				}
+				logger.Debug.Println("HTTP Basic Auth: Auth header not present.")
 				w.Header().Add("WWW-Authenticate", c.authheader)
 				w.WriteHeader(401)
 				w.Write([]byte("Authentication required."))
 			} else {
-				if c.debug {
-					logger.Debug.Printf("HTTP Basic Auth: Invalid credentials: %s:%s \n", username, password)
-				}
+				logger.Warning.Printf("HTTP Basic Auth: Invalid credentials for username %s\n", username)
 				w.WriteHeader(403)
 				w.Write([]byte("Forbidden."))
 			}

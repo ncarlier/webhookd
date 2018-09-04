@@ -27,7 +27,7 @@ var config = &Config{
 	Timeout:        flag.Int("timeout", getIntEnv("HOOK_TIMEOUT", 10), "Hook maximum delay before timeout (in second)"),
 	ScriptDir:      flag.String("scripts", getEnv("SCRIPTS_DIR", "scripts"), "Scripts directory"),
 	Authentication: flag.String("auth", getEnv("AUTH", "none"), ""),
-	AuthenticationParam: flag.String("authparam", getEnv("AUTH_PARAM", ""), func() string {
+	AuthenticationParam: flag.String("auth-param", getEnv("AUTH_PARAM", ""), func() string {
 		authdocwriter := bytes.NewBufferString("Authentication method. Available methods: ")
 
 		for key, method := range auth.AvailableMethods {

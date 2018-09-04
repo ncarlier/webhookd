@@ -56,7 +56,7 @@ func main() {
 	logger.Init(level)
 
 	logger.Debug.Println("Starting webhookd server...")
-	logger.Info.Println("Using Authentication:", name)
+	logger.Debug.Println("Using Authentication:", name)
 	authmethod.Init(*config.Debug)
 
 	router := http.NewServeMux()
