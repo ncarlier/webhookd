@@ -1,67 +1,28 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.2.6...v) (2018-07-27)
+# [](https://github.com/ncarlier/webhookd/compare/v1.3.0...v) (2018-09-12)
 
 
 
-<a name="1.2.6"></a>
-## [1.2.6](https://github.com/ncarlier/webhookd/compare/v1.2.5...v1.2.6) (2018-07-27)
+<a name="1.3.0"></a>
+# [1.3.0](https://github.com/ncarlier/webhookd/compare/v1.2.1...v1.3.0) (2018-09-04)
 
 
 ### Bug Fixes
 
-* **runner:** fix concurent access to the work request channel ([6ff847c](https://github.com/ncarlier/webhookd/commit/6ff847c))
+* fix panic due to writing into closed chan ([43820cd](https://github.com/ncarlier/webhookd/commit/43820cd))
+* **docker:** add bash shell to the Docker image ([c723387](https://github.com/ncarlier/webhookd/commit/c723387))
+* **runner:** fix concurent access to the work request channel ([e8d1c6e](https://github.com/ncarlier/webhookd/commit/e8d1c6e))
+* **script:** kill script process and sub process on timeout ([5f32a4f](https://github.com/ncarlier/webhookd/commit/5f32a4f))
+* **server:** remove global server timeouts ([82346b0](https://github.com/ncarlier/webhookd/commit/82346b0))
 
 
 ### Features
 
-* **cli:** add print version command ([2f13ea1](https://github.com/ncarlier/webhookd/commit/2f13ea1))
-
-
-
-<a name="1.2.5"></a>
-## [1.2.5](https://github.com/ncarlier/webhookd/compare/v1.2.4...v1.2.5) (2018-07-24)
-
-
-### Features
-
-* **logging:** improve log outputs ([25b68d3](https://github.com/ncarlier/webhookd/commit/25b68d3))
-
-
-
-<a name="1.2.4"></a>
-## [1.2.4](https://github.com/ncarlier/webhookd/compare/v1.2.3...v1.2.4) (2018-07-23)
-
-
-### Bug Fixes
-
-* **script:** kill script process and sub process on timeout ([92ef4e4](https://github.com/ncarlier/webhookd/commit/92ef4e4))
-
-
-### Features
-
-* add Docker entrypoint ([4b58677](https://github.com/ncarlier/webhookd/commit/4b58677))
-* **config:** improve configuration flags ([eb699dd](https://github.com/ncarlier/webhookd/commit/eb699dd))
-
-
-
-<a name="1.2.3"></a>
-## [1.2.3](https://github.com/ncarlier/webhookd/compare/v1.2.2...v1.2.3) (2018-05-06)
-
-
-### Bug Fixes
-
-* **docker:** add bash shell to the Docker image ([d760073](https://github.com/ncarlier/webhookd/commit/d760073))
-
-
-
-<a name="1.2.2"></a>
-## [1.2.2](https://github.com/ncarlier/webhookd/compare/v1.2.1...v1.2.2) (2018-03-21)
-
-
-### Bug Fixes
-
-* **server:** remove global server timeouts ([1e38906](https://github.com/ncarlier/webhookd/commit/1e38906))
-* fix panic due to writing into closed chan ([2a22680](https://github.com/ncarlier/webhookd/commit/2a22680))
+* add Docker entrypoint ([67bfe07](https://github.com/ncarlier/webhookd/commit/67bfe07))
+* **cli:** add print version command ([6565f6f](https://github.com/ncarlier/webhookd/commit/6565f6f))
+* **config:** improve configuration flags ([fbf8794](https://github.com/ncarlier/webhookd/commit/fbf8794))
+* **logging:** improve log outputs ([5cd5547](https://github.com/ncarlier/webhookd/commit/5cd5547))
+* **security:** add http basic auth (fix [#6](https://github.com/ncarlier/webhookd/issues/6)) ([#7](https://github.com/ncarlier/webhookd/issues/7)) ([513e6d7](https://github.com/ncarlier/webhookd/commit/513e6d7))
 
 
 
