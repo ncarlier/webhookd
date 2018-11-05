@@ -17,6 +17,8 @@ func TestToSnakeCase(t *testing.T) {
 		{"hello-world", "helloworld"},
 		{"helloWorld", "hello_world"},
 		{"HelloWorld", "hello_world"},
+		{"Hello/World", "hello__world"},
+		{"Hello/world", "hello_world"},
 	}
 	for _, tc := range testCases {
 		value := tools.ToSnakeCase(tc.value)

@@ -20,8 +20,8 @@ func ToSnakeCase(in string) string {
 		}
 		out = append(out, unicode.ToLower(runes[i]))
 	}
-
-	return strings.Replace(string(out), "-", "", -1)
+	result := strings.Replace(string(out), "/", "_", -1)
+	return strings.Replace(result, "-", "", -1)
 }
 
 // QueryParamsToShellVars convert URL query parameters to shell vars.
