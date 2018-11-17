@@ -1,5 +1,10 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.3.0...v) (2018-09-12)
+# [](https://github.com/ncarlier/webhookd/compare/v1.3.0...v) (2018-11-17)
+
+
+### Bug Fixes
+
+* **worker:** use snakecase for log filename ([3021c19](https://github.com/ncarlier/webhookd/commit/3021c19)), closes [#8](https://github.com/ncarlier/webhookd/issues/8)
 
 
 
