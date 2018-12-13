@@ -1,5 +1,15 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.3.1...v) (2018-11-17)
+# [](https://github.com/ncarlier/webhookd/compare/v1.3.2...v) (2018-12-13)
+
+
+
+<a name="1.3.2"></a>
+## [1.3.2](https://github.com/ncarlier/webhookd/compare/v1.3.1...v1.3.2) (2018-12-13)
+
+
+### Bug Fixes
+
+* **runner:** fix concurrency and log file creation ([c5e393e](https://github.com/ncarlier/webhookd/commit/c5e393e))
 
 
 
