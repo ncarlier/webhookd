@@ -1,7 +1,7 @@
 #########################################
 # Build stage
 #########################################
-FROM golang:1.10 AS builder
+FROM golang:1.11 AS builder
 
 # Repository location
 ARG REPOSITORY=github.com/ncarlier
