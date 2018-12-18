@@ -1,5 +1,7 @@
 .SILENT :
 
+export GO111MODULE=on
+
 # Author
 AUTHOR=github.com/ncarlier
 

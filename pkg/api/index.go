@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ncarlier/webhookd/pkg/config"
 	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/tools"
 	"github.com/ncarlier/webhookd/pkg/worker"
@@ -24,10 +25,10 @@ func atoiFallback(str string, fallback int) int {
 	return fallback
 }
 
-// Index is the main handler of the API.
-func Index(timeout int, scrDir string) http.Handler {
-	defaultTimeout = timeout
-	scriptDir = scrDir
+// index is the main handler of the API.
+func index(conf *config.Config) http.Handler {
+	defaultTimeout = *conf.Timeout
+	scriptDir = *conf.ScriptDir
 	return http.HandlerFunc(webhookHandler)
 }
 

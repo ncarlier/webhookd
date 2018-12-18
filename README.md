@@ -46,6 +46,7 @@ You can configure the daemon by:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `APP_LISTEN_ADDR` | `:8080` | HTTP service address |
+| `APP_PASSWD_FILE` | `.htpasswd` | Password file for HTTP basic authentication |
 | `APP_NB_WORKERS` | `2` | The number of workers to start |
 | `APP_HOOK_TIMEOUT` | `10` | Hook maximum delay before timeout (in second) |
 | `APP_SCRIPTS_DIR` | `./scripts` | Scripts directory |
@@ -64,6 +65,7 @@ You can configure the daemon by:
 | Parameter | Default | Description |
 |----------|---------|-------------|
 | `-l <address> or --listen <address>` | `:8080` | HTTP service address |
+| `-p or --passwd <htpasswd file>` | `.htpasswd` | Password file for HTTP basic authentication
 | `-d or --debug` | false | Output debug logs |
 | `--nb-workers <workers>` | `2` | The number of workers to start |
 | `--scripts <dir>` | `./scripts` | Scripts directory |
@@ -198,6 +200,34 @@ SMTP notification configuration:
 - **APP_SMTP_NOTIFIER_HOST**=localhost:25
 
 The log file will be sent as an GZIP attachment.
+
+### Authentication
+
+You can restrict access to webhooks using HTTP basic authentication.
+
+To activate basic authentication, you have to create a `htpasswd` file:
+
+```bash
+$ # create passwd file the user 'api'
+$ htpasswd -B -c .htpasswd api
+```
+This command will ask for a password and store it in the htpawsswd file.
+
+Please note that by default, the daemon will try to load the `.htpasswd` file.
+
+But you can override this behavior by specifying the location of the file:
+
+```bash
+$ APP_PASSWD_FILE=/etc/webhookd/users.htpasswd
+$ # or
+$ webhookd -p /etc/webhookd/users.htpasswd
+```
+
+Once configured, you must call webhooks using basic authentication:
+
+```bash
+$ curl -u api:test -XPOST "http://localhost:8080/echo?msg=hello"
+```
 
 ---
 
