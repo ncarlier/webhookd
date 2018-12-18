@@ -1,5 +1,15 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.3.2...v) (2018-12-13)
+# [](https://github.com/ncarlier/webhookd/compare/v1.4.0...v) (2018-12-18)
+
+
+
+<a name="1.4.0"></a>
+# [1.4.0](https://github.com/ncarlier/webhookd/compare/v1.3.2...v1.4.0) (2018-12-18)
+
+
+### Features
+
+* use htpasswd to manage basic auth ([aab844c](https://github.com/ncarlier/webhookd/commit/aab844c))
 
 
 
