@@ -2,17 +2,14 @@ package worker
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
-	"path"
 	"sync"
 	"syscall"
 	"time"
 
 	"github.com/ncarlier/webhookd/pkg/logger"
-	"github.com/ncarlier/webhookd/pkg/tools"
 )
 
 // ChanWriter is a simple writer to a channel of byte.
@@ -25,22 +22,14 @@ func (c *ChanWriter) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
-var (
-	workingdir = os.Getenv("APP_WORKING_DIR")
-)
-
-func run(work *WorkRequest) (string, error) {
-	if workingdir == "" {
-		workingdir = os.TempDir()
-	}
-
+func run(work *WorkRequest) error {
 	logger.Info.Printf("Work %s#%d started...\n", work.Name, work.ID)
 	logger.Debug.Printf("Work %s#%d script: %s\n", work.Name, work.ID, work.Script)
 	logger.Debug.Printf("Work %s#%d parameter: %v\n", work.Name, work.ID, work.Args)
 
 	binary, err := exec.LookPath(work.Script)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	// Exec script with args...
@@ -50,14 +39,13 @@ func run(work *WorkRequest) (string, error) {
 	// using a process group...
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
-	// Open the out file for writing
-	logFilename := path.Join(workingdir, fmt.Sprintf("%s_%d_%s.txt", tools.ToSnakeCase(work.Name), work.ID, time.Now().Format("20060102_1504")))
-	logFile, err := os.Create(logFilename)
+	// Open the log file for writing
+	logFile, err := createLogFile(work)
 	if err != nil {
-		return "", err
+		return err
 	}
 	defer logFile.Close()
-	logger.Debug.Printf("Work %s#%d output to file: %s\n", work.Name, work.ID, logFilename)
+	logger.Debug.Printf("Work %s#%d output to file: %s\n", work.Name, work.ID, logFile.Name())
 
 	wLogFile := bufio.NewWriter(logFile)
 	defer wLogFile.Flush()
@@ -65,18 +53,18 @@ func run(work *WorkRequest) (string, error) {
 	// Combine cmd stdout and stderr
 	outReader, err := cmd.StdoutPipe()
 	if err != nil {
-		return logFilename, err
+		return err
 	}
 	errReader, err := cmd.StderrPipe()
 	if err != nil {
-		return logFilename, err
+		return err
 	}
 	cmdReader := io.MultiReader(outReader, errReader)
 
 	// Start the script...
 	err = cmd.Start()
 	if err != nil {
-		return logFilename, err
+		return err
 	}
 
 	// Create wait group to wait for command output completion
@@ -97,7 +85,7 @@ func run(work *WorkRequest) (string, error) {
 			}
 			// writing to outfile
 			if _, err := wLogFile.WriteString(line + "\n"); err != nil {
-				logger.Error.Println("Error while writing into the log file:", logFilename, err)
+				logger.Error.Println("Error while writing into the log file:", logFile.Name(), err)
 				break
 			}
 		}
@@ -127,8 +115,8 @@ func run(work *WorkRequest) (string, error) {
 
 	if err != nil {
 		logger.Info.Printf("Work %s#%d done [ERROR]\n", work.Name, work.ID)
-		return logFilename, err
+		return err
 	}
 	logger.Info.Printf("Work %s#%d done [SUCCESS]\n", work.Name, work.ID)
-	return logFilename, nil
+	return nil
 }

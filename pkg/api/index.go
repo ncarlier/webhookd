@@ -2,8 +2,10 @@ package api
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
+	"path"
 	"strconv"
 	"strings"
 
@@ -33,14 +35,21 @@ func index(conf *config.Config) http.Handler {
 }
 
 func webhookHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		triggerWebhook(w, r)
+	} else if r.Method == "GET" {
+		getWebhookLog(w, r)
+	} else {
+		http.Error(w, "405 Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+}
+
+func triggerWebhook(w http.ResponseWriter, r *http.Request) {
+	// Check that streaming is supported
 	flusher, ok := w.(http.Flusher)
 	if !ok {
 		http.Error(w, "Streaming not supported!", http.StatusInternalServerError)
-		return
-	}
-
-	if r.Method != "POST" {
-		http.Error(w, "405 Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -76,6 +85,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("X-Hook-ID", strconv.FormatUint(work.ID, 10))
 
 	for {
 		msg, open := <-work.MessageChan
@@ -89,4 +99,35 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 		// Flush the data immediatly instead of buffering it for later.
 		flusher.Flush()
 	}
+}
+
+func getWebhookLog(w http.ResponseWriter, r *http.Request) {
+	// Get hook ID
+	id := path.Base(r.URL.Path)
+
+	// Get script location
+	name := path.Dir(strings.TrimPrefix(r.URL.Path, "/"))
+	_, err := tools.ResolveScript(scriptDir, name)
+	if err != nil {
+		logger.Error.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	// Get log file
+	logFile, err := worker.GetLogFile(id, name)
+	if err != nil {
+		logger.Error.Println(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if logFile == nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	defer logFile.Close()
+
+	w.Header().Set("Content-Type", "text/plain")
+
+	io.Copy(w, logFile)
 }
