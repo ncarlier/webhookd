@@ -33,6 +33,7 @@ func TestWorkRunner(t *testing.T) {
 	printWorkMessages(work)
 	err := run(work)
 	assert.Nil(t, err, "")
+	assert.Equal(t, work.Status, Success, "")
 
 	// Test that log file is ok
 	id := strconv.FormatUint(work.ID, 10)
@@ -50,6 +51,7 @@ func TestWorkRunnerWithError(t *testing.T) {
 	printWorkMessages(work)
 	err := run(work)
 	assert.NotNil(t, err, "")
+	assert.Equal(t, work.Status, Error, "")
 	assert.Equal(t, "exit status 1", err.Error(), "")
 }
 
@@ -61,5 +63,6 @@ func TestWorkRunnerWithTimeout(t *testing.T) {
 	printWorkMessages(work)
 	err := run(work)
 	assert.NotNil(t, err, "")
+	assert.Equal(t, work.Status, Error, "")
 	assert.Equal(t, "signal: killed", err.Error(), "")
 }
