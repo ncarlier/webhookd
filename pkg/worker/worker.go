@@ -44,11 +44,9 @@ func (w Worker) Start() {
 				logger.Debug.Printf("Worker #%d received work request: %s#%d\n", w.ID, work.Name, work.ID)
 				err := run(&work)
 				if err != nil {
-					// subject := fmt.Sprintf("Webhook %s#%d FAILED.", work.Name, work.ID)
 					work.MessageChan <- []byte(fmt.Sprintf("error: %s", err.Error()))
 					// notify(subject, err.Error(), filename)
 				} else {
-					// subject := fmt.Sprintf("Webhook %s#%d SUCCEEDED.", work.Name, workID)
 					work.MessageChan <- []byte("done")
 					// notify(subject, "See attachment.", filename)
 				}

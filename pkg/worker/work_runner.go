@@ -23,13 +23,14 @@ func (c *ChanWriter) Write(p []byte) (int, error) {
 }
 
 func run(work *WorkRequest) error {
+	work.Status = Running
 	logger.Info.Printf("Work %s#%d started...\n", work.Name, work.ID)
 	logger.Debug.Printf("Work %s#%d script: %s\n", work.Name, work.ID, work.Script)
 	logger.Debug.Printf("Work %s#%d parameter: %v\n", work.Name, work.ID, work.Args)
 
 	binary, err := exec.LookPath(work.Script)
 	if err != nil {
-		return err
+		return work.Terminate(err)
 	}
 
 	// Exec script with args...
@@ -42,7 +43,7 @@ func run(work *WorkRequest) error {
 	// Open the log file for writing
 	logFile, err := createLogFile(work)
 	if err != nil {
-		return err
+		return work.Terminate(err)
 	}
 	defer logFile.Close()
 	logger.Debug.Printf("Work %s#%d output to file: %s\n", work.Name, work.ID, logFile.Name())
@@ -53,18 +54,18 @@ func run(work *WorkRequest) error {
 	// Combine cmd stdout and stderr
 	outReader, err := cmd.StdoutPipe()
 	if err != nil {
-		return err
+		return work.Terminate(err)
 	}
 	errReader, err := cmd.StderrPipe()
 	if err != nil {
-		return err
+		return work.Terminate(err)
 	}
 	cmdReader := io.MultiReader(outReader, errReader)
 
 	// Start the script...
 	err = cmd.Start()
 	if err != nil {
-		return err
+		return work.Terminate(err)
 	}
 
 	// Create wait group to wait for command output completion
@@ -111,12 +112,5 @@ func run(work *WorkRequest) error {
 	timer.Stop()
 
 	// Mark work as terminated
-	work.Terminate()
-
-	if err != nil {
-		logger.Info.Printf("Work %s#%d done [ERROR]\n", work.Name, work.ID)
-		return err
-	}
-	logger.Info.Printf("Work %s#%d done [SUCCESS]\n", work.Name, work.ID)
-	return nil
+	return work.Terminate(err)
 }
