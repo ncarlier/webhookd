@@ -52,7 +52,7 @@ You can configure the daemon by:
 | `APP_SCRIPTS_DIR` | `./scripts` | Scripts directory |
 | `APP_SCRIPTS_GIT_URL` | none | GIT repository that contains scripts (Note: this is only used by the Docker image or by using the Docker entrypoint script) |
 | `APP_SCRIPTS_GIT_KEY` | none | GIT SSH private key used to clone the repository (Note: this is only used by the Docker image or by using the Docker entrypoint script) |
-| `APP_WORKING_DIR` | `/tmp` (OS temp dir) | Working directory (to store execution logs) |
+| `APP_LOG_DIR` | `/tmp` (OS temp dir) | Directory to store execution logs |
 | `APP_NOTIFIER` | none | Post script notification (`http` or `smtp`) |
 | `APP_NOTIFIER_FROM` | none | Sender of the notification |
 | `APP_NOTIFIER_TO` | none | Recipient of the notification |
@@ -110,7 +110,7 @@ echo "bar bar bar"
 ```
 
 ```bash
-$ curl -XPOST http://localhost/foo/bar
+$ curl -XPOST http://localhost:8080/foo/bar
 data: foo foo foo
 
 data: bar bar bar
@@ -147,7 +147,7 @@ echo "Script parameters: $1"
 The result:
 
 ```bash
-$ curl --data @test.json http://localhost/echo?foo=bar
+$ curl --data @test.json http://localhost:8080/echo?foo=bar
 data: Query parameter: foo=bar
 
 data: Header parameter: user-agent=curl/7.52.1
@@ -169,7 +169,28 @@ You can override this global behavior per request by setting the HTTP header:
 *Example:*
 
 ```bash
-$ curl -XPOST -H "X-Hook-Timeout: 5" http://localhost/echo?foo=bar
+$ curl -XPOST -H "X-Hook-Timeout: 5" http://localhost:8080/echo?foo=bar
+```
+
+### Webhook logs
+
+As mentioned above, web hook logs are stream in real time during the call.
+However, you can retrieve the logs of a previous call by using the hook ID: `http://localhost:8080/<NAME>/<ID>`
+
+The hook ID is returned as an HTTP header with the Webhook response: `X-Hook-ID`
+
+*Example:*
+
+```bash
+$ # Call webhook
+$ curl -v -XPOST http://localhost:8080/echo?foo=bar
+...
+< HTTP/1.1 200 OK
+< Content-Type: text/event-stream
+< X-Hook-Id: 2
+...
+$ # Retrieve logs afterwards
+$ curl http://localhost:8080/echo/2
 ```
 
 ### Post hook notifications

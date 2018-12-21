@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/ncarlier/webhookd/pkg/assert"
@@ -30,8 +31,15 @@ func TestWorkRunner(t *testing.T) {
 	work := NewWorkRequest("test", script, payload, args, 5)
 	assert.NotNil(t, work, "")
 	printWorkMessages(work)
-	_, err := run(work)
+	err := run(work)
 	assert.Nil(t, err, "")
+
+	// Test that log file is ok
+	id := strconv.FormatUint(work.ID, 10)
+	logFile, err := GetLogFile(id, "test")
+	defer logFile.Close()
+	assert.Nil(t, err, "Log file should exists")
+	assert.NotNil(t, logFile, "Log file should be retrieve")
 }
 
 func TestWorkRunnerWithError(t *testing.T) {
@@ -40,7 +48,7 @@ func TestWorkRunnerWithError(t *testing.T) {
 	work := NewWorkRequest("test", script, "", []string{}, 5)
 	assert.NotNil(t, work, "")
 	printWorkMessages(work)
-	_, err := run(work)
+	err := run(work)
 	assert.NotNil(t, err, "")
 	assert.Equal(t, "exit status 1", err.Error(), "")
 }
@@ -51,7 +59,7 @@ func TestWorkRunnerWithTimeout(t *testing.T) {
 	work := NewWorkRequest("test", script, "", []string{}, 1)
 	assert.NotNil(t, work, "")
 	printWorkMessages(work)
-	_, err := run(work)
+	err := run(work)
 	assert.NotNil(t, err, "")
 	assert.Equal(t, "signal: killed", err.Error(), "")
 }
