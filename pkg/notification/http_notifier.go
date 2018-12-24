@@ -2,139 +2,65 @@ package notification
 
 import (
 	"bytes"
-	"fmt"
-	"io"
-	"mime/multipart"
+	"encoding/json"
 	"net/http"
-	"net/textproto"
 	"net/url"
-	"os"
-	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/ncarlier/webhookd/pkg/logger"
+	"github.com/ncarlier/webhookd/pkg/model"
 )
+
+type notifPayload struct {
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Text  string `json:"text"`
+	Error error  `json:"error,omitempty"`
+}
 
 // HTTPNotifier is able to send a notification to a HTTP endpoint.
 type HTTPNotifier struct {
-	URL  string
-	From string
-	To   string
-	User []string
+	URL          *url.URL
+	PrefixFilter string
 }
 
-func newHTTPNotifier() *HTTPNotifier {
-	notifier := new(HTTPNotifier)
-	notifier.URL = os.Getenv("APP_HTTP_NOTIFIER_URL")
-	if notifier.URL == "" {
-		logger.Error.Println("Unable to create HTTP notifier. APP_HTTP_NOTIFIER_URL not set.")
-		return nil
+func newHTTPNotifier(uri *url.URL) *HTTPNotifier {
+	logger.Info.Println("Using HTTP notification system: ", uri.String())
+	return &HTTPNotifier{
+		URL:          uri,
+		PrefixFilter: getValueOrAlt(uri.Query(), "prefix", "notify:"),
 	}
-	user := os.Getenv("APP_HTTP_NOTIFIER_USER")
-	if user != "" {
-		notifier.User = strings.Split(user, ":")
-	}
-	notifier.From = os.Getenv("APP_NOTIFIER_FROM")
-	if notifier.From == "" {
-		notifier.From = "webhookd <noreply@nunux.org>"
-	}
-	notifier.To = os.Getenv("APP_NOTIFIER_TO")
-	if notifier.To == "" {
-		notifier.To = "hostmaster@nunux.org"
-	}
-	return notifier
 }
 
 // Notify send a notification to a HTTP endpoint.
-func (n *HTTPNotifier) Notify(subject string, text string, attachfile string) {
-	logger.Debug.Println("Sending notification '" + subject + "' to " + n.URL + " ...")
-	data := make(url.Values)
-	data.Set("from", n.From)
-	data.Set("to", n.To)
-	data.Set("subject", subject)
-	data.Set("text", text)
-
-	if attachfile != "" {
-		file, err := os.Open(attachfile)
-		if err != nil {
-			logger.Error.Println("Unable to open notification attachment file", err)
-			return
-		}
-		defer file.Close()
-
-		body := &bytes.Buffer{}
-		writer := multipart.NewWriter(body)
-
-		mh := make(textproto.MIMEHeader)
-		mh.Set("Content-Type", "application/x-gzip")
-		mh.Set("Content-Disposition", fmt.Sprintf("form-data; name=\"attachment\"; filename=\"%s\"", filepath.Base(attachfile)))
-		part, err := writer.CreatePart(mh)
-		if err != nil {
-			logger.Error.Println("Unable to create HTTP notification attachment", err)
-			return
-		}
-		_, err = io.Copy(part, file)
-
-		for key, val := range data {
-			_ = writer.WriteField(key, val[0])
-		}
-
-		err = writer.Close()
-		if err != nil {
-			logger.Error.Println("Unable to close the gzip writer", err)
-			return
-		}
-		req, err := http.NewRequest("POST", n.URL, body)
-		if err != nil {
-			logger.Error.Println("Unable to post HTTP notification", err)
-		}
-		defer req.Body.Close()
-		req.Header.Set("Content-Type", writer.FormDataContentType())
-
-		if len(n.User) == 2 {
-			req.SetBasicAuth(n.User[0], n.User[1])
-		}
-
-		// Submit the request
-		client := &http.Client{}
-		res, err := client.Do(req)
-		if err != nil {
-			logger.Error.Println("Unable to do HTTP notification request", err)
-			return
-		}
-
-		// Check the response
-		if res.StatusCode != http.StatusOK {
-			logger.Error.Println("HTTP notification bad response: ", res.Status)
-			logger.Debug.Println(res.Body)
-			return
-		}
-		logger.Info.Println("HTTP notification sent with attachment: ", attachfile)
-	} else {
-		req, err := http.NewRequest("POST", n.URL, bytes.NewBufferString(data.Encode()))
-		if err != nil {
-			logger.Error.Println("Unable to post HTTP notification request", err)
-		}
-		defer req.Body.Close()
-
-		if len(n.User) == 2 {
-			req.SetBasicAuth(n.User[0], n.User[1])
-		}
-
-		// Submit the request
-		client := &http.Client{}
-		res, err := client.Do(req)
-		if err != nil {
-			logger.Error.Println("Unable to do the HTTP notification request", err)
-			return
-		}
-
-		// Check the response
-		if res.StatusCode != http.StatusOK {
-			logger.Error.Println("HTTP notification bad response: ", res.Status)
-			logger.Debug.Println(res.Body)
-			return
-		}
-		logger.Info.Println("HTTP notification sent.")
+func (n *HTTPNotifier) Notify(work *model.WorkRequest) error {
+	payload := work.GetLogContent(n.PrefixFilter)
+	if strings.TrimSpace(payload) == "" {
+		// Nothing to notify, abort
+		return nil
 	}
+
+	notif := &notifPayload{
+		ID:    strconv.FormatUint(work.ID, 10),
+		Name:  work.Name,
+		Text:  payload,
+		Error: work.Err,
+	}
+	notifJSON, err := json.Marshal(notif)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", n.URL.String(), bytes.NewBuffer(notifJSON))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	resp.Body.Close()
+	logger.Info.Printf("Work %s#%d notified to %s\n", work.Name, work.ID, n.URL.String())
+	return nil
 }
