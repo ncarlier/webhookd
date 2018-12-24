@@ -4,18 +4,18 @@ import (
 	"fmt"
 
 	"github.com/ncarlier/webhookd/pkg/logger"
+	"github.com/ncarlier/webhookd/pkg/model"
 	"github.com/ncarlier/webhookd/pkg/notification"
-	"github.com/ncarlier/webhookd/pkg/tools"
 )
 
 // NewWorker creates, and returns a new Worker object. Its only argument
 // is a channel that the worker can add itself to whenever it is done its
 // work.
-func NewWorker(id int, workerQueue chan chan WorkRequest) Worker {
+func NewWorker(id int, workerQueue chan chan model.WorkRequest) Worker {
 	// Create, and return the worker.
 	worker := Worker{
 		ID:          id,
-		Work:        make(chan WorkRequest),
+		Work:        make(chan model.WorkRequest),
 		WorkerQueue: workerQueue,
 		QuitChan:    make(chan bool)}
 
@@ -25,8 +25,8 @@ func NewWorker(id int, workerQueue chan chan WorkRequest) Worker {
 // Worker is a go routine in charge of executing a work.
 type Worker struct {
 	ID          int
-	Work        chan WorkRequest
-	WorkerQueue chan chan WorkRequest
+	Work        chan model.WorkRequest
+	WorkerQueue chan chan model.WorkRequest
 	QuitChan    chan bool
 }
 
@@ -45,11 +45,12 @@ func (w Worker) Start() {
 				err := run(&work)
 				if err != nil {
 					work.MessageChan <- []byte(fmt.Sprintf("error: %s", err.Error()))
-					// notify(subject, err.Error(), filename)
 				} else {
 					work.MessageChan <- []byte("done")
-					// notify(subject, "See attachment.", filename)
 				}
+				// Send notification
+				notification.Notify(&work)
+
 				close(work.MessageChan)
 			case <-w.QuitChan:
 				logger.Debug.Printf("Stopping worker #%d...\n", w.ID)
@@ -65,27 +66,4 @@ func (w Worker) Stop() {
 	go func() {
 		w.QuitChan <- true
 	}()
-}
-
-func notify(subject string, text string, outfilename string) {
-	var notifier, err = notification.NotifierFactory()
-	if err != nil {
-		logger.Debug.Println("Unable to get the notifier. Notification skipped:", err)
-		return
-	}
-	if notifier == nil {
-		logger.Debug.Println("Notification provider not found. Notification skipped.")
-		return
-	}
-
-	var zipfile string
-	if outfilename != "" {
-		zipfile, err = tools.CompressFile(outfilename)
-		if err != nil {
-			fmt.Println(err)
-			zipfile = outfilename
-		}
-	}
-
-	notifier.Notify(subject, text, zipfile)
 }

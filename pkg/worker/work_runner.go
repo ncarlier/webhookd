@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/ncarlier/webhookd/pkg/logger"
+	"github.com/ncarlier/webhookd/pkg/model"
 )
 
 // ChanWriter is a simple writer to a channel of byte.
@@ -22,8 +23,8 @@ func (c *ChanWriter) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
-func run(work *WorkRequest) error {
-	work.Status = Running
+func run(work *model.WorkRequest) error {
+	work.Status = model.Running
 	logger.Info.Printf("Work %s#%d started...\n", work.Name, work.ID)
 	logger.Debug.Printf("Work %s#%d script: %s\n", work.Name, work.ID, work.Script)
 	logger.Debug.Printf("Work %s#%d parameter: %v\n", work.Name, work.ID, work.Args)
@@ -41,7 +42,7 @@ func run(work *WorkRequest) error {
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
 	// Open the log file for writing
-	logFile, err := createLogFile(work)
+	logFile, err := os.Create(work.LogFilename)
 	if err != nil {
 		return work.Terminate(err)
 	}

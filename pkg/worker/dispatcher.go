@@ -2,15 +2,19 @@ package worker
 
 import (
 	"github.com/ncarlier/webhookd/pkg/logger"
+	"github.com/ncarlier/webhookd/pkg/model"
 )
 
-var WorkerQueue chan chan WorkRequest
-var WorkQueue = make(chan WorkRequest, 100)
+// WorkerQueue is the gloabl queue of Workers
+var WorkerQueue chan chan model.WorkRequest
+
+// WorkQueue is the global queue of work to dispatch
+var WorkQueue = make(chan model.WorkRequest, 100)
 
 // StartDispatcher is charged to start n workers.
 func StartDispatcher(nworkers int) {
 	// First, initialize the channel we are going to but the workers' work channels into.
-	WorkerQueue = make(chan chan WorkRequest, nworkers)
+	WorkerQueue = make(chan chan model.WorkRequest, nworkers)
 
 	// Now, create all of our workers.
 	for i := 0; i < nworkers; i++ {

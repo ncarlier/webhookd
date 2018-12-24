@@ -11,6 +11,7 @@ import (
 
 	"github.com/ncarlier/webhookd/pkg/config"
 	"github.com/ncarlier/webhookd/pkg/logger"
+	"github.com/ncarlier/webhookd/pkg/model"
 	"github.com/ncarlier/webhookd/pkg/tools"
 	"github.com/ncarlier/webhookd/pkg/worker"
 )
@@ -76,7 +77,7 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 
 	// Create work
 	timeout := atoiFallback(r.Header.Get("X-Hook-Timeout"), defaultTimeout)
-	work := worker.NewWorkRequest(p, script, string(body), params, timeout)
+	work := model.NewWorkRequest(p, script, string(body), params, timeout)
 
 	// Put work in queue
 	worker.WorkQueue <- *work
@@ -114,8 +115,8 @@ func getWebhookLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get log file
-	logFile, err := worker.GetLogFile(id, name)
+	// Retrieve log file
+	logFile, err := worker.RetrieveLogFile(id, name)
 	if err != nil {
 		logger.Error.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)

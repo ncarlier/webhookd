@@ -4,75 +4,80 @@ import (
 	"fmt"
 	"log"
 	"net/smtp"
-	"os"
+	"net/url"
+	"strings"
 
 	"github.com/ncarlier/webhookd/pkg/logger"
+	"github.com/ncarlier/webhookd/pkg/model"
 )
 
 // SMTPNotifier is able to send notifcation to a email destination.
 type SMTPNotifier struct {
-	Host string
-	From string
-	To   string
+	Host         string
+	From         string
+	To           string
+	PrefixFilter string
 }
 
-func newSMTPNotifier() *SMTPNotifier {
-	notifier := new(SMTPNotifier)
-	notifier.Host = os.Getenv("APP_SMTP_NOTIFIER_HOST")
-	if notifier.Host == "" {
-		notifier.Host = "localhost:25"
+func newSMTPNotifier(uri *url.URL) *SMTPNotifier {
+	logger.Info.Println("Using SMTP notification system: ", uri.Opaque)
+	return &SMTPNotifier{
+		Host:         getValueOrAlt(uri.Query(), "smtp", "localhost:25"),
+		From:         getValueOrAlt(uri.Query(), "from", "noreply@nunux.org"),
+		To:           uri.Opaque,
+		PrefixFilter: getValueOrAlt(uri.Query(), "prefix", "notify:"),
 	}
-	notifier.From = os.Getenv("APP_NOTIFIER_FROM")
-	if notifier.From == "" {
-		notifier.From = "webhookd <noreply@nunux.org>"
-	}
-	notifier.To = os.Getenv("APP_NOTIFIER_TO")
-	if notifier.To == "" {
-		notifier.To = "hostmaster@nunux.org"
-	}
-	return notifier
 }
 
 // Notify send a notification to a email destination.
-func (n *SMTPNotifier) Notify(subject string, text string, attachfile string) {
-	logger.Debug.Println("SMTP notification: ", subject)
+func (n *SMTPNotifier) Notify(work *model.WorkRequest) error {
+	// Get email body
+	payload := work.GetLogContent(n.PrefixFilter)
+	if strings.TrimSpace(payload) == "" {
+		// Nothing to notify, abort
+		return nil
+	}
+
+	// Buidl subject
+	var subject string
+	if work.Status == model.Success {
+		subject = fmt.Sprintf("Webhook %s#%d SUCCESS.", work.Name, work.ID)
+	} else {
+		subject = fmt.Sprintf("Webhook %s#%d FAILED.", work.Name, work.ID)
+	}
+
 	// Connect to the remote SMTP server.
 	c, err := smtp.Dial(n.Host)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 
 	// Set the sender and recipient first
 	if err := c.Mail(n.From); err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 	if err := c.Rcpt(n.To); err != nil {
 		log.Println(err)
-		return
+		return err
 	}
 
 	// Send the email body.
 	wc, err := c.Data()
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
-	_, err = fmt.Fprintf(wc, text)
+
+	_, err = fmt.Fprintf(wc, "Subject: %s\r\n\r\n%s\r\n\r\n", subject, payload)
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 	err = wc.Close()
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 
+	logger.Info.Printf("Work %s#%d notified to %s\n", work.Name, work.ID, n.To)
+
 	// Send the QUIT command and close the connection.
-	err = c.Quit()
-	if err != nil {
-		log.Fatal(err)
-	}
+	return c.Quit()
 }

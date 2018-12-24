@@ -11,6 +11,7 @@ import (
 	"github.com/ncarlier/webhookd/pkg/api"
 	"github.com/ncarlier/webhookd/pkg/config"
 	"github.com/ncarlier/webhookd/pkg/logger"
+	"github.com/ncarlier/webhookd/pkg/notification"
 	"github.com/ncarlier/webhookd/pkg/worker"
 )
 
@@ -36,6 +37,11 @@ func main() {
 		Addr:     *conf.ListenAddr,
 		Handler:  api.NewRouter(config.Get()),
 		ErrorLog: logger.Error,
+	}
+
+	// Configure notification
+	if err := notification.Init(*conf.NotificationURI); err != nil {
+		logger.Error.Fatalf("Unable to create notification channel: %v\n", err)
 	}
 
 	// Start the dispatcher.

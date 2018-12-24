@@ -11,4 +11,6 @@ echo "Testing payload..."
 [ -z "$1" ] && echo "Payload undefined" && exit 1
 [ "$1" != "{\"foo\": \"bar\"}" ] && echo "Invalid payload: $1" && exit 1
 
+echo "notify: OK"
+
 exit 0

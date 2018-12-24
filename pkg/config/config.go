@@ -8,21 +8,25 @@ import (
 
 // Config contain global configuration
 type Config struct {
-	ListenAddr *string
-	NbWorkers  *int
-	Debug      *bool
-	Timeout    *int
-	ScriptDir  *string
-	PasswdFile *string
+	ListenAddr      *string
+	NbWorkers       *int
+	Debug           *bool
+	Timeout         *int
+	ScriptDir       *string
+	PasswdFile      *string
+	LogDir          *string
+	NotificationURI *string
 }
 
 var config = &Config{
-	ListenAddr: flag.String("listen", getEnv("LISTEN_ADDR", ":8080"), "HTTP service address (e.g.address, ':8080')"),
-	NbWorkers:  flag.Int("nb-workers", getIntEnv("NB_WORKERS", 2), "The number of workers to start"),
-	Debug:      flag.Bool("debug", getBoolEnv("DEBUG", false), "Output debug logs"),
-	Timeout:    flag.Int("timeout", getIntEnv("HOOK_TIMEOUT", 10), "Hook maximum delay before timeout (in second)"),
-	ScriptDir:  flag.String("scripts", getEnv("SCRIPTS_DIR", "scripts"), "Scripts directory"),
-	PasswdFile: flag.String("passwd", getEnv("PASSWD_FILE", ".htpasswd"), "Password file (encoded with htpasswd)"),
+	ListenAddr:      flag.String("listen", getEnv("LISTEN_ADDR", ":8080"), "HTTP service address (e.g.address, ':8080')"),
+	NbWorkers:       flag.Int("nb-workers", getIntEnv("NB_WORKERS", 2), "The number of workers to start"),
+	Debug:           flag.Bool("debug", getBoolEnv("DEBUG", false), "Output debug logs"),
+	Timeout:         flag.Int("timeout", getIntEnv("HOOK_TIMEOUT", 10), "Hook maximum delay before timeout (in second)"),
+	ScriptDir:       flag.String("scripts", getEnv("SCRIPTS_DIR", "scripts"), "Scripts directory"),
+	PasswdFile:      flag.String("passwd", getEnv("PASSWD_FILE", ".htpasswd"), "Password file (encoded with htpasswd)"),
+	LogDir:          flag.String("log-dir", getEnv("LOG_DIR", os.TempDir()), "Webhooks execution log directory"),
+	NotificationURI: flag.String("notification-uri", getEnv("NOTIFICATION_URI", ""), "Notification URI"),
 }
 
 func init() {

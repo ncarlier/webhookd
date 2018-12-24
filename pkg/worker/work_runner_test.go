@@ -6,9 +6,10 @@ import (
 
 	"github.com/ncarlier/webhookd/pkg/assert"
 	"github.com/ncarlier/webhookd/pkg/logger"
+	"github.com/ncarlier/webhookd/pkg/model"
 )
 
-func printWorkMessages(work *WorkRequest) {
+func printWorkMessages(work *model.WorkRequest) {
 	go func() {
 		for {
 			msg, open := <-work.MessageChan
@@ -28,16 +29,17 @@ func TestWorkRunner(t *testing.T) {
 		"user_agent=test",
 	}
 	payload := "{\"foo\": \"bar\"}"
-	work := NewWorkRequest("test", script, payload, args, 5)
+	work := model.NewWorkRequest("test", script, payload, args, 5)
 	assert.NotNil(t, work, "")
 	printWorkMessages(work)
 	err := run(work)
 	assert.Nil(t, err, "")
-	assert.Equal(t, work.Status, Success, "")
+	assert.Equal(t, work.Status, model.Success, "")
+	assert.Equal(t, work.GetLogContent("notify:"), "OK\n", "")
 
-	// Test that log file is ok
+	// Test that we can retrieve log file afterward
 	id := strconv.FormatUint(work.ID, 10)
-	logFile, err := GetLogFile(id, "test")
+	logFile, err := RetrieveLogFile(id, "test")
 	defer logFile.Close()
 	assert.Nil(t, err, "Log file should exists")
 	assert.NotNil(t, logFile, "Log file should be retrieve")
@@ -46,23 +48,23 @@ func TestWorkRunner(t *testing.T) {
 func TestWorkRunnerWithError(t *testing.T) {
 	logger.Init("debug")
 	script := "../../tests/test_error.sh"
-	work := NewWorkRequest("test", script, "", []string{}, 5)
+	work := model.NewWorkRequest("test", script, "", []string{}, 5)
 	assert.NotNil(t, work, "")
 	printWorkMessages(work)
 	err := run(work)
 	assert.NotNil(t, err, "")
-	assert.Equal(t, work.Status, Error, "")
+	assert.Equal(t, work.Status, model.Error, "")
 	assert.Equal(t, "exit status 1", err.Error(), "")
 }
 
 func TestWorkRunnerWithTimeout(t *testing.T) {
 	logger.Init("debug")
 	script := "../../tests/test_timeout.sh"
-	work := NewWorkRequest("test", script, "", []string{}, 1)
+	work := model.NewWorkRequest("test", script, "", []string{}, 1)
 	assert.NotNil(t, work, "")
 	printWorkMessages(work)
 	err := run(work)
 	assert.NotNil(t, err, "")
-	assert.Equal(t, work.Status, Error, "")
+	assert.Equal(t, work.Status, model.Error, "")
 	assert.Equal(t, "signal: killed", err.Error(), "")
 }
