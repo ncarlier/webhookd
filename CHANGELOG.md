@@ -1,5 +1,12 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.4.0...v) (2018-12-18)
+# [](https://github.com/ncarlier/webhookd/compare/v1.4.0...v) (2018-12-30)
+
+
+### Features
+
+* **api:** add API endpoint to retrieve logs ([2ca5d67](https://github.com/ncarlier/webhookd/commit/2ca5d67))
+* **notification:** complete refactoring of the notification system ([1dab1e9](https://github.com/ncarlier/webhookd/commit/1dab1e9))
+* **worker:** add worker status lifecycle ([adead6d](https://github.com/ncarlier/webhookd/commit/adead6d))
 
 
 
