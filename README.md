@@ -28,7 +28,8 @@ $ sudo curl -s https://raw.githubusercontent.com/ncarlier/webhookd/master/instal
 $ docker run -d --name=webhookd \
   -v ${PWD}/scripts:/var/opt/webhookd/scripts \
   -p 8080:8080 \
-  ncarlier/webhookd
+  ncarlier/webhookd \
+  webhookd --scripts=/var/opt/webhookd/scripts
 ```
 
 > Note that this image extends `docker:dind` Docker image.
