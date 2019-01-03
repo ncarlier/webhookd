@@ -123,7 +123,7 @@ func getWebhookLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if logFile == nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
+		http.Error(w, "job not found", http.StatusNotFound)
 		return
 	}
 	defer logFile.Close()
