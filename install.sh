@@ -35,7 +35,7 @@ sudo tar xvzf ${download_file} -C /tmp/
 [ $? != 0 ] && die "Unable to extract archive."
 
 echo "Moving binary to $bin_target ..."
-sudo mv /tmp/release/webhookd* $bin_target
+sudo mv /tmp/webhookd* $bin_target
 [ $? != 0 ] && die "Unable to move binary."
 
 echo "Making $bin_target as executable ..."

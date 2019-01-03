@@ -9,10 +9,10 @@ deploy:
   api_key:
     secure: VATbHmgR1DDXlIHEMpupuTggPU6wgtZk3BFK/eT5L+qqhnfSal1z+ZsypgWMGZN2Ch6WTRFaXqUhpV7N2oo+pQoXAYcDFWTd3BiTUied+pKVoUa8VuZFF2TW1cNcVJ3fnFPMFnpJPTYkld//+8s8zJQitTabE1QZdXNYPU1uUiY=
   file:
-  - release/webhookd-linux-amd64.tgz
-  - release/webhookd-linux-arm64.tgz
-  - release/webhookd-linux-arm.tgz
-  - release/webhookd-darwin-amd64.tgz
+  - release/webhookd-linux-amd64.gz
+  - release/webhookd-linux-arm64.gz
+  - release/webhookd-linux-arm.gz
+  - release/webhookd-darwin-amd64.gz
   skip_cleanup: true
   on:
     repo: ncarlier/webhookd
