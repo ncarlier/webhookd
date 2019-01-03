@@ -23,6 +23,7 @@ func NewRouter(conf *config.Config) *http.ServeMux {
 		var handler http.Handler
 
 		handler = route.HandlerFunc(conf)
+		handler = middleware.Cors(handler)
 		handler = middleware.Logger(handler)
 		handler = middleware.Tracing(nextRequestID)(handler)
 
