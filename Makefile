@@ -2,9 +2,6 @@
 
 export GO111MODULE=on
 
-# Author
-AUTHOR=github.com/ncarlier
-
 # App name
 APPNAME=webhookd
 
@@ -15,9 +12,6 @@ GOARCH?=amd64
 # Add exe extension if windows target
 is_windows:=$(filter windows,$(GOOS))
 EXT:=$(if $(is_windows),".exe","")
-
-# Go app path
-APPBASE=${GOPATH}/src/$(AUTHOR)
 
 # Artefact name
 ARTEFACT=release/$(APPNAME)-$(GOOS)-$(GOARCH)$(EXT)
@@ -33,18 +27,13 @@ root_dir:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 makefiles:=$(root_dir)/makefiles
 include $(makefiles)/help.Makefile
 
-$(APPBASE)/$(APPNAME):
-	echo "Creating GO src link: $(APPBASE)/$(APPNAME) ..."
-	mkdir -p $(APPBASE)
-	ln -s $(root_dir) $(APPBASE)/$(APPNAME)
-
 ## Clean built files
 clean:
 	-rm -rf release
 .PHONY: clean
 
 ## Build executable
-build: $(APPBASE)/$(APPNAME)
+build:
 	-mkdir -p release
 	echo "Building: $(ARTEFACT) $(VERSION) ..."
 	GOOS=$(GOOS) GOARCH=$(GOARCH) go build $(LDFLAGS) -o $(ARTEFACT)
@@ -54,7 +43,7 @@ $(ARTEFACT): build
 
 ## Run tests
 test:
-	cd $(APPBASE)/$(APPNAME) && go test `go list ./... | grep -v vendor`
+	go test `go list ./... | grep -v vendor`
 .PHONY: test
 
 ## Install executable
