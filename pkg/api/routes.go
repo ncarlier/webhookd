@@ -30,4 +30,9 @@ var routes = Routes{
 		"/healtz",
 		healthz,
 	},
+	Route{
+		"GET",
+		"/varz",
+		varz,
+	},
 }

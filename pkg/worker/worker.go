@@ -3,6 +3,8 @@ package worker
 import (
 	"fmt"
 
+	"github.com/ncarlier/webhookd/pkg/metric"
+
 	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/model"
 	"github.com/ncarlier/webhookd/pkg/notification"
@@ -42,8 +44,10 @@ func (w Worker) Start() {
 			case work := <-w.Work:
 				// Receive a work request.
 				logger.Debug.Printf("Worker #%d received work request: %s#%d\n", w.ID, work.Name, work.ID)
+				metric.Requests.Add(1)
 				err := run(&work)
 				if err != nil {
+					metric.RequestsFailed.Add(1)
 					work.MessageChan <- []byte(fmt.Sprintf("error: %s", err.Error()))
 				} else {
 					work.MessageChan <- []byte("done")
