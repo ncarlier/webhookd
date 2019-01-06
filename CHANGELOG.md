@@ -1,5 +1,21 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.5.0...v) (2019-01-03)
+# [](https://github.com/ncarlier/webhookd/compare/v1.5.1...v) (2019-01-06)
+
+
+
+<a name="1.5.1"></a>
+## [1.5.1](https://github.com/ncarlier/webhookd/compare/v1.5.0...v1.5.1) (2019-01-06)
+
+
+### Bug Fixes
+
+* **api:** fix nil pointer ([4d2c75e](https://github.com/ncarlier/webhookd/commit/4d2c75e))
+
+
+### Features
+
+* **api:** add basic CORS support ([7a6af73](https://github.com/ncarlier/webhookd/commit/7a6af73))
+* **cli:** improve parameters desc ([d8d440a](https://github.com/ncarlier/webhookd/commit/d8d440a))
 
 
 
