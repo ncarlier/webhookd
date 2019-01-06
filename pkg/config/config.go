@@ -19,20 +19,25 @@ type Config struct {
 }
 
 var config = &Config{
-	ListenAddr:      flag.String("listen", getEnv("LISTEN_ADDR", ":8080"), "HTTP service address (e.g.address, ':8080')"),
+	ListenAddr:      flag.String("listen", getEnv("LISTEN_ADDR", ":8080"), "HTTP service address"),
 	NbWorkers:       flag.Int("nb-workers", getIntEnv("NB_WORKERS", 2), "The number of workers to start"),
 	Debug:           flag.Bool("debug", getBoolEnv("DEBUG", false), "Output debug logs"),
-	Timeout:         flag.Int("timeout", getIntEnv("HOOK_TIMEOUT", 10), "Hook maximum delay before timeout (in second)"),
+	Timeout:         flag.Int("timeout", getIntEnv("HOOK_TIMEOUT", 10), "Hook maximum delay (in second) before timeout"),
 	ScriptDir:       flag.String("scripts", getEnv("SCRIPTS_DIR", "scripts"), "Scripts directory"),
-	PasswdFile:      flag.String("passwd", getEnv("PASSWD_FILE", ".htpasswd"), "Password file (encoded with htpasswd)"),
+	PasswdFile:      flag.String("passwd", getEnv("PASSWD_FILE", ".htpasswd"), "Password file encoded with htpasswd"),
 	LogDir:          flag.String("log-dir", getEnv("LOG_DIR", os.TempDir()), "Webhooks execution log directory"),
 	NotificationURI: flag.String("notification-uri", getEnv("NOTIFICATION_URI", ""), "Notification URI"),
 }
 
 func init() {
-	flag.StringVar(config.ListenAddr, "l", *config.ListenAddr, "HTTP service (e.g address: ':8080')")
-	flag.BoolVar(config.Debug, "d", *config.Debug, "Output debug logs")
-	flag.StringVar(config.PasswdFile, "p", *config.PasswdFile, "Password file (encoded with htpasswd)")
+	// set shorthand parameters
+	const shorthand = " (shorthand)"
+	usage := flag.Lookup("listen").Usage + shorthand
+	flag.StringVar(config.ListenAddr, "l", *config.ListenAddr, usage)
+	usage = flag.Lookup("debug").Usage + shorthand
+	flag.BoolVar(config.Debug, "d", *config.Debug, usage)
+	usage = flag.Lookup("passwd").Usage + shorthand
+	flag.StringVar(config.PasswdFile, "p", *config.PasswdFile, usage)
 }
 
 // Get global configuration
