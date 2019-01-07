@@ -11,7 +11,7 @@ type HandlerFunc func(conf *config.Config) http.Handler
 
 // Route is the structure of an HTTP route definition
 type Route struct {
-	Method      string
+	Methods     []string
 	Path        string
 	HandlerFunc HandlerFunc
 }
@@ -21,17 +21,17 @@ type Routes []Route
 
 var routes = Routes{
 	Route{
-		"GET",
+		[]string{"GET", "POST"},
 		"/",
 		index,
 	},
 	Route{
-		"GET",
+		[]string{"GET"},
 		"/healtz",
 		healthz,
 	},
 	Route{
-		"GET",
+		[]string{"GET"},
 		"/varz",
 		varz,
 	},
