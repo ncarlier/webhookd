@@ -43,7 +43,7 @@ $(ARTEFACT): build
 
 ## Run tests
 test:
-	go test `go list ./... | grep -v vendor`
+	go test ./...
 .PHONY: test
 
 ## Install executable
