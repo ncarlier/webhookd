@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -36,14 +37,13 @@ func index(conf *config.Config) http.Handler {
 }
 
 func webhookHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		triggerWebhook(w, r)
-	} else if r.Method == "GET" {
-		getWebhookLog(w, r)
-	} else {
-		http.Error(w, "405 Method Not Allowed", http.StatusMethodNotAllowed)
-		return
+	if r.Method == "GET" {
+		if _, err := strconv.Atoi(filepath.Base(r.URL.Path)); err == nil {
+			getWebhookLog(w, r)
+			return
+		}
 	}
+	triggerWebhook(w, r)
 }
 
 func triggerWebhook(w http.ResponseWriter, r *http.Request) {
@@ -82,10 +82,15 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 	// Put work in queue
 	worker.WorkQueue <- *work
 
-	w.Header().Set("Content-Type", "text/event-stream")
+	if r.Method == "GET" {
+		// Send SSE response
+		w.Header().Set("Content-Type", "text/event-stream")
+	} else {
+		// Send chunked response
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+	}
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("X-Hook-ID", strconv.FormatUint(work.ID, 10))
 
 	for {
@@ -95,7 +100,11 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		fmt.Fprintf(w, "data: %s\n\n", msg)
+		if r.Method == "GET" {
+			fmt.Fprintf(w, "data: %s\n\n", msg) // Send SSE response
+		} else {
+			fmt.Fprintf(w, "%s\n", msg) // Send chunked response
+		}
 
 		// Flush the data immediatly instead of buffering it for later.
 		flusher.Flush()

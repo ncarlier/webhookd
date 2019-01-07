@@ -90,8 +90,14 @@ You can override the default using the `APP_SCRIPTS_DIR` environment variable.
 ### Webhook URL
 
 The directory structure define the webhook URL.
-The Webhook can only be call with HTTP POST verb.
-If the script exists, the HTTP response will be a `text/event-stream` content type (Server-sent events).
+
+If the script exists, the output the will be streamed to the HTTP response.
+
+The streaming technology depends on the HTTP method used.
+With `POST` the response will be chunked.
+With `GET` the response will use [Server-sent events][sse].
+
+[sse]: https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
 
 *Example:*
 
@@ -104,8 +110,27 @@ echo "foo foo foo"
 echo "bar bar bar"
 ```
 
+Output using `POST` (`Chunked transfer encoding`):
+
 ```bash
-$ curl -XPOST http://localhost:8080/foo/bar
+$ curl -v -XPOST http://localhost:8080/foo/bar
+< HTTP/1.1 200 OK
+< Content-Type: text/plain; charset=utf-8
+< Transfer-Encoding: chunked
+< X-Hook-Id: 7
+foo foo foo
+bar bar bar
+done
+```
+
+Output using  `GET` (`Server-sent events`):
+
+```bash
+$ curl -v -XGET http://localhost:8080/foo/bar
+< HTTP/1.1 200 OK
+< Content-Type: text/event-stream
+< Transfer-Encoding: chunked
+< X-Hook-Id: 8
 data: foo foo foo
 
 data: bar bar bar
@@ -123,7 +148,7 @@ You have several way to provide parameters to your webhook script:
 
   *ex: `CONTENT-TYPE` will become `content_type`.*
 
-- Body content (text/plain or application/json) is transmit to the script as parameter.
+- When using `POST`, body content (text/plain or application/json) is transmit to the script as parameter.
 
 *Example:*
 
@@ -141,13 +166,10 @@ The result:
 
 ```bash
 $ curl --data @test.json http://localhost:8080/echo?foo=bar
-data: Query parameter: foo=bar
-
-data: Header parameter: user-agent=curl/7.52.1
-
-data: Script parameter: {"foo": "bar"}
-
-data: done
+Query parameter: foo=bar
+Header parameter: user-agent=curl/7.52.1
+Script parameter: {"foo": "bar"}
+done
 ```
 
 ### Webhook timeout configuration
@@ -162,7 +184,7 @@ You can override this global behavior per request by setting the HTTP header:
 *Example:*
 
 ```bash
-$ curl -XPOST -H "X-Hook-Timeout: 5" http://localhost:8080/echo?foo=bar
+$ curl -H "X-Hook-Timeout: 5" http://localhost:8080/echo?foo=bar
 ```
 
 ### Webhook logs
@@ -176,7 +198,7 @@ The hook ID is returned as an HTTP header with the Webhook response: `X-Hook-ID`
 
 ```bash
 $ # Call webhook
-$ curl -v -XPOST http://localhost:8080/echo?foo=bar
+$ curl -v http://localhost:8080/echo?foo=bar
 ...
 < HTTP/1.1 200 OK
 < Content-Type: text/event-stream
