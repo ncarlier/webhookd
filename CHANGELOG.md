@@ -1,5 +1,18 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.5.1...v) (2019-01-06)
+# [](https://github.com/ncarlier/webhookd/compare/v1.6.0...v) (2019-01-07)
+
+
+
+<a name="1.6.0"></a>
+# [1.6.0](https://github.com/ncarlier/webhookd/compare/v1.5.1...v1.6.0) (2019-01-07)
+
+
+### Features
+
+* safer script resolution ([682b265](https://github.com/ncarlier/webhookd/commit/682b265))
+* **api:** add method whitelist ([d11da6f](https://github.com/ncarlier/webhookd/commit/d11da6f))
+* **api:** add varz endpoint with metrics ([35a2321](https://github.com/ncarlier/webhookd/commit/35a2321))
+* **api:** use GET and POST requests for hooks ([e7fac82](https://github.com/ncarlier/webhookd/commit/e7fac82))
 
 
 
