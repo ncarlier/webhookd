@@ -13,8 +13,11 @@ GOARCH?=amd64
 is_windows:=$(filter windows,$(GOOS))
 EXT:=$(if $(is_windows),".exe","")
 
-# Artefact name
-ARTEFACT=release/$(APPNAME)-$(GOOS)-$(GOARCH)$(EXT)
+# Archive name
+ARCHIVE=$(APPNAME)-$(GOOS)-$(GOARCH).tgz
+
+# Executable name
+EXECUTABLE=$(APPNAME)$(EXT)
 
 # Extract version infos
 VERSION:=`git describe --tags`
@@ -35,11 +38,11 @@ clean:
 ## Build executable
 build:
 	-mkdir -p release
-	echo "Building: $(ARTEFACT) $(VERSION) ..."
-	GOOS=$(GOOS) GOARCH=$(GOARCH) go build $(LDFLAGS) -o $(ARTEFACT)
+	echo "Building: $(EXECUTABLE) $(VERSION) for $(GOOS)-$(GOARCH) ..."
+	GOOS=$(GOOS) GOARCH=$(GOARCH) go build $(LDFLAGS) -o release/$(EXECUTABLE)
 .PHONY: build
 
-$(ARTEFACT): build
+release/$(EXECUTABLE): build
 
 ## Run tests
 test:
@@ -47,14 +50,14 @@ test:
 .PHONY: test
 
 ## Install executable
-install: $(ARTEFACT)
-	echo "Installing $(ARTEFACT) to ${HOME}/.local/bin/$(APPNAME) ..."
-	cp $(ARTEFACT) ${HOME}/.local/bin/$(APPNAME)
+install: release/$(EXECUTABLE)
+	echo "Installing $(EXECUTABLE) to ${HOME}/.local/bin/$(EXECUTABLE) ..."
+	cp release/$(EXECUTABLE) ${HOME}/.local/bin/$(EXECUTABLE)
 .PHONY: install
 
 ## Create Docker image
 image:
-	echo "Building Docker inage ..."
+	echo "Building Docker image ..."
 	docker build --rm -t ncarlier/$(APPNAME) .
 .PHONY: image
 
@@ -63,16 +66,18 @@ changelog:
 	standard-changelog --first-release
 .PHONY: changelog
 
-## GZIP executable
-gzip:
-	gzip $(ARTEFACT)
-.PHONY: gzip
+## Create archive
+archive: release/$(EXECUTABLE)
+	echo "Creating release/$(ARCHIVE) archive..."
+	tar czf release/$(ARCHIVE) README.md LICENSE CHANGELOG.md -C release/ $(EXECUTABLE)
+	rm release/$(EXECUTABLE)
+.PHONY: archive
 
 ## Create distribution binaries
-distribution:
-	GOARCH=amd64 make build gzip
-	GOARCH=arm64 make build gzip
-	GOARCH=arm make build gzip
-	GOOS=darwin make build gzip
+distribution: changelog
+	GOARCH=amd64 make build archive
+	GOARCH=arm64 make build archive
+	GOARCH=arm make build archive
+	GOOS=darwin make build archive
 .PHONY: distribution
 
