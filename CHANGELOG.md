@@ -1,5 +1,5 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.6.0...v) (2019-01-09)
+# [](https://github.com/ncarlier/webhookd/compare/v1.6.1...v) (2019-01-09)
 
 
 ### Bug Fixes
