@@ -74,7 +74,7 @@ archive: release/$(EXECUTABLE)
 .PHONY: archive
 
 ## Create distribution binaries
-distribution: changelog
+distribution:
 	GOARCH=amd64 make build archive
 	GOARCH=arm64 make build archive
 	GOARCH=arm make build archive
