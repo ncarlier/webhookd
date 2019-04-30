@@ -24,7 +24,7 @@ base_download_url=`dirname $artefact_url`
 
 download_url=$base_download_url/webhookd-$os-${arch}.tgz
 download_file=/tmp/webhookd-$os-${arch}.tgz
-bin_target=/usr/local/bin/webhookd
+bin_target=/usr/local/bin
 
 echo "Downloading $download_url to $download_file ..."
 sudo curl -o $download_file --fail -L $download_url
@@ -39,7 +39,7 @@ sudo mv /tmp/webhookd* $bin_target
 [ $? != 0 ] && die "Unable to move binary."
 
 echo "Making $bin_target as executable ..."
-sudo chmod +x $bin_target
+sudo chmod +x $bin_target/webhookd
 [ $? != 0 ] && die "Unable to make the binary as executable."
 
 echo "Installation done. Type 'webhookd' to start the server."
