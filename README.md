@@ -1,8 +1,9 @@
 # webhookd
 
 [![Build Status](https://travis-ci.org/ncarlier/webhookd.svg?branch=master)](https://travis-ci.org/ncarlier/webhookd)
-[![Image size](https://images.microbadger.com/badges/image/ncarlier/webhookd.svg)](https://microbadger.com/images/ncarlier/webhookd)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ncarlier/webhookd)](https://goreportcard.com/report/github.com/ncarlier/webhookd)
 [![Docker pulls](https://img.shields.io/docker/pulls/ncarlier/webhookd.svg)](https://hub.docker.com/r/ncarlier/webhookd/)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/nunux)
 
 A very simple webhook server to launch shell scripts.
 
