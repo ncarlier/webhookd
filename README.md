@@ -38,44 +38,20 @@ $ docker run -d --name=webhookd \
 
 ## Configuration
 
-You can configure the daemon by:
+Webhookd can be configured by using command line parameters or by setting environment variables.
 
-### Setting environment variables:
+Type `webhookd -h` to display all parameters and related environment variables.
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `APP_LISTEN_ADDR` | `:8080` | HTTP service address |
-| `APP_PASSWD_FILE` | `.htpasswd` | Password file for HTTP basic authentication |
-| `APP_NB_WORKERS` | `2` | The number of workers to start |
-| `APP_HOOK_TIMEOUT` | `10` | Hook maximum delay before timeout (in second) |
-| `APP_SCRIPTS_DIR` | `./scripts` | Scripts directory |
-| `APP_SCRIPTS_GIT_URL` | none | GIT repository that contains scripts (Note: this is only used by the Docker image or by using the Docker entrypoint script) |
-| `APP_SCRIPTS_GIT_KEY` | none | GIT SSH private key used to clone the repository (Note: this is only used by the Docker image or by using the Docker entrypoint script) |
-| `APP_LOG_DIR` | `/tmp` (OS temp dir) | Directory to store execution logs |
-| `APP_NOTIFICATION_URI` | none | Notification configuration URI |
-| `APP_DEBUG` | `false` | Output debug logs |
-
-### Using command parameters:
-
-| Parameter | Default | Description |
-|----------|---------|-------------|
-| `-l <address> or --listen <address>` | `:8080` | HTTP service address |
-| `-p or --passwd <htpasswd file>` | `.htpasswd` | Password file for HTTP basic authentication
-| `-d or --debug` | false | Output debug logs |
-| `--nb-workers <workers>` | `2` | The number of workers to start |
-| `--scripts <dir>` | `./scripts` | Scripts directory |
-| `--timeout <timeout>` | `10` | Hook maximum delay before timeout (in second) |
-| `--notification-uri <uri>` |  | Notification configuration URI |
-| `--log-dir <dir>` | `/tmp` | Directory to store execution logs |
+All configuration variables are described in [etc/default/webhookd.env](./etc/default/webhookd.env) file.
 
 ## Usage
 
 ### Directory structure
 
-Webhooks are simple scripts dispatched into a directory structure.
+Webhooks are simple scripts within a directory structure.
 
 By default inside the `./scripts` directory.
-You can override the default using the `APP_SCRIPTS_DIR` environment variable.
+You can override the default using the `WHD_SCRIPTS_DIR` environment variable or `-script` parameter.
 
 *Example:*
 
@@ -177,7 +153,7 @@ done
 
 By default a webhook has a timeout of 10 seconds.
 This timeout is globally configurable by setting the environment variable:
-`APP_HOOK_TIMEOUT` (in seconds).
+`WHD_HOOK_TIMEOUT` (in seconds).
 
 You can override this global behavior per request by setting the HTTP header:
 `X-Hook-Timeout` (in seconds).
@@ -212,7 +188,7 @@ $ curl http://localhost:8080/echo/2
 ### Post hook notifications
 
 The output of the script is collected and stored into a log file
-(configured by the `APP_LOG_DIR` environment variable).
+(configured by the `WHD_LOG_DIR` environment variable).
 
 Once the script is executed, you can send the result and this log file to a notification channel.
 Currently, only two channels are supported: `Email` and `HTTP`.
@@ -220,7 +196,7 @@ Currently, only two channels are supported: `Email` and `HTTP`.
 Notifications configuration can be done as follow:
 
 ```bash
-$ export APP_NOTIFICATION_URI=http://requestb.in/v9b229v9
+$ export WHD_NOTIFICATION_URI=http://requestb.in/v9b229v9
 $ # or
 $ webhookd --notification-uri=http://requestb.in/v9b229v9
 ```
@@ -237,7 +213,7 @@ echo "notify: Hello World" # Will be notified
 echo "Goodbye"             # Will not be notified
 ```
 
-You can overide the notification prefix by adding `prefix` as a query parameter to the configuration URL.
+You can override the notification prefix by adding `prefix` as a query parameter to the configuration URL.
 
 **Example:** http://requestb.in/v9b229v9?prefix="foo:"
 
@@ -291,7 +267,7 @@ Please note that by default, the daemon will try to load the `.htpasswd` file.
 But you can override this behavior by specifying the location of the file:
 
 ```bash
-$ APP_PASSWD_FILE=/etc/webhookd/users.htpasswd
+$ export WHD_PASSWD_FILE=/etc/webhookd/users.htpasswd
 $ # or
 $ webhookd -p /etc/webhookd/users.htpasswd
 ```
@@ -302,6 +278,36 @@ Once configured, you must call webhooks using basic authentication:
 $ curl -u api:test -XPOST "http://localhost:8080/echo?msg=hello"
 ```
 
+### TLS
+
+You can activate TLS to secure communications:
+
+```bash
+$ export WHD_TLS_LISTEN_ADDR=:8443
+$ # or
+$ webhookd -tls-listen-addr=:8443
+```
+
+This will disable HTTP port.
+
+By default webhookd is expecting a certificate and key file (`./server.pem` and `./server.key`).
+You can provide your own certificate and key with `-tls-cert-file` and `-tls-key-file`.
+
+Webhookd also support [ACME](https://ietf-wg-acme.github.io/acme/) protocol.
+You can activate ACME by setting a fully qualified domain name:
+
+```bash
+$ export WHD_TLS_LISTEN_ADDR=:8443
+$ export WHD_TLS_DOMAIN=hook.example.com
+$ # or
+$ webhookd -tls-listen-addr=:8443 -tls-domain=hook.example.com
+```
+
+**Note:**
+On *nix, if you want to listen on ports 80 and 443, don't forget to use `setcap` to privilege the binary:
+
+```bash
+sudo setcap CAP_NET_BIND_SERVICE+ep webhookd
+```
+
 ---
-
-

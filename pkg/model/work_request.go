@@ -11,7 +11,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/ncarlier/webhookd/pkg/config"
 	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/tools"
 )
@@ -48,7 +47,7 @@ type WorkRequest struct {
 }
 
 // NewWorkRequest creats new work request
-func NewWorkRequest(name, script, payload string, args []string, timeout int) *WorkRequest {
+func NewWorkRequest(name, script, payload, output string, args []string, timeout int) *WorkRequest {
 	w := &WorkRequest{
 		ID:          atomic.AddUint64(&workID, 1),
 		Name:        name,
@@ -59,7 +58,7 @@ func NewWorkRequest(name, script, payload string, args []string, timeout int) *W
 		MessageChan: make(chan []byte),
 		Status:      Idle,
 	}
-	w.LogFilename = path.Join(*config.Get().LogDir, fmt.Sprintf("%s_%d_%s.txt", tools.ToSnakeCase(w.Name), w.ID, time.Now().Format("20060102_1504")))
+	w.LogFilename = path.Join(output, fmt.Sprintf("%s_%d_%s.txt", tools.ToSnakeCase(w.Name), w.ID, time.Now().Format("20060102_1504")))
 	return w
 }
 

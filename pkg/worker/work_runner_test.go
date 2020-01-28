@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"os"
 	"strconv"
 	"testing"
 
@@ -29,7 +30,7 @@ func TestWorkRunner(t *testing.T) {
 		"user_agent=test",
 	}
 	payload := "{\"foo\": \"bar\"}"
-	work := model.NewWorkRequest("test", script, payload, args, 5)
+	work := model.NewWorkRequest("test", script, payload, os.TempDir(), args, 5)
 	assert.NotNil(t, work, "")
 	printWorkMessages(work)
 	err := run(work)
@@ -39,7 +40,7 @@ func TestWorkRunner(t *testing.T) {
 
 	// Test that we can retrieve log file afterward
 	id := strconv.FormatUint(work.ID, 10)
-	logFile, err := RetrieveLogFile(id, "test")
+	logFile, err := RetrieveLogFile(id, "test", os.TempDir())
 	defer logFile.Close()
 	assert.Nil(t, err, "Log file should exists")
 	assert.NotNil(t, logFile, "Log file should be retrieve")
@@ -48,7 +49,7 @@ func TestWorkRunner(t *testing.T) {
 func TestWorkRunnerWithError(t *testing.T) {
 	logger.Init("debug")
 	script := "../../tests/test_error.sh"
-	work := model.NewWorkRequest("test", script, "", []string{}, 5)
+	work := model.NewWorkRequest("test", script, "", os.TempDir(), []string{}, 5)
 	assert.NotNil(t, work, "")
 	printWorkMessages(work)
 	err := run(work)
@@ -60,7 +61,7 @@ func TestWorkRunnerWithError(t *testing.T) {
 func TestWorkRunnerWithTimeout(t *testing.T) {
 	logger.Init("debug")
 	script := "../../tests/test_timeout.sh"
-	work := model.NewWorkRequest("test", script, "", []string{}, 1)
+	work := model.NewWorkRequest("test", script, "", os.TempDir(), []string{}, 1)
 	assert.NotNil(t, work, "")
 	printWorkMessages(work)
 	err := run(work)

@@ -13,10 +13,14 @@ import (
 	"github.com/ncarlier/webhookd/pkg/config"
 	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/notification"
+	"github.com/ncarlier/webhookd/pkg/server"
 	"github.com/ncarlier/webhookd/pkg/worker"
 )
 
 func main() {
+	conf := &config.Config{}
+	config.HydrateFromFlags(conf)
+
 	flag.Parse()
 
 	if *version {
@@ -24,30 +28,28 @@ func main() {
 		return
 	}
 
-	conf := config.Get()
-
 	level := "info"
-	if *conf.Debug {
+	if conf.Debug {
 		level = "debug"
 	}
 	logger.Init(level)
 
-	logger.Debug.Println("Starting webhookd server...")
-
-	server := &http.Server{
-		Addr:     *conf.ListenAddr,
-		Handler:  api.NewRouter(config.Get()),
-		ErrorLog: logger.Error,
+	if conf.LogDir == "" {
+		conf.LogDir = os.TempDir()
 	}
 
+	logger.Debug.Println("Starting webhookd server...")
+
+	srv := server.NewServer(conf)
+
 	// Configure notification
-	if err := notification.Init(*conf.NotificationURI); err != nil {
+	if err := notification.Init(conf.NotificationURI); err != nil {
 		logger.Error.Fatalf("Unable to create notification channel: %v\n", err)
 	}
 
 	// Start the dispatcher.
-	logger.Debug.Printf("Starting the dispatcher (%d workers)...\n", *conf.NbWorkers)
-	worker.StartDispatcher(*conf.NbWorkers)
+	logger.Debug.Printf("Starting the dispatcher (%d workers)...\n", conf.NbWorkers)
+	worker.StartDispatcher(conf.NbWorkers)
 
 	done := make(chan bool)
 	quit := make(chan os.Signal, 1)
@@ -61,17 +63,20 @@ func main() {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
-		server.SetKeepAlivesEnabled(false)
-		if err := server.Shutdown(ctx); err != nil {
+		if err := srv.Shutdown(ctx); err != nil {
 			logger.Error.Fatalf("Could not gracefully shutdown the server: %v\n", err)
 		}
 		close(done)
 	}()
 
-	logger.Info.Println("Server is ready to handle requests at", *conf.ListenAddr)
+	addr := conf.ListenAddr
+	if conf.TLSListenAddr != "" {
+		addr = conf.TLSListenAddr
+	}
+	logger.Info.Println("Server is ready to handle requests at", addr)
 	api.Start()
-	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		logger.Error.Fatalf("Could not listen on %s: %v\n", *conf.ListenAddr, err)
+	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		logger.Error.Fatalf("Could not listen on %s : %v\n", addr, err)
 	}
 
 	<-done

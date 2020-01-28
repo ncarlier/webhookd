@@ -25,6 +25,9 @@ func NewRouter(conf *config.Config) *http.ServeMux {
 		handler = route.HandlerFunc(conf)
 		handler = middleware.Method(handler, route.Methods)
 		handler = middleware.Cors(handler)
+		if conf.TLSListenAddr != "" {
+			handler = middleware.HSTS(handler)
+		}
 		handler = middleware.Logger(handler)
 		handler = middleware.Tracing(nextRequestID)(handler)
 

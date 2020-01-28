@@ -20,6 +20,7 @@ import (
 var (
 	defaultTimeout int
 	scriptDir      string
+	outputDir      string
 )
 
 func atoiFallback(str string, fallback int) int {
@@ -31,8 +32,9 @@ func atoiFallback(str string, fallback int) int {
 
 // index is the main handler of the API.
 func index(conf *config.Config) http.Handler {
-	defaultTimeout = *conf.Timeout
-	scriptDir = *conf.ScriptDir
+	defaultTimeout = conf.Timeout
+	scriptDir = conf.ScriptDir
+	outputDir = conf.LogDir
 	return http.HandlerFunc(webhookHandler)
 }
 
@@ -77,7 +79,7 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 
 	// Create work
 	timeout := atoiFallback(r.Header.Get("X-Hook-Timeout"), defaultTimeout)
-	work := model.NewWorkRequest(p, script, string(body), params, timeout)
+	work := model.NewWorkRequest(p, script, string(body), outputDir, params, timeout)
 
 	// Put work in queue
 	worker.WorkQueue <- *work
@@ -125,7 +127,7 @@ func getWebhookLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Retrieve log file
-	logFile, err := worker.RetrieveLogFile(id, name)
+	logFile, err := worker.RetrieveLogFile(id, name, outputDir)
 	if err != nil {
 		logger.Error.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)

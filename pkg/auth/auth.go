@@ -14,9 +14,9 @@ type Authenticator interface {
 
 // NewAuthenticator creates new authenticator form the configuration
 func NewAuthenticator(conf *config.Config) Authenticator {
-	authenticator, err := NewHtpasswdFromFile(*conf.PasswdFile)
+	authenticator, err := NewHtpasswdFromFile(conf.PasswdFile)
 	if err != nil {
-		logger.Debug.Printf("unable to load htpasswd file: \"%s\" (%s)\n", *conf.PasswdFile, err)
+		logger.Debug.Printf("unable to load htpasswd file: \"%s\" (%s)\n", conf.PasswdFile, err)
 		return nil
 	}
 	return authenticator

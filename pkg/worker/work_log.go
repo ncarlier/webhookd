@@ -6,13 +6,12 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/ncarlier/webhookd/pkg/config"
 	"github.com/ncarlier/webhookd/pkg/tools"
 )
 
 // RetrieveLogFile retrieve work log with its name and id
-func RetrieveLogFile(id, name string) (*os.File, error) {
-	logPattern := path.Join(*config.Get().LogDir, fmt.Sprintf("%s_%s_*.txt", tools.ToSnakeCase(name), id))
+func RetrieveLogFile(id, name, base string) (*os.File, error) {
+	logPattern := path.Join(base, fmt.Sprintf("%s_%s_*.txt", tools.ToSnakeCase(name), id))
 	files, err := filepath.Glob(logPattern)
 	if err != nil {
 		return nil, err
