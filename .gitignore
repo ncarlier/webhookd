@@ -1,3 +1,5 @@
 release/
 .vscode/
 .htpasswd
+*.pem
+*.key
