@@ -37,8 +37,13 @@ func Init(level string) {
 		warnHandle = ioutil.Discard
 	}
 
-	Debug = log.New(debugHandle, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
-	Info = log.New(infoHandle, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
-	Warning = log.New(warnHandle, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
-	Error = log.New(errorHandle, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
+	commonFlags := log.LstdFlags | log.Lmicroseconds
+	if level == "debug" {
+		commonFlags = log.LstdFlags | log.Lmicroseconds | log.Lshortfile
+	}
+
+	Debug = log.New(debugHandle, "DBG ", commonFlags)
+	Info = log.New(infoHandle, "INF ", commonFlags)
+	Warning = log.New(warnHandle, "WRN ", commonFlags)
+	Error = log.New(errorHandle, "ERR ", commonFlags)
 }
