@@ -69,11 +69,11 @@ func (wr *WorkRequest) Terminate(err error) error {
 	if err != nil {
 		wr.Status = Error
 		wr.Err = err
-		logger.Info.Printf("Work %s#%d done [ERROR]\n", wr.Name, wr.ID)
+		logger.Info.Printf("job %s#%d done [ERROR]\n", wr.Name, wr.ID)
 		return err
 	}
 	wr.Status = Success
-	logger.Info.Printf("Work %s#%d done [SUCCESS]\n", wr.Name, wr.ID)
+	logger.Info.Printf("job %s#%d done [SUCCESS]\n", wr.Name, wr.ID)
 	return nil
 }
 

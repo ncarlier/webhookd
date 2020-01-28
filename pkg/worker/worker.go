@@ -43,7 +43,7 @@ func (w Worker) Start() {
 			select {
 			case work := <-w.Work:
 				// Receive a work request.
-				logger.Debug.Printf("Worker #%d received work request: %s#%d\n", w.ID, work.Name, work.ID)
+				logger.Debug.Printf("worker #%d received job request: %s#%d\n", w.ID, work.Name, work.ID)
 				metric.Requests.Add(1)
 				err := run(&work)
 				if err != nil {
@@ -57,7 +57,7 @@ func (w Worker) Start() {
 
 				close(work.MessageChan)
 			case <-w.QuitChan:
-				logger.Debug.Printf("Stopping worker #%d...\n", w.ID)
+				logger.Debug.Printf("stopping worker #%d...\n", w.ID)
 				return
 			}
 		}

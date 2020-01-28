@@ -67,7 +67,7 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		logger.Error.Printf("Error reading body: %v", err)
+		logger.Error.Printf("error reading body: %v", err)
 		http.Error(w, "can't read body", http.StatusBadRequest)
 		return
 	}
@@ -108,7 +108,7 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "%s\n", msg) // Send chunked response
 		}
 
-		// Flush the data immediatly instead of buffering it for later.
+		// Flush the data immediately instead of buffering it for later.
 		flusher.Flush()
 	}
 }

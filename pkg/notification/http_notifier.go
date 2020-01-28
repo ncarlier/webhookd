@@ -26,7 +26,7 @@ type HTTPNotifier struct {
 }
 
 func newHTTPNotifier(uri *url.URL) *HTTPNotifier {
-	logger.Info.Println("Using HTTP notification system: ", uri.String())
+	logger.Info.Println("using HTTP notification system: ", uri.String())
 	return &HTTPNotifier{
 		URL:          uri,
 		PrefixFilter: getValueOrAlt(uri.Query(), "prefix", "notify:"),
@@ -61,6 +61,6 @@ func (n *HTTPNotifier) Notify(work *model.WorkRequest) error {
 		return err
 	}
 	resp.Body.Close()
-	logger.Info.Printf("Work %s#%d notified to %s\n", work.Name, work.ID, n.URL.String())
+	logger.Info.Printf("job %s#%d notification sent to %s\n", work.Name, work.ID, n.URL.String())
 	return nil
 }

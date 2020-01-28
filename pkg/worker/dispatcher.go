@@ -18,7 +18,7 @@ func StartDispatcher(nworkers int) {
 
 	// Now, create all of our workers.
 	for i := 0; i < nworkers; i++ {
-		logger.Debug.Println("Starting worker", i+1)
+		logger.Debug.Printf("starting worker #%d ...\n", i+1)
 		worker := NewWorker(i+1, WorkerQueue)
 		worker.Start()
 	}
@@ -30,7 +30,7 @@ func StartDispatcher(nworkers int) {
 				go func() {
 					worker := <-WorkerQueue
 
-					logger.Debug.Printf("Dispatching work request: %s#%d", work.Name, work.ID)
+					logger.Debug.Printf("dispatching job request: %s#%d", work.Name, work.ID)
 					worker <- work
 				}()
 			}

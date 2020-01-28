@@ -22,7 +22,7 @@ func Notify(work *model.WorkRequest) {
 		return
 	}
 	if err := notifier.Notify(work); err != nil {
-		logger.Error.Printf("Unable to send notification of work %s#%d: %v\n", work.Name, work.ID, err)
+		logger.Error.Printf("unable to send notification for webhook %s#%d: %v\n", work.Name, work.ID, err)
 	}
 }
 

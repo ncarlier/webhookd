@@ -38,17 +38,17 @@ func main() {
 		conf.LogDir = os.TempDir()
 	}
 
-	logger.Debug.Println("Starting webhookd server...")
+	logger.Debug.Println("starting webhookd server...")
 
 	srv := server.NewServer(conf)
 
 	// Configure notification
 	if err := notification.Init(conf.NotificationURI); err != nil {
-		logger.Error.Fatalf("Unable to create notification channel: %v\n", err)
+		logger.Error.Fatalf("unable to create notification channel: %v\n", err)
 	}
 
 	// Start the dispatcher.
-	logger.Debug.Printf("Starting the dispatcher (%d workers)...\n", conf.NbWorkers)
+	logger.Debug.Printf("starting the dispatcher with %d workers...\n", conf.NbWorkers)
 	worker.StartDispatcher(conf.NbWorkers)
 
 	done := make(chan bool)
@@ -57,14 +57,14 @@ func main() {
 
 	go func() {
 		<-quit
-		logger.Debug.Println("Server is shutting down...")
+		logger.Debug.Println("server is shutting down...")
 		api.Shutdown()
 
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
 		if err := srv.Shutdown(ctx); err != nil {
-			logger.Error.Fatalf("Could not gracefully shutdown the server: %v\n", err)
+			logger.Error.Fatalf("could not gracefully shutdown the server: %v\n", err)
 		}
 		close(done)
 	}()
@@ -73,12 +73,12 @@ func main() {
 	if conf.TLSListenAddr != "" {
 		addr = conf.TLSListenAddr
 	}
-	logger.Info.Println("Server is ready to handle requests at", addr)
+	logger.Info.Println("server is ready to handle requests at", addr)
 	api.Start()
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		logger.Error.Fatalf("Could not listen on %s : %v\n", addr, err)
+		logger.Error.Fatalf("could not listen on %s : %v\n", addr, err)
 	}
 
 	<-done
-	logger.Debug.Println("Server stopped")
+	logger.Debug.Println("server stopped")
 }

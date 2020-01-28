@@ -20,7 +20,7 @@ type SMTPNotifier struct {
 }
 
 func newSMTPNotifier(uri *url.URL) *SMTPNotifier {
-	logger.Info.Println("Using SMTP notification system: ", uri.Opaque)
+	logger.Info.Println("using SMTP notification system: ", uri.Opaque)
 	return &SMTPNotifier{
 		Host:         getValueOrAlt(uri.Query(), "smtp", "localhost:25"),
 		From:         getValueOrAlt(uri.Query(), "from", "noreply@nunux.org"),
@@ -76,7 +76,7 @@ func (n *SMTPNotifier) Notify(work *model.WorkRequest) error {
 		return err
 	}
 
-	logger.Info.Printf("Work %s#%d notified to %s\n", work.Name, work.ID, n.To)
+	logger.Info.Printf("job %s#%d notification sent to %s\n", work.Name, work.ID, n.To)
 
 	// Send the QUIT command and close the connection.
 	return c.Quit()

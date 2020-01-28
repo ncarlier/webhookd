@@ -25,9 +25,9 @@ func (c *ChanWriter) Write(p []byte) (int, error) {
 
 func run(work *model.WorkRequest) error {
 	work.Status = model.Running
-	logger.Info.Printf("Work %s#%d started...\n", work.Name, work.ID)
-	logger.Debug.Printf("Work %s#%d script: %s\n", work.Name, work.ID, work.Script)
-	logger.Debug.Printf("Work %s#%d parameter: %v\n", work.Name, work.ID, work.Args)
+	logger.Info.Printf("job %s#%d started...\n", work.Name, work.ID)
+	logger.Debug.Printf("job %s#%d script: %s\n", work.Name, work.ID, work.Script)
+	logger.Debug.Printf("job %s#%d parameter: %v\n", work.Name, work.ID, work.Args)
 
 	binary, err := exec.LookPath(work.Script)
 	if err != nil {
@@ -47,7 +47,7 @@ func run(work *model.WorkRequest) error {
 		return work.Terminate(err)
 	}
 	defer logFile.Close()
-	logger.Debug.Printf("Work %s#%d output to file: %s\n", work.Name, work.ID, logFile.Name())
+	logger.Debug.Printf("job %s#%d output file: %s\n", work.Name, work.ID, logFile.Name())
 
 	wLogFile := bufio.NewWriter(logFile)
 	defer wLogFile.Flush()
@@ -82,24 +82,24 @@ func run(work *model.WorkRequest) error {
 			if !work.IsTerminated() {
 				work.MessageChan <- []byte(line)
 			} else {
-				logger.Error.Printf("Work %s#%d is over. Unable to write more data into the channel: %s\n", work.Name, work.ID, line)
+				logger.Error.Printf("job %s#%d is over ; unable to write more data into the channel: %s\n", work.Name, work.ID, line)
 				break
 			}
 			// writing to outfile
 			if _, err := wLogFile.WriteString(line + "\n"); err != nil {
-				logger.Error.Println("Error while writing into the log file:", logFile.Name(), err)
+				logger.Error.Println("error while writing into the log file:", logFile.Name(), err)
 				break
 			}
 		}
 		if err := scanner.Err(); err != nil {
-			logger.Error.Printf("Work %s#%d unable to read script stdout: %v\n", work.Name, work.ID, err)
+			logger.Error.Printf("job %s#%d is unable to read script stdout: %v\n", work.Name, work.ID, err)
 		}
 		wg.Done()
 	}(cmdReader)
 
 	// Start timeout timer
 	timer := time.AfterFunc(time.Duration(work.Timeout)*time.Second, func() {
-		logger.Warning.Printf("Work %s#%d has timed out (%ds). Killing process #%d...\n", work.Name, work.ID, work.Timeout, cmd.Process.Pid)
+		logger.Warning.Printf("job %s#%d has timed out (%ds): killing process #%d ...\n", work.Name, work.ID, work.Timeout, cmd.Process.Pid)
 		syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
 	})
 
