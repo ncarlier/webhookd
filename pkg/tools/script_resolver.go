@@ -12,7 +12,7 @@ import (
 func ResolveScript(dir, name string) (string, error) {
 	script := path.Clean(path.Join(dir, fmt.Sprintf("%s.sh", name)))
 	if !strings.HasPrefix(script, dir) {
-		return "", errors.New("Invalid script path: " + script)
+		return "", errors.New("Invalid script path: " + name)
 	}
 	if _, err := os.Stat(script); os.IsNotExist(err) {
 		return "", errors.New("Script not found: " + script)
