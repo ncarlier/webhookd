@@ -5,7 +5,7 @@ import (
 	"github.com/ncarlier/webhookd/pkg/model"
 )
 
-// WorkerQueue is the gloabl queue of Workers
+// WorkerQueue is the global queue of Workers
 var WorkerQueue chan chan model.WorkRequest
 
 // WorkQueue is the global queue of work to dispatch

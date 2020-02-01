@@ -49,8 +49,6 @@ func (w Worker) Start() {
 				if err != nil {
 					metric.RequestsFailed.Add(1)
 					work.MessageChan <- []byte(fmt.Sprintf("error: %s", err.Error()))
-				} else {
-					work.MessageChan <- []byte("done")
 				}
 				// Send notification
 				notification.Notify(&work)
