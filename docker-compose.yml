@@ -9,6 +9,6 @@ services:
     ports:
     - "8080:8080"
     environment:
-    - WHD_SCRIPTS_DIR=/scripts
+    - WHD_SCRIPTS=/scripts
     volumes:
     - ./scripts:/scripts

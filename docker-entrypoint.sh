@@ -3,17 +3,17 @@
 # Error function
 die() { echo "error: $@" 1>&2 ; exit 1; }
 
-if [ ! -z "$APP_SCRIPTS_GIT_URL" ]
+if [ ! -z "$WHD_SCRIPTS_GIT_URL" ]
 then
-  [ ! -f "$APP_SCRIPTS_GIT_KEY" ] && die "Git clone key not found."
+  [ ! -f "$WHD_SCRIPTS_GIT_KEY" ] && die "Git clone key not found."
 
-  export APP_SCRIPTS_DIR=${APP_SCRIPTS_DIR:-/opt/scripts-git}
+  export WHD_SCRIPTS=${WHD_SCRIPTS:-/opt/scripts-git}
   export GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
-  mkdir -p $APP_SCRIPTS_DIR
+  mkdir -p $WHD_SCRIPTS
 
-  echo "Cloning $APP_SCRIPTS_GIT_URL into $APP_SCRIPTS_DIR ..."
-  ssh-agent sh -c 'ssh-add ${APP_SCRIPTS_GIT_KEY}; git clone --depth 1 --single-branch ${APP_SCRIPTS_GIT_URL} ${APP_SCRIPTS_DIR}'
+  echo "Cloning $WHD_SCRIPTS_GIT_URL into $WHD_SCRIPTS ..."
+  ssh-agent sh -c 'ssh-add ${WHD_SCRIPTS_GIT_KEY}; git clone --depth 1 --single-branch ${WHD_SCRIPTS_GIT_URL} ${WHD_SCRIPTS}'
   [ $? != 0 ] && die "Unable to clone repository"
 fi
 

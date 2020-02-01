@@ -51,7 +51,7 @@ All configuration variables are described in [etc/default/webhookd.env](./etc/de
 Webhooks are simple scripts within a directory structure.
 
 By default inside the `./scripts` directory.
-You can override the default using the `WHD_SCRIPTS_DIR` environment variable or `-script` parameter.
+You can override the default using the `WHD_SCRIPTS` environment variable or `-script` parameter.
 
 *Example:*
 
