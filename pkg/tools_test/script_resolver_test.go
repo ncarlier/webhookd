@@ -22,5 +22,11 @@ func TestNotResolveScript(t *testing.T) {
 func TestResolveBadScript(t *testing.T) {
 	_, err := tools.ResolveScript("../../scripts", "../tests/test_simple")
 	assert.NotNil(t, err, "")
-	assert.Equal(t, "Invalid script path: ../tests/test_simple", err.Error(), "")
+	assert.Equal(t, "Invalid script path: ../tests/test_simple.sh", err.Error(), "")
+}
+
+func TestResolveScriptWithExtension(t *testing.T) {
+	_, err := tools.ResolveScript("../../scripts", "node.js")
+	assert.NotNil(t, err, "")
+	assert.Equal(t, "Script not found: ../../scripts/node.js", err.Error(), "")
 }

@@ -60,14 +60,19 @@ You can override the default using the `WHD_SCRIPTS_DIR` environment variable or
 |--> /github
   |--> /build.sh
   |--> /deploy.sh
-|--> /ping.sh
+|--> /push.js
+|--> /echo.sh
 |--> ...
 ```
+
+Note that Webhookd is able to run any type of file in this directory as long as the file is executable.
+For example, you can execute a Node.js file if you give execution rights to the file and add the appropriate `#!` header (in this case: `#!/usr/bin/env node`).
 
 ### Webhook URL
 
 The directory structure define the webhook URL.
 
+You can omit the script extension. If you do, webhookd will search for a `.sh` file.
 If the script exists, the output the will be streamed to the HTTP response.
 
 The streaming technology depends on the HTTP method used.
@@ -97,7 +102,6 @@ $ curl -v -XPOST http://localhost:8080/foo/bar
 < X-Hook-Id: 7
 foo foo foo
 bar bar bar
-done
 ```
 
 Output using  `GET` (`Server-sent events`):
@@ -111,8 +115,6 @@ $ curl -v -XGET http://localhost:8080/foo/bar
 data: foo foo foo
 
 data: bar bar bar
-
-data: done
 ```
 
 ### Webhook parameters
@@ -146,7 +148,6 @@ $ curl --data @test.json http://localhost:8080/echo?foo=bar
 Query parameter: foo=bar
 Header parameter: user-agent=curl/7.52.1
 Script parameter: {"foo": "bar"}
-done
 ```
 
 ### Webhook timeout configuration

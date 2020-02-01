@@ -2,7 +2,6 @@ package tools
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -10,7 +9,10 @@ import (
 
 // ResolveScript is resolving the target script.
 func ResolveScript(dir, name string) (string, error) {
-	script := path.Clean(path.Join(dir, fmt.Sprintf("%s.sh", name)))
+	if path.Ext(name) == "" {
+		name = name + ".sh"
+	}
+	script := path.Clean(path.Join(dir, name))
 	if !strings.HasPrefix(script, dir) {
 		return "", errors.New("Invalid script path: " + name)
 	}
