@@ -9,23 +9,6 @@ import (
 	"github.com/ncarlier/webhookd/pkg/tools"
 )
 
-func TestToSnakeCase(t *testing.T) {
-	testCases := []struct {
-		value    string
-		expected string
-	}{
-		{"hello-world", "helloworld"},
-		{"helloWorld", "hello_world"},
-		{"HelloWorld", "hello_world"},
-		{"Hello/World", "hello__world"},
-		{"Hello/world", "hello_world"},
-	}
-	for _, tc := range testCases {
-		value := tools.ToSnakeCase(tc.value)
-		assert.Equal(t, tc.expected, value, "")
-	}
-}
-
 func TestQueryParamsToShellVars(t *testing.T) {
 	tc := url.Values{
 		"string": []string{"foo"},

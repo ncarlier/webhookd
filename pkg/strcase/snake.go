@@ -77,7 +77,7 @@ func ToScreamingDelimited(s string, del uint8, screaming bool) string {
 			} else if v >= 'a' && v <= 'z' {
 				n += string(v) + string(del)
 			}
-		} else if v == ' ' || v == '_' || v == '-' {
+		} else if v == ' ' || v == '_' || v == '-' || v == '/' {
 			// replace spaces/underscores with delimiters
 			n += string(del)
 		} else {
