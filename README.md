@@ -36,6 +36,8 @@ $ docker run -d --name=webhookd \
 > Note that this image extends `docker:dind` Docker image.
 > Therefore you are able to interact with a Docker daemon with yours shell scripts.
 
+Finally, it is possible to install Webhookd using the Debian packaging system through this [custom repository](https://packages.azlux.fr/).
+
 ## Configuration
 
 Webhookd can be configured by using command line parameters or by setting environment variables.
