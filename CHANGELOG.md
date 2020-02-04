@@ -1,5 +1,21 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.6.1...v) (2019-01-09)
+# [](https://github.com/ncarlier/webhookd/compare/v1.6.1...v) (2020-02-04)
+
+
+### Bug Fixes
+
+* fix error message ([84524e9](https://github.com/ncarlier/webhookd/commit/84524e9))
+* remove "done" statement at execution  end ([57e5b79](https://github.com/ncarlier/webhookd/commit/57e5b79))
+* typo on HC route ([4c7b73b](https://github.com/ncarlier/webhookd/commit/4c7b73b))
+
+
+### Features
+
+* ACME support + configuration refactoring ([c7ea370](https://github.com/ncarlier/webhookd/commit/c7ea370))
+* allow scripts with extensions ([2828873](https://github.com/ncarlier/webhookd/commit/2828873))
+* improve logger ([e663336](https://github.com/ncarlier/webhookd/commit/e663336))
+* logs refactoring ([d793c78](https://github.com/ncarlier/webhookd/commit/d793c78))
+* refactoring of the config flag system ([6a01127](https://github.com/ncarlier/webhookd/commit/6a01127))
 
 
 
