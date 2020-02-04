@@ -11,6 +11,7 @@ import (
 
 	"github.com/ncarlier/webhookd/pkg/api"
 	"github.com/ncarlier/webhookd/pkg/config"
+	configflag "github.com/ncarlier/webhookd/pkg/config/flag"
 	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/notification"
 	"github.com/ncarlier/webhookd/pkg/server"
@@ -19,7 +20,7 @@ import (
 
 func main() {
 	conf := &config.Config{}
-	config.HydrateFromFlags(conf)
+	configflag.Bind(conf, "WHD")
 
 	flag.Parse()
 
