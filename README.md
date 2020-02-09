@@ -39,8 +39,9 @@ $ docker run -d --name=webhookd \
 **Or** use APT:
 
 Finally, it is possible to install Webhookd using the Debian packaging system through this [custom repository](https://packages.azlux.fr/).
-> Note that custom configuration variables can be set into `/etc/webhoockd.env`
-> Sytemd service is already set and enable, you just have to start it with `systemctl start webhoockd`
+
+> Note that custom configuration variables can be set into `/etc/webhoockd.env` file.
+> Sytemd service is already set and enable, you just have to start it with `systemctl start webhoockd`.
 
 ## Configuration
 
@@ -276,7 +277,7 @@ But you can override this behavior by specifying the location of the file:
 ```bash
 $ export WHD_PASSWD_FILE=/etc/webhookd/users.htpasswd
 $ # or
-$ webhookd -p /etc/webhookd/users.htpasswd
+$ webhookd --passwd-file /etc/webhookd/users.htpasswd
 ```
 
 Once configured, you must call webhooks using basic authentication:
@@ -292,7 +293,7 @@ You can activate TLS to secure communications:
 ```bash
 $ export WHD_TLS_LISTEN_ADDR=:8443
 $ # or
-$ webhookd -tls-listen-addr=:8443
+$ webhookd --tls-listen-addr=:8443
 ```
 
 This will disable HTTP port.
@@ -307,7 +308,7 @@ You can activate ACME by setting a fully qualified domain name:
 $ export WHD_TLS_LISTEN_ADDR=:8443
 $ export WHD_TLS_DOMAIN=hook.example.com
 $ # or
-$ webhookd -tls-listen-addr=:8443 -tls-domain=hook.example.com
+$ webhookd --tls-listen-addr=:8443 --tls-domain=hook.example.com
 ```
 
 **Note:**
