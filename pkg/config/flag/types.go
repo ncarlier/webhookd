@@ -17,6 +17,9 @@ func newArrayFlags(items *[]string) *arrayFlags {
 
 // Values return the values of a flag array
 func (i *arrayFlags) Values() []string {
+	if i.items == nil {
+		return []string{}
+	}
 	return *i.items
 }
 
