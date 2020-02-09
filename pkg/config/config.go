@@ -11,7 +11,7 @@ type Config struct {
 	Debug           bool   `flag:"debug" desc:"Output debug logs" default:"false"`
 	Timeout         int    `flag:"timeout" desc:"Maximum hook execution time in second" default:"10"`
 	ScriptDir       string `flag:"scripts" desc:"Scripts location" default:"scripts"`
-	PasswdFile      string `flag:"passwd-file" desc:"Password file for basic HTTP authentication" defult:".htpasswd"`
+	PasswdFile      string `flag:"passwd-file" desc:"Password file for basic HTTP authentication" default:".htpasswd"`
 	LogDir          string `flag:"log-dir" desc:"Hook execution logs location" default:""`
 	NotificationURI string `flag:"notification-uri" desc:"Notification URI"`
 }
