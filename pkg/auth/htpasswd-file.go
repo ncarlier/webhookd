@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"regexp"
-	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -54,22 +53,11 @@ func NewHtpasswdFromFile(path string) (*HtpasswdFile, error) {
 
 // Validate HTTP request credentials
 func (h *HtpasswdFile) Validate(r *http.Request) bool {
-	s := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
-	if len(s) != 2 {
+	user, passwd, ok := r.BasicAuth()
+	if !ok {
 		return false
 	}
-
-	b, err := base64.StdEncoding.DecodeString(s[1])
-	if err != nil {
-		return false
-	}
-
-	pair := strings.SplitN(string(b), ":", 2)
-	if len(pair) != 2 {
-		return false
-	}
-
-	return h.validateCredentials(pair[0], pair[1])
+	return h.validateCredentials(user, passwd)
 }
 
 func (h *HtpasswdFile) validateCredentials(user string, password string) bool {
