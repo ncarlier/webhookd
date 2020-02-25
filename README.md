@@ -286,6 +286,31 @@ Once configured, you must call webhooks using basic authentication:
 $ curl -u api:test -XPOST "http://localhost:8080/echo?msg=hello"
 ```
 
+### Signature
+
+You can ensure message integrity (and authenticity) with [HTTP Signatures](https://www.ietf.org/archive/id/draft-cavage-http-signatures-12.txt).
+
+To activate HTTP signature verification, you have to configure the key store:
+
+```bash
+$ export WHD_KEY_STORE_URI=file:///etc/webhookd/keys
+$ # or
+$ webhookd --key-store-uri file:///etc/webhookd/keys
+```
+
+Note that only `file://` URI s currently supported.
+All public keys stored in PEM format in the targeted directory will be loaded.
+
+Once configured, you must call webhooks using a valid HTTP signature:
+
+```bash
+$ curl -X POST \
+  -H 'Date: <req-date>' \
+  -H 'Signature: keyId=<key-id>,algorithm="rsa-sha256",headers="(request-target) date",signature=<signature-string>' \
+  -H 'Accept: application/json' \
+  "http://loclahost:8080/echo?msg=hello"
+```
+
 ### TLS
 
 You can activate TLS to secure communications:
