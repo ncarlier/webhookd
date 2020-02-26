@@ -1,5 +1,18 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.7.0...v) (2020-02-04)
+# [](https://github.com/ncarlier/webhookd/compare/v1.7.0...v) (2020-02-26)
+
+
+### Bug Fixes
+
+* fix password default configuration ([4022007](https://github.com/ncarlier/webhookd/commit/4022007))
+* improve configflag stability ([3044b39](https://github.com/ncarlier/webhookd/commit/3044b39))
+
+
+### Features
+
+* **auth:** simplify validate method ([5948b60](https://github.com/ncarlier/webhookd/commit/5948b60))
+* finalize HTTP signature support ([4320467](https://github.com/ncarlier/webhookd/commit/4320467))
+* HTTP signature support ([c16ec83](https://github.com/ncarlier/webhookd/commit/c16ec83))
 
 
 
