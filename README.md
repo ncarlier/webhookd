@@ -311,6 +311,8 @@ $ curl -X POST \
   "http://loclahost:8080/echo?msg=hello"
 ```
 
+You can find a small HTTP client in the ["tooling" directory](./tooling/httpsig/README.md) that is capable of forging HTTP signatures.
+
 ### TLS
 
 You can activate TLS to secure communications:

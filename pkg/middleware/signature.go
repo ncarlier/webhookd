@@ -12,8 +12,8 @@ func HTTPSignature(inner http.Handler, keyStore pubkey.KeyStore) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		verifier, err := httpsig.NewVerifier(r)
 		if err != nil {
-			w.WriteHeader(500)
-			w.Write([]byte("unable to initialize HTTP signature verifier: " + err.Error()))
+			w.WriteHeader(400)
+			w.Write([]byte("invalid HTTP signature: " + err.Error()))
 			return
 		}
 		pubKeyID := verifier.KeyId()

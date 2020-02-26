@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 
 	"github.com/go-fed/httpsig"
+	"github.com/ncarlier/webhookd/pkg/logger"
 )
 
 const defaultAlgorithm = httpsig.RSA_SHA256
@@ -28,17 +29,17 @@ func (ks *directoryKeyStore) Get(keyID string) (crypto.PublicKey, httpsig.Algori
 	return key, defaultAlgorithm, nil
 }
 
-func newDirectoryKeyStore(root string) (store *directoryKeyStore, err error) {
-	store = &directoryKeyStore{
+func newDirectoryKeyStore(root string) (*directoryKeyStore, error) {
+	store := &directoryKeyStore{
 		algorithm: "",
 		keys:      make(map[string]crypto.PublicKey),
 	}
 
-	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+	walkErr := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		if filepath.Ext(path) == "pem" {
+		if filepath.Ext(path) == ".pem" {
 			data, err := ioutil.ReadFile(path)
 			if err != nil {
 				return err
@@ -51,7 +52,7 @@ func newDirectoryKeyStore(root string) (store *directoryKeyStore, err error) {
 
 			pub, err := x509.ParsePKIXPublicKey(block.Bytes)
 			if err != nil {
-				return err
+				return nil
 			}
 			rsaPublicKey, ok := pub.(*rsa.PublicKey)
 			if !ok {
@@ -61,9 +62,10 @@ func newDirectoryKeyStore(root string) (store *directoryKeyStore, err error) {
 			keyID, ok := block.Headers["key_id"]
 			if ok {
 				store.keys[keyID] = rsaPublicKey
+				logger.Debug.Println("HTTP signature public key loaded: ", path)
 			}
 		}
 		return nil
 	})
-	return
+	return store, walkErr
 }
