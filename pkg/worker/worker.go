@@ -10,16 +10,15 @@ import (
 	"github.com/ncarlier/webhookd/pkg/notification"
 )
 
-// NewWorker creates, and returns a new Worker object. Its only argument
-// is a channel that the worker can add itself to whenever it is done its
-// work.
+// NewWorker creates, and returns a new Worker object.
 func NewWorker(id int, workerQueue chan chan model.WorkRequest) Worker {
 	// Create, and return the worker.
 	worker := Worker{
 		ID:          id,
 		Work:        make(chan model.WorkRequest),
 		WorkerQueue: workerQueue,
-		QuitChan:    make(chan bool)}
+		QuitChan:    make(chan bool),
+	}
 
 	return worker
 }
@@ -45,7 +44,7 @@ func (w Worker) Start() {
 				// Receive a work request.
 				logger.Debug.Printf("worker #%d received job request: %s#%d\n", w.ID, work.Name, work.ID)
 				metric.Requests.Add(1)
-				err := run(&work)
+				err := Run(&work)
 				if err != nil {
 					metric.RequestsFailed.Add(1)
 					work.MessageChan <- []byte(fmt.Sprintf("error: %s", err.Error()))

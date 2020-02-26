@@ -23,7 +23,8 @@ func (c *ChanWriter) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
-func run(work *model.WorkRequest) error {
+// Run work request
+func Run(work *model.WorkRequest) error {
 	work.Status = model.Running
 	logger.Info.Printf("job %s#%d started...\n", work.Name, work.ID)
 	logger.Debug.Printf("job %s#%d script: %s\n", work.Name, work.ID, work.Script)

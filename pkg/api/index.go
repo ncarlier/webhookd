@@ -13,7 +13,6 @@ import (
 	"github.com/ncarlier/webhookd/pkg/config"
 	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/model"
-	"github.com/ncarlier/webhookd/pkg/tools"
 	"github.com/ncarlier/webhookd/pkg/worker"
 )
 
@@ -58,7 +57,7 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 
 	// Get script location
 	p := strings.TrimPrefix(r.URL.Path, "/")
-	script, err := tools.ResolveScript(scriptDir, p)
+	script, err := worker.ResolveScript(scriptDir, p)
 	if err != nil {
 		logger.Error.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusNotFound)
@@ -72,8 +71,8 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	params := tools.QueryParamsToShellVars(r.URL.Query())
-	params = append(params, tools.HTTPHeadersToShellVars(r.Header)...)
+	params := QueryParamsToShellVars(r.URL.Query())
+	params = append(params, HTTPHeadersToShellVars(r.Header)...)
 
 	// logger.Debug.Printf("API REQUEST: \"%s\" with params %s...\n", p, params)
 
@@ -119,7 +118,7 @@ func getWebhookLog(w http.ResponseWriter, r *http.Request) {
 
 	// Get script location
 	name := path.Dir(strings.TrimPrefix(r.URL.Path, "/"))
-	_, err := tools.ResolveScript(scriptDir, name)
+	_, err := worker.ResolveScript(scriptDir, name)
 	if err != nil {
 		logger.Error.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusNotFound)

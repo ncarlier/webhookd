@@ -1,12 +1,12 @@
-package tools_test
+package test
 
 import (
 	"net/http"
 	"net/url"
 	"testing"
 
+	"github.com/ncarlier/webhookd/pkg/api"
 	"github.com/ncarlier/webhookd/pkg/assert"
-	"github.com/ncarlier/webhookd/pkg/tools"
 )
 
 func TestQueryParamsToShellVars(t *testing.T) {
@@ -14,7 +14,7 @@ func TestQueryParamsToShellVars(t *testing.T) {
 		"string": []string{"foo"},
 		"list":   []string{"foo", "bar"},
 	}
-	values := tools.QueryParamsToShellVars(tc)
+	values := api.QueryParamsToShellVars(tc)
 	assert.ContainsStr(t, "string=foo", values, "")
 	assert.ContainsStr(t, "list=foo,bar", values, "")
 }
@@ -24,7 +24,7 @@ func TestHTTPHeadersToShellVars(t *testing.T) {
 		"Content-Type": []string{"text/plain"},
 		"X-Foo-Bar":    []string{"foo", "bar"},
 	}
-	values := tools.HTTPHeadersToShellVars(tc)
+	values := api.HTTPHeadersToShellVars(tc)
 	assert.ContainsStr(t, "content_type=text/plain", values, "")
 	assert.ContainsStr(t, "x_foo_bar=foo,bar", values, "")
 }

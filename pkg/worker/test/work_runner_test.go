@@ -1,4 +1,4 @@
-package worker
+package test
 
 import (
 	"os"
@@ -8,6 +8,7 @@ import (
 	"github.com/ncarlier/webhookd/pkg/assert"
 	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/model"
+	"github.com/ncarlier/webhookd/pkg/worker"
 )
 
 func printWorkMessages(work *model.WorkRequest) {
@@ -24,7 +25,7 @@ func printWorkMessages(work *model.WorkRequest) {
 
 func TestWorkRunner(t *testing.T) {
 	logger.Init("debug")
-	script := "../../tests/test_simple.sh"
+	script := "./test_simple.sh"
 	args := []string{
 		"name=foo",
 		"user_agent=test",
@@ -33,14 +34,14 @@ func TestWorkRunner(t *testing.T) {
 	work := model.NewWorkRequest("test", script, payload, os.TempDir(), args, 5)
 	assert.NotNil(t, work, "")
 	printWorkMessages(work)
-	err := run(work)
+	err := worker.Run(work)
 	assert.Nil(t, err, "")
 	assert.Equal(t, work.Status, model.Success, "")
 	assert.Equal(t, work.GetLogContent("notify:"), "OK\n", "")
 
 	// Test that we can retrieve log file afterward
 	id := strconv.FormatUint(work.ID, 10)
-	logFile, err := RetrieveLogFile(id, "test", os.TempDir())
+	logFile, err := worker.RetrieveLogFile(id, "test", os.TempDir())
 	defer logFile.Close()
 	assert.Nil(t, err, "Log file should exists")
 	assert.NotNil(t, logFile, "Log file should be retrieve")
@@ -48,11 +49,11 @@ func TestWorkRunner(t *testing.T) {
 
 func TestWorkRunnerWithError(t *testing.T) {
 	logger.Init("debug")
-	script := "../../tests/test_error.sh"
+	script := "./test_error.sh"
 	work := model.NewWorkRequest("test", script, "", os.TempDir(), []string{}, 5)
 	assert.NotNil(t, work, "")
 	printWorkMessages(work)
-	err := run(work)
+	err := worker.Run(work)
 	assert.NotNil(t, err, "")
 	assert.Equal(t, work.Status, model.Error, "")
 	assert.Equal(t, "exit status 1", err.Error(), "")
@@ -60,11 +61,11 @@ func TestWorkRunnerWithError(t *testing.T) {
 
 func TestWorkRunnerWithTimeout(t *testing.T) {
 	logger.Init("debug")
-	script := "../../tests/test_timeout.sh"
+	script := "./test_timeout.sh"
 	work := model.NewWorkRequest("test", script, "", os.TempDir(), []string{}, 1)
 	assert.NotNil(t, work, "")
 	printWorkMessages(work)
-	err := run(work)
+	err := worker.Run(work)
 	assert.NotNil(t, err, "")
 	assert.Equal(t, work.Status, model.Error, "")
 	assert.Equal(t, "signal: killed", err.Error(), "")

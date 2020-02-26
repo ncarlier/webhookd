@@ -75,6 +75,9 @@ You can override the default using the `WHD_SCRIPTS` environment variable or `-s
 Note that Webhookd is able to run any type of file in this directory as long as the file is executable.
 For example, you can execute a Node.js file if you give execution rights to the file and add the appropriate `#!` header (in this case: `#!/usr/bin/env node`).
 
+You can find sample scripts in the [example folder](./scripts/examples).
+In particular, examples of integration with Gitlab and Github.
+
 ### Webhook URL
 
 The directory structure define the webhook URL.
@@ -308,7 +311,7 @@ $ curl -X POST \
   -H 'Date: <req-date>' \
   -H 'Signature: keyId=<key-id>,algorithm="rsa-sha256",headers="(request-target) date",signature=<signature-string>' \
   -H 'Accept: application/json' \
-  "http://loclahost:8080/echo?msg=hello"
+  "http://localhost:8080/echo?msg=hello"
 ```
 
 You can find a small HTTP client in the ["tooling" directory](./tooling/httpsig/README.md) that is capable of forging HTTP signatures.
@@ -344,5 +347,11 @@ On *nix, if you want to listen on ports 80 and 443, don't forget to use `setcap`
 ```bash
 sudo setcap CAP_NET_BIND_SERVICE+ep webhookd
 ```
+
+## License
+
+The MIT License (MIT)
+
+See [LICENSE](./LICENSE) to see the full text.
 
 ---
