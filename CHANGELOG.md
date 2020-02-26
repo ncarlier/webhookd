@@ -1,5 +1,10 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.7.0...v) (2020-02-26)
+#  (2020-02-26)
+
+
+
+<a name="1.8.0"></a>
+# [1.8.0](https://github.com/ncarlier/webhookd/compare/v1.7.0...1.8.0) (2020-02-26)
 
 
 ### Bug Fixes
