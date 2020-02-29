@@ -1,5 +1,11 @@
 package logger
 
+import (
+	"os"
+
+	"github.com/mattn/go-isatty"
+)
+
 var (
 	nocolor = "\033[0m"
 	red     = "\033[0;31m"
@@ -12,7 +18,10 @@ var (
 )
 
 func colorize(text string, color string) string {
-	return color + text + nocolor
+	if isatty.IsTerminal(os.Stdout.Fd()) {
+		return color + text + nocolor
+	}
+	return text
 }
 
 // Gray ANSI color applied to a string
