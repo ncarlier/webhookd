@@ -6,7 +6,7 @@ import (
 )
 
 // Tracing is a middleware to trace HTTP request
-func Tracing(nextRequestID func() string) func(http.Handler) http.Handler {
+func Tracing(nextRequestID func() string) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			requestID := r.Header.Get("X-Request-Id")

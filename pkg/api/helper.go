@@ -2,9 +2,11 @@ package api
 
 import (
 	"bytes"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/ncarlier/webhookd/pkg/strcase"
 )
@@ -41,4 +43,8 @@ func HTTPHeadersToShellVars(h http.Header) []string {
 		params = append(params, buf.String())
 	}
 	return params
+}
+
+func nextRequestID() string {
+	return fmt.Sprintf("%d", time.Now().UnixNano())
 }

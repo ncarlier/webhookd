@@ -42,8 +42,8 @@ func Init(level string) {
 		commonFlags = log.LstdFlags | log.Lmicroseconds | log.Lshortfile
 	}
 
-	Debug = log.New(debugHandle, "DBG ", commonFlags)
-	Info = log.New(infoHandle, "INF ", commonFlags)
-	Warning = log.New(warnHandle, "WRN ", commonFlags)
-	Error = log.New(errorHandle, "ERR ", commonFlags)
+	Debug = log.New(debugHandle, Gray("DBG "), commonFlags)
+	Info = log.New(infoHandle, Green("INF "), commonFlags)
+	Warning = log.New(warnHandle, Orange("WRN "), commonFlags)
+	Error = log.New(errorHandle, Red("ERR "), commonFlags)
 }
