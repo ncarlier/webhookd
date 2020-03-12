@@ -12,8 +12,8 @@ import (
 
 var commonMiddlewares = []middleware.Middleware{
 	middleware.Cors,
-	middleware.Tracing(nextRequestID),
 	middleware.Logger,
+	middleware.Tracing(nextRequestID),
 }
 
 // NewRouter creates router with declared routes
