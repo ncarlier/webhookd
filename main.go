@@ -15,6 +15,7 @@ import (
 	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/notification"
 	"github.com/ncarlier/webhookd/pkg/server"
+	"github.com/ncarlier/webhookd/pkg/version"
 	"github.com/ncarlier/webhookd/pkg/worker"
 )
 
@@ -24,9 +25,9 @@ func main() {
 
 	flag.Parse()
 
-	if *version {
-		printVersion()
-		return
+	if *version.ShowVersion {
+		version.Print()
+		os.Exit(0)
 	}
 
 	level := "info"

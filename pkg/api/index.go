@@ -57,10 +57,14 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 
 	// Get script location
 	p := strings.TrimPrefix(r.URL.Path, "/")
+	if p == "" {
+		infoHandler(w, r)
+		return
+	}
 	script, err := worker.ResolveScript(scriptDir, p)
 	if err != nil {
 		logger.Error.Println(err.Error())
-		http.Error(w, err.Error(), http.StatusNotFound)
+		http.Error(w, "hook not found", http.StatusNotFound)
 		return
 	}
 
