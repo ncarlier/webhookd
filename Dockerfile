@@ -29,6 +29,9 @@ ARG REPOSITORY=github.com/ncarlier
 # Artifact name
 ARG ARTIFACT=webhookd
 
+# Docker Compose version
+ARG COMPOSE_VERSION=1.25.4
+
 # Fix lib dep
 RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
 
@@ -36,11 +39,9 @@ RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
 RUN apk add --no-cache git openssh-client jq bash curl
 
 # Install docker-compose
-RUN COMPOSE_VERSION="1.25.4" \
-&& apk add --no-cache \
-  py-pip \
-&& pip install --no-cache-dir \
-  docker-compose==${COMPOSE_VERSION}
+RUN curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/run.sh" \
+    -o /usr/local/bin/docker-compose && \
+    chmod +x /usr/local/bin/docker-compose
 
 # Create folder structure
 RUN mkdir -p /var/opt/webhookd/scripts /var/opt/webhookd/work
