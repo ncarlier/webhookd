@@ -56,3 +56,13 @@ func ContainsStr(t *testing.T, expected string, array []string, message string) 
 	}
 	t.Fatalf("%s - array: %v, expected value: %s", message, array, expected)
 }
+
+// True assert that an expression is true
+func True(t *testing.T, expression bool, message string) {
+	if message == "" {
+		message = "Expression is not true"
+	}
+	if !expression {
+		t.Fatalf("%s : %v", message, expression)
+	}
+}

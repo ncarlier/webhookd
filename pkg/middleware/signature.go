@@ -18,13 +18,13 @@ func HTTPSignature(trustStore pubkey.TrustStore) Middleware {
 				return
 			}
 			pubKeyID := verifier.KeyId()
-			pubKey, algo, err := trustStore.Get(pubKeyID)
-			if err != nil {
+			entry := trustStore.Get(pubKeyID)
+			if entry == nil {
 				w.WriteHeader(400)
 				w.Write([]byte("invalid HTTP signature: " + err.Error()))
 				return
 			}
-			err = verifier.Verify(pubKey, algo)
+			err = verifier.Verify(entry.Pubkey, entry.Algorythm)
 			if err != nil {
 				w.WriteHeader(400)
 				w.Write([]byte("invalid HTTP signature: " + err.Error()))
