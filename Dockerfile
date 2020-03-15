@@ -33,10 +33,10 @@ ARG ARTIFACT=webhookd
 RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
 
 # Install deps
-RUN apk add --no-cache git openssh-client jq bash
+RUN apk add --no-cache git openssh-client jq bash curl
 
 # Install docker-compose
-RUN COMPOSE_VERSION="1.23.2" \
+RUN COMPOSE_VERSION="1.25.4" \
 && apk add --no-cache \
   py-pip \
 && pip install --no-cache-dir \
@@ -55,4 +55,3 @@ ENTRYPOINT ["/docker-entrypoint.sh"]
 
 # Define command
 CMD webhookd
-
