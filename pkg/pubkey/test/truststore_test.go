@@ -12,7 +12,7 @@ import (
 func TestKeyStore(t *testing.T) {
 	logger.Init("warn")
 
-	ks, err := pubkey.NewKeyStore("file://.")
+	ks, err := pubkey.NewTrustStore("test-key.pem")
 	assert.Nil(t, err, "")
 	assert.NotNil(t, ks, "")
 
@@ -20,7 +20,4 @@ func TestKeyStore(t *testing.T) {
 	assert.Nil(t, err, "")
 	assert.NotNil(t, pk, "")
 	assert.Equal(t, httpsig.RSA_SHA256, algo, "")
-
-	_, _, err = ks.Get("notfound")
-	assert.NotNil(t, err, "")
 }

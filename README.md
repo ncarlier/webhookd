@@ -293,16 +293,15 @@ $ curl -u api:test -XPOST "http://localhost:8080/echo?msg=hello"
 
 You can ensure message integrity (and authenticity) with [HTTP Signatures](https://www.ietf.org/archive/id/draft-cavage-http-signatures-12.txt).
 
-To activate HTTP signature verification, you have to configure the key store:
+To activate HTTP signature verification, you have to configure the trust store:
 
 ```bash
-$ export WHD_KEY_STORE_URI=file:///etc/webhookd/keys
+$ export WHD_TRUST_STORE_FILE=/etc/webhookd/pubkey.pem
 $ # or
-$ webhookd --key-store-uri file:///etc/webhookd/keys
+$ webhookd --trust-store-file /etc/webhookd/pubkey.pem
 ```
 
-Note that only `file://` URI s currently supported.
-All public keys stored in PEM format in the targeted directory will be loaded.
+Public key is stored in PEM format.
 
 Once configured, you must call webhooks using a valid HTTP signature:
 

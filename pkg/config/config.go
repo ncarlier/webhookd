@@ -14,5 +14,5 @@ type Config struct {
 	PasswdFile      string `flag:"passwd-file" desc:"Password file for basic HTTP authentication" default:".htpasswd"`
 	LogDir          string `flag:"log-dir" desc:"Hook execution logs location" default:""`
 	NotificationURI string `flag:"notification-uri" desc:"Notification URI"`
-	KeyStoreURI     string `flag:"key-store-uri" desc:"Key store URI used by HTTP signature verifier"`
+	TrustStoreFile  string `flag:"trust-store-file" desc:"Trust store used by HTTP signature verifier (.pem or .p12)"`
 }

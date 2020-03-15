@@ -20,7 +20,7 @@ MIIEowIBAAKCAQEAwdCB5DZD0cFeJYUu1W3IlNN9y+NZC/Jqktdkn8/WHlXec07n
 - Start Webhookd with HTTP signature support:
 
 ```bash
-$ webhookd -key-store-uri file://.
+$ webhookd --trust-store-file ./key-pub.pem
 ```
 
 - Make HTTP signed request:
