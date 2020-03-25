@@ -1,5 +1,20 @@
 <a name=""></a>
-#  (2020-02-26)
+#  (2020-03-25)
+
+
+### Bug Fixes
+
+* **logger:** print colors only for TTY ([548149a](https://github.com/ncarlier/webhookd/commit/548149a))
+* fix tracing id log ([a257e82](https://github.com/ncarlier/webhookd/commit/a257e82))
+* **test:** add missing assets ([d96be9c](https://github.com/ncarlier/webhookd/commit/d96be9c))
+
+
+### Features
+
+* **api:** add info endpoint ([a5fe96d](https://github.com/ncarlier/webhookd/commit/a5fe96d))
+* **docker:** use Docker Compose container wrapper ([8a393cc](https://github.com/ncarlier/webhookd/commit/8a393cc))
+* **signature:** multi entries for a PEM file ([0e2f580](https://github.com/ncarlier/webhookd/commit/0e2f580))
+* **signature:** refactore the trust store system ([d91e84d](https://github.com/ncarlier/webhookd/commit/d91e84d))
 
 
 
