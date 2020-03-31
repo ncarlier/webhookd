@@ -40,8 +40,8 @@ $ docker run -d --name=webhookd \
 
 Finally, it is possible to install Webhookd using the Debian packaging system through this [custom repository](https://packages.azlux.fr/).
 
-> Note that custom configuration variables can be set into `/etc/webhoockd.env` file.
-> Sytemd service is already set and enable, you just have to start it with `systemctl start webhoockd`.
+> Note that custom configuration variables can be set into `/etc/webhookd.env` file.
+> Sytemd service is already set and enable, you just have to start it with `systemctl start webhookd`.
 
 ## Configuration
 
