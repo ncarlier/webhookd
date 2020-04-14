@@ -50,6 +50,9 @@ func NewRouter(conf *config.Config) *http.ServeMux {
 			handler = mw(handler)
 		}
 		for _, mw := range middlewares {
+			if route.Path == "/healthz" {
+				continue
+			}
 			handler = mw(handler)
 		}
 		router.Handle(route.Path, handler)
