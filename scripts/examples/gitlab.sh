@@ -15,6 +15,7 @@ debug() {
 
 # Validate parameters
 payload=$1
+payload="$(echo "$payload"|tr -d '\n')"
 [ -z "$payload" ] && die "missing request payload"
 payload_type=$(echo $payload | jq type -r)
 [ $? != 0 ] && die "bad body format: expecting JSON"
