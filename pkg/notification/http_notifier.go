@@ -53,6 +53,9 @@ func (n *HTTPNotifier) Notify(work *model.WorkRequest) error {
 	}
 
 	req, err := http.NewRequest("POST", n.URL.String(), bytes.NewBuffer(notifJSON))
+	if err != nil {
+		return err
+	}
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
