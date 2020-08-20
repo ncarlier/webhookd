@@ -17,7 +17,7 @@ import (
 
 var workID uint64
 
-// WorkStatus is the status of a worload
+// WorkStatus is the status of a workload
 type WorkStatus int
 
 const (
@@ -46,7 +46,7 @@ type WorkRequest struct {
 	mutex       sync.Mutex
 }
 
-// NewWorkRequest creats new work request
+// NewWorkRequest creates new work request
 func NewWorkRequest(name, script, payload, output string, args []string, timeout int) *WorkRequest {
 	w := &WorkRequest{
 		ID:          atomic.AddUint64(&workID, 1),
@@ -69,11 +69,11 @@ func (wr *WorkRequest) Terminate(err error) error {
 	if err != nil {
 		wr.Status = Error
 		wr.Err = err
-		logger.Info.Printf("job %s#%d done [ERROR]\n", wr.Name, wr.ID)
+		logger.Info.Printf("hook %s#%d done [ERROR]\n", wr.Name, wr.ID)
 		return err
 	}
 	wr.Status = Success
-	logger.Info.Printf("job %s#%d done [SUCCESS]\n", wr.Name, wr.ID)
+	logger.Info.Printf("hook %s#%d done [SUCCESS]\n", wr.Name, wr.ID)
 	return nil
 }
 

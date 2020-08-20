@@ -30,7 +30,7 @@ func StartDispatcher(nworkers int) {
 				go func() {
 					worker := <-WorkerQueue
 
-					logger.Debug.Printf("dispatching job request: %s#%d", work.Name, work.ID)
+					logger.Debug.Printf("dispatching hook request: %s#%d", work.Name, work.ID)
 					worker <- work
 				}()
 			}

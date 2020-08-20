@@ -42,7 +42,7 @@ func (w Worker) Start() {
 			select {
 			case work := <-w.Work:
 				// Receive a work request.
-				logger.Debug.Printf("worker #%d received job request: %s#%d\n", w.ID, work.Name, work.ID)
+				logger.Debug.Printf("worker #%d received hook request: %s#%d\n", w.ID, work.Name, work.ID)
 				metric.Requests.Add(1)
 				err := Run(&work)
 				if err != nil {
