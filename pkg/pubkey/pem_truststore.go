@@ -48,7 +48,7 @@ func newPEMTrustStore(filename string) (*pemTrustStore, error) {
 				keyID = "default"
 			}
 			result.keys[keyID] = TrustStoreEntry{
-				Algorythm: defaultAlgorithm,
+				Algorithm: defaultAlgorithm,
 				Pubkey:    rsaPublicKey,
 			}
 			logger.Debug.Printf("public key \"%s\" loaded into the trustore", keyID)
@@ -60,7 +60,7 @@ func newPEMTrustStore(filename string) (*pemTrustStore, error) {
 			rsaPublicKey, _ := cert.PublicKey.(*rsa.PublicKey)
 			keyID := string(cert.Subject.CommonName)
 			result.keys[keyID] = TrustStoreEntry{
-				Algorythm: defaultAlgorithm,
+				Algorithm: defaultAlgorithm,
 				Pubkey:    rsaPublicKey,
 			}
 			logger.Debug.Printf("certificate \"%s\" loaded into the trustore", keyID)

@@ -19,7 +19,7 @@ func TestTrustStoreWithNoKeyID(t *testing.T) {
 	assert.True(t, entry == nil, "")
 	entry = ts.Get("default")
 	assert.NotNil(t, entry, "")
-	assert.Equal(t, httpsig.RSA_SHA256, entry.Algorythm, "")
+	assert.Equal(t, httpsig.RSA_SHA256, entry.Algorithm, "")
 }
 
 func TestTrustStoreWithKeyID(t *testing.T) {
@@ -30,7 +30,7 @@ func TestTrustStoreWithKeyID(t *testing.T) {
 	assert.NotNil(t, ts, "")
 	entry := ts.Get("test")
 	assert.NotNil(t, entry, "")
-	assert.Equal(t, httpsig.RSA_SHA256, entry.Algorythm, "")
+	assert.Equal(t, httpsig.RSA_SHA256, entry.Algorithm, "")
 }
 
 func TestTrustStoreWithCertificate(t *testing.T) {
@@ -41,7 +41,7 @@ func TestTrustStoreWithCertificate(t *testing.T) {
 	assert.NotNil(t, ts, "")
 	entry := ts.Get("test.localnet")
 	assert.NotNil(t, entry, "")
-	assert.Equal(t, httpsig.RSA_SHA256, entry.Algorythm, "")
+	assert.Equal(t, httpsig.RSA_SHA256, entry.Algorithm, "")
 }
 
 func TestTrustStoreWithMultipleEntries(t *testing.T) {
@@ -52,8 +52,8 @@ func TestTrustStoreWithMultipleEntries(t *testing.T) {
 	assert.NotNil(t, ts, "")
 	entry := ts.Get("test.localnet")
 	assert.NotNil(t, entry, "")
-	assert.Equal(t, httpsig.RSA_SHA256, entry.Algorythm, "")
+	assert.Equal(t, httpsig.RSA_SHA256, entry.Algorithm, "")
 	entry = ts.Get("foo")
 	assert.NotNil(t, entry, "")
-	assert.Equal(t, httpsig.RSA_SHA256, entry.Algorythm, "")
+	assert.Equal(t, httpsig.RSA_SHA256, entry.Algorithm, "")
 }

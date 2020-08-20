@@ -14,7 +14,7 @@ const defaultAlgorithm = httpsig.RSA_SHA256
 // TrustStoreEntry is a trust store entry
 type TrustStoreEntry struct {
 	Pubkey    crypto.PublicKey
-	Algorythm httpsig.Algorithm
+	Algorithm httpsig.Algorithm
 }
 
 // TrustStore is a generic interface to retrieve a public key
