@@ -36,9 +36,8 @@ type Server struct {
 func (s *Server) ListenAndServe() error {
 	if s.tls {
 		return s.self.ListenAndServeTLS(s.certFile, s.keyFile)
-	} else {
-		return s.self.ListenAndServe()
 	}
+	return s.self.ListenAndServe()
 }
 
 // Shutdown stop HTTP(s) server
@@ -49,23 +48,17 @@ func (s *Server) Shutdown(ctx context.Context) error {
 
 // NewServer create new HTTP(s) server
 func NewServer(cfg *config.Config) *Server {
-	server := &Server{}
-	if cfg.TLSListenAddr == "" {
-		// Simple HTTP server
-		server.self = &http.Server{
+	server := &Server{
+		tls: cfg.TLS,
+		self: &http.Server{
 			Addr:     cfg.ListenAddr,
 			Handler:  api.NewRouter(cfg),
 			ErrorLog: logger.Error,
-		}
-		server.tls = false
-	} else {
+		},
+	}
+	if server.tls {
 		// HTTPs server
 		if cfg.TLSDomain == "" {
-			server.self = &http.Server{
-				Addr:     cfg.TLSListenAddr,
-				Handler:  api.NewRouter(cfg),
-				ErrorLog: logger.Error,
-			}
 			server.certFile = cfg.TLSCertFile
 			server.keyFile = cfg.TLSKeyFile
 		} else {
@@ -74,16 +67,10 @@ func NewServer(cfg *config.Config) *Server {
 				Prompt:     autocert.AcceptTOS,
 				HostPolicy: autocert.HostWhitelist(cfg.TLSDomain),
 			}
-			server.self = &http.Server{
-				Addr:      cfg.TLSListenAddr,
-				Handler:   api.NewRouter(cfg),
-				ErrorLog:  logger.Error,
-				TLSConfig: m.TLSConfig(),
-			}
+			server.self.TLSConfig = m.TLSConfig()
 			server.certFile = ""
 			server.keyFile = ""
 		}
-		server.tls = true
 	}
 	return server
 }

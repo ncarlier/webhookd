@@ -324,12 +324,10 @@ You can find a small HTTP client in the ["tooling" directory](./tooling/httpsig/
 You can activate TLS to secure communications:
 
 ```bash
-$ export WHD_TLS_LISTEN_ADDR=:8443
+$ export WHD_TLS=true
 $ # or
-$ webhookd --tls-listen-addr=:8443
+$ webhookd --tls
 ```
-
-This will disable HTTP port.
 
 By default webhookd is expecting a certificate and key file (`./server.pem` and `./server.key`).
 You can provide your own certificate and key with `-tls-cert-file` and `-tls-key-file`.
@@ -338,10 +336,10 @@ Webhookd also support [ACME](https://ietf-wg-acme.github.io/acme/) protocol.
 You can activate ACME by setting a fully qualified domain name:
 
 ```bash
-$ export WHD_TLS_LISTEN_ADDR=:8443
+$ export WHD_TLS=true
 $ export WHD_TLS_DOMAIN=hook.example.com
 $ # or
-$ webhookd --tls-listen-addr=:8443 --tls-domain=hook.example.com
+$ webhookd --tls --tls-domain=hook.example.com
 ```
 
 **Note:**

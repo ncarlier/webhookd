@@ -71,14 +71,10 @@ func main() {
 		close(done)
 	}()
 
-	addr := conf.ListenAddr
-	if conf.TLSListenAddr != "" {
-		addr = conf.TLSListenAddr
-	}
-	logger.Info.Println("server is ready to handle requests at", addr)
+	logger.Info.Println("server is ready to handle requests at", conf.ListenAddr)
 	api.Start()
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		logger.Error.Fatalf("could not listen on %s : %v\n", addr, err)
+		logger.Error.Fatalf("could not listen on %s : %v\n", conf.ListenAddr, err)
 	}
 
 	<-done

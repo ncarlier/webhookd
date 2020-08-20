@@ -21,7 +21,7 @@ func NewRouter(conf *config.Config) *http.ServeMux {
 	router := http.NewServeMux()
 
 	var middlewares = commonMiddlewares
-	if conf.TLSListenAddr != "" {
+	if conf.TLS {
 		middlewares = append(middlewares, middleware.HSTS)
 	}
 

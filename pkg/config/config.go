@@ -3,7 +3,7 @@ package config
 // Config contain global configuration
 type Config struct {
 	ListenAddr      string `flag:"listen-addr" desc:"HTTP listen address" default:":8080"`
-	TLSListenAddr   string `flag:"tls-listen-addr" desc:"TLS listen address"`
+	TLS             bool   `flag:"tls" desc:"Activate TLS" default:"false"`
 	TLSCertFile     string `flag:"tls-cert-file" desc:"TLS certificate file" default:"server.pem"`
 	TLSKeyFile      string `flag:"tls-key-file" desc:"TLS key file" default:"server.key"`
 	TLSDomain       string `flag:"tls-domain" desc:"TLS domain name used by ACME"`
