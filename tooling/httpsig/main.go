@@ -61,8 +61,10 @@ func main() {
 	}
 
 	var payload io.Reader
+	var jsonBytes []byte
 	if conf.JSON != "" {
-		jsonBytes, err := ioutil.ReadFile(conf.JSON)
+		var err error
+		jsonBytes, err = ioutil.ReadFile(conf.JSON)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
@@ -70,8 +72,9 @@ func main() {
 	}
 
 	prefs := []httpsig.Algorithm{httpsig.RSA_SHA256}
+	digestAlgorithm := httpsig.DigestSha256
 	headers := []string{httpsig.RequestTarget, "date"}
-	signer, _, err := httpsig.NewSigner(prefs, headers, httpsig.Signature)
+	signer, _, err := httpsig.NewSigner(prefs, digestAlgorithm, headers, httpsig.Signature, 0)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -85,7 +88,7 @@ func main() {
 	}
 	req.Header.Add("date", time.Now().UTC().Format(http.TimeFormat))
 
-	if err = signer.SignRequest(privateKey, conf.KeyID, req); err != nil {
+	if err = signer.SignRequest(privateKey, conf.KeyID, req, jsonBytes); err != nil {
 		log.Fatal(err.Error())
 	}
 

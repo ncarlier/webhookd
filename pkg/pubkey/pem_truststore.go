@@ -22,7 +22,7 @@ func (ts *pemTrustStore) Get(keyID string) *TrustStoreEntry {
 	return nil
 }
 
-func newPEMTrustStore(filename string) (*pemTrustStore, error) {
+func newPEMTrustStore(filename string) (TrustStore, error) {
 	raw, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err

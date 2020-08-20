@@ -25,13 +25,13 @@ func NewRouter(conf *config.Config) *http.ServeMux {
 		middlewares = append(middlewares, middleware.HSTS)
 	}
 
-	// Load key store...
-	keystore, err := pubkey.NewTrustStore(conf.TrustStoreFile)
+	// Load trust store...
+	trustStore, err := pubkey.NewTrustStore(conf.TrustStoreFile)
 	if err != nil {
 		logger.Warning.Printf("unable to load trust store (\"%s\"): %s\n", conf.TrustStoreFile, err)
 	}
-	if keystore != nil {
-		middlewares = append(middlewares, middleware.HTTPSignature(keystore))
+	if trustStore != nil {
+		middlewares = append(middlewares, middleware.HTTPSignature(trustStore))
 	}
 
 	// Load authenticator...
