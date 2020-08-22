@@ -1,5 +1,16 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.9.0...v) (2020-03-25)
+# [](https://github.com/ncarlier/webhookd/compare/v1.9.0...v) (2020-08-22)
+
+
+### Bug Fixes
+
+* **scripts:** fix line breaks ([#33](https://github.com/ncarlier/webhookd/issues/33)) ([552b683](https://github.com/ncarlier/webhookd/commit/552b683))
+
+
+### Features
+
+* **server:** simplify TLS usage ([1ee71be](https://github.com/ncarlier/webhookd/commit/1ee71be))
+* improve HTTP signature support ([296ab6a](https://github.com/ncarlier/webhookd/commit/296ab6a))
 
 
 
@@ -9,9 +20,9 @@
 
 ### Bug Fixes
 
-* **logger:** print colors only for TTY ([548149a](https://github.com/ncarlier/webhookd/commit/548149a))
-* fix tracing id log ([a257e82](https://github.com/ncarlier/webhookd/commit/a257e82))
 * **test:** add missing assets ([d96be9c](https://github.com/ncarlier/webhookd/commit/d96be9c))
+* fix tracing id log ([a257e82](https://github.com/ncarlier/webhookd/commit/a257e82))
+* **logger:** print colors only for TTY ([548149a](https://github.com/ncarlier/webhookd/commit/548149a))
 
 
 ### Features
@@ -35,9 +46,9 @@
 
 ### Features
 
-* **auth:** simplify validate method ([5948b60](https://github.com/ncarlier/webhookd/commit/5948b60))
 * finalize HTTP signature support ([4320467](https://github.com/ncarlier/webhookd/commit/4320467))
 * HTTP signature support ([c16ec83](https://github.com/ncarlier/webhookd/commit/c16ec83))
+* **auth:** simplify validate method ([5948b60](https://github.com/ncarlier/webhookd/commit/5948b60))
 
 
 
@@ -78,10 +89,10 @@
 
 ### Features
 
-* safer script resolution ([682b265](https://github.com/ncarlier/webhookd/commit/682b265))
 * **api:** add method whitelist ([d11da6f](https://github.com/ncarlier/webhookd/commit/d11da6f))
 * **api:** add varz endpoint with metrics ([35a2321](https://github.com/ncarlier/webhookd/commit/35a2321))
 * **api:** use GET and POST requests for hooks ([e7fac82](https://github.com/ncarlier/webhookd/commit/e7fac82))
+* safer script resolution ([682b265](https://github.com/ncarlier/webhookd/commit/682b265))
 
 
 
@@ -149,20 +160,20 @@
 
 ### Bug Fixes
 
-* fix panic due to writing into closed chan ([43820cd](https://github.com/ncarlier/webhookd/commit/43820cd))
 * **docker:** add bash shell to the Docker image ([c723387](https://github.com/ncarlier/webhookd/commit/c723387))
 * **runner:** fix concurent access to the work request channel ([e8d1c6e](https://github.com/ncarlier/webhookd/commit/e8d1c6e))
 * **script:** kill script process and sub process on timeout ([5f32a4f](https://github.com/ncarlier/webhookd/commit/5f32a4f))
+* fix panic due to writing into closed chan ([43820cd](https://github.com/ncarlier/webhookd/commit/43820cd))
 * **server:** remove global server timeouts ([82346b0](https://github.com/ncarlier/webhookd/commit/82346b0))
 
 
 ### Features
 
-* add Docker entrypoint ([67bfe07](https://github.com/ncarlier/webhookd/commit/67bfe07))
 * **cli:** add print version command ([6565f6f](https://github.com/ncarlier/webhookd/commit/6565f6f))
 * **config:** improve configuration flags ([fbf8794](https://github.com/ncarlier/webhookd/commit/fbf8794))
 * **logging:** improve log outputs ([5cd5547](https://github.com/ncarlier/webhookd/commit/5cd5547))
 * **security:** add http basic auth (fix [#6](https://github.com/ncarlier/webhookd/issues/6)) ([#7](https://github.com/ncarlier/webhookd/issues/7)) ([513e6d7](https://github.com/ncarlier/webhookd/commit/513e6d7))
+* add Docker entrypoint ([67bfe07](https://github.com/ncarlier/webhookd/commit/67bfe07))
 
 
 
@@ -188,9 +199,9 @@
 
 ### Features
 
+* transmit HTTP headers as env variables to the script ([2e80359](https://github.com/ncarlier/webhookd/commit/2e80359))
 * **docker:** add git and ssh client inside the Docker image ([10b82d6](https://github.com/ncarlier/webhookd/commit/10b82d6))
 * **docker:** add jq inside the Docker image ([c2a1741](https://github.com/ncarlier/webhookd/commit/c2a1741))
-* transmit HTTP headers as env variables to the script ([2e80359](https://github.com/ncarlier/webhookd/commit/2e80359))
 
 
 
