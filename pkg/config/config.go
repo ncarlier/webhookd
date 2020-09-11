@@ -13,6 +13,7 @@ type Config struct {
 	ScriptDir       string `flag:"scripts" desc:"Scripts location" default:"scripts"`
 	PasswdFile      string `flag:"passwd-file" desc:"Password file for basic HTTP authentication" default:".htpasswd"`
 	LogDir          string `flag:"log-dir" desc:"Hook execution logs location" default:""`
+	StaticDir       string `flag:"static-dir" desc:"Static file directory to serve on /static path" default:""`
 	NotificationURI string `flag:"notification-uri" desc:"Notification URI"`
 	TrustStoreFile  string `flag:"trust-store-file" desc:"Trust store used by HTTP signature verifier (.pem or .p12)"`
 }

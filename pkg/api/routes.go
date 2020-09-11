@@ -30,6 +30,7 @@ type Routes []Route
 
 var routes = Routes{
 	route("/", index, middleware.Methods("GET", "POST")),
+	route("/static/", static("/static/"), middleware.Methods("GET")),
 	route("/healthz", healthz, middleware.Methods("GET")),
 	route("/varz", varz, middleware.Methods("GET")),
 }
