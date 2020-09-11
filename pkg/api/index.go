@@ -31,7 +31,7 @@ func atoiFallback(str string, fallback int) int {
 
 // index is the main handler of the API.
 func index(conf *config.Config) http.Handler {
-	defaultTimeout = conf.Timeout
+	defaultTimeout = conf.HookTimeout
 	scriptDir = conf.ScriptDir
 	outputDir = conf.LogDir
 	return http.HandlerFunc(webhookHandler)
