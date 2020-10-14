@@ -50,7 +50,7 @@ func (w Worker) Start() {
 					work.MessageChan <- []byte(fmt.Sprintf("error: %s", err.Error()))
 				}
 				// Send notification
-				notification.Notify(&work)
+				go notification.Notify(&work)
 
 				close(work.MessageChan)
 			case <-w.QuitChan:

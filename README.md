@@ -263,7 +263,10 @@ Options (using query parameters):
 
 - `prefix`: Prefix to filter output log
 - `smtp`: SMTP host to use (by default: `localhost:25`)
-- `from`: Sender email (by default: `webhookd <noreply@nunux.org>`)
+- `username`: SMTP username (not set by default)
+- `password`: SMTP password (not set by default)
+- `conn`: SMTP connection type (`tls`, `tls-insecure` or by default: `plain`)
+- `from`: Sender email (by default: `noreply@nunux.org`)
 
 ### Authentication
 
