@@ -2,6 +2,7 @@ package worker
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -38,7 +39,8 @@ func Run(work *model.WorkRequest) error {
 	// Exec script with args...
 	cmd := exec.Command(binary, work.Payload)
 	// with env variables...
-	cmd.Env = append(os.Environ(), "HOOK_ID=" + work.ID , work.Args...)
+	workEnv := append(os.Environ(), fmt.Sprintf("HOOK_ID=%d", work.ID))
+	cmd.Env = append(workEnv, work.Args...)
 	// using a process group...
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
