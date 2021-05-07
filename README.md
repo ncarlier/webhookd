@@ -150,6 +150,7 @@ The script:
 ```bash
 #!/bin/bash
 
+echo "Hook information: name=$hook_name, id=$hook_id"
 echo "Query parameter: foo=$foo"
 echo "Header parameter: user-agent=$user_agent"
 echo "Script parameters: $1"
@@ -159,6 +160,7 @@ The result:
 
 ```bash
 $ curl --data @test.json http://localhost:8080/echo?foo=bar
+Hook information: name=echo, id=1
 Query parameter: foo=bar
 Header parameter: user-agent=curl/7.52.1
 Script parameter: {"foo": "bar"}

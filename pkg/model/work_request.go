@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -60,6 +61,14 @@ func NewWorkRequest(name, script, payload, output string, args []string, timeout
 	}
 	w.LogFilename = path.Join(output, fmt.Sprintf("%s_%d_%s.txt", strcase.ToSnake(w.Name), w.ID, time.Now().Format("20060102_1504")))
 	return w
+}
+
+// Meta return work request meta
+func (wr *WorkRequest) Meta() []string {
+	return []string{
+		"hook_id=" + strconv.FormatUint(wr.ID, 10),
+		"hook_name=" + wr.Name,
+	}
 }
 
 // Terminate set work request as terminated

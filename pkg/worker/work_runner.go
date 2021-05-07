@@ -2,7 +2,6 @@ package worker
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -36,11 +35,12 @@ func Run(work *model.WorkRequest) error {
 		return work.Terminate(err)
 	}
 
-	// Exec script with args...
+	// Exec script with parameter...
 	cmd := exec.Command(binary, work.Payload)
-	// with env variables...
-	workEnv := append(os.Environ(), fmt.Sprintf("hook_id=%d", work.ID))
-	cmd.Env = append(workEnv, work.Args...)
+	// with env variables and hook arguments...
+	cmd.Env = append(os.Environ(), work.Args...)
+	// and hook meta...
+	cmd.Env = append(cmd.Env, work.Meta()...)
 	// using a process group...
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 

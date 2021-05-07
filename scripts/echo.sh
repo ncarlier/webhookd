@@ -2,7 +2,9 @@
 
 # Usage: http POST :8080/echo msg==hello foo=bar
 
-echo "Echo script:"
+echo "This is a simple echo hook."
+
+echo "Hook information: name=$hook_name, id=$hook_id"
 
 echo "Command result: hostname=`hostname`"
 
