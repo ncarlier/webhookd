@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/smtp"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -21,6 +22,7 @@ type SMTPNotifier struct {
 	Conn         string
 	From         string
 	To           string
+	Subject      string
 	PrefixFilter string
 }
 
@@ -34,7 +36,8 @@ func newSMTPNotifier(uri *url.URL) *SMTPNotifier {
 		Conn:         getValueOrAlt(q, "conn", "plain"),
 		From:         getValueOrAlt(q, "from", "noreply@nunux.org"),
 		To:           uri.Opaque,
-		PrefixFilter: getValueOrAlt(q, "prefix", "notify:"),
+		Subject:      getValueOrAlt(uri.Query(), "subject", "[whd-notification] {name}#{id} {status}"),
+		PrefixFilter: getValueOrAlt(uri.Query(), "prefix", "notify:"),
 	}
 }
 
@@ -44,13 +47,10 @@ func (n *SMTPNotifier) buildEmailPayload(work *model.WorkRequest) string {
 	if strings.TrimSpace(body) == "" {
 		return ""
 	}
-	// Get email subject
-	var subject string
-	if work.Status == model.Success {
-		subject = fmt.Sprintf("Webhook %s#%d SUCCESS.", work.Name, work.ID)
-	} else {
-		subject = fmt.Sprintf("Webhook %s#%d FAILED.", work.Name, work.ID)
-	}
+
+	// Build email subject
+	subject := buildSubject(n.Subject, work)
+
 	// Build email headers
 	headers := make(map[string]string)
 	headers["From"] = n.From
@@ -131,4 +131,11 @@ func (n *SMTPNotifier) Notify(work *model.WorkRequest) error {
 
 	// Send the QUIT command and close the connection.
 	return client.Quit()
+}
+
+func buildSubject(template string, work *model.WorkRequest) string {
+	result := strings.ReplaceAll(template, "{name}", work.Name)
+	result = strings.ReplaceAll(result, "{id}", strconv.FormatUint(uint64(work.ID), 10))
+	result = strings.ReplaceAll(result, "{status}", work.StatusLabel())
+	return result
 }

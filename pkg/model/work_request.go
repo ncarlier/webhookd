@@ -93,6 +93,20 @@ func (wr *WorkRequest) IsTerminated() bool {
 	return wr.Status == Success || wr.Status == Error
 }
 
+// StatusLabel return work status as string
+func (wr *WorkRequest) StatusLabel() string {
+	switch wr.Status {
+	case Error:
+		return "error"
+	case Success:
+		return "success"
+	case Running:
+		return "running"
+	default:
+		return "idle"
+	}
+}
+
 // GetLogContent returns work logs filtered with the prefix
 func (wr *WorkRequest) GetLogContent(prefixFilter string) string {
 	file, err := os.Open(wr.LogFilename)

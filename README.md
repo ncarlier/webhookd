@@ -25,6 +25,8 @@ $ go get -v github.com/ncarlier/webhookd
 
 ```bash
 $ sudo curl -s https://raw.githubusercontent.com/ncarlier/webhookd/master/install.sh | bash
+or
+$ curl -sf https://gobinaries.com/ncarlier/za | sh
 ```
 
 **Or** use Docker:
@@ -269,6 +271,7 @@ Options (using query parameters):
 - `password`: SMTP password (not set by default)
 - `conn`: SMTP connection type (`tls`, `tls-insecure` or by default: `plain`)
 - `from`: Sender email (by default: `noreply@nunux.org`)
+- `subject`: Email subject (by default: `[whd-notification] {name}#{id} {status}`)
 
 ### Authentication
 
