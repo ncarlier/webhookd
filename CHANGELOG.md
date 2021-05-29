@@ -1,5 +1,37 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.10.0...v) (2020-08-22)
+# [](https://github.com/ncarlier/webhookd/compare/v1.11.0...v) (2021-05-29)
+
+
+### Features
+
+* output hook execution logs to server logs ([07fbb6e](https://github.com/ncarlier/webhookd/commit/07fbb6e)), closes [#44](https://github.com/ncarlier/webhookd/issues/44)
+* **notification:** email subject customization ([ed67fc7](https://github.com/ncarlier/webhookd/commit/ed67fc7))
+
+
+### BREAKING CHANGES
+
+* for configuration
+
+- rename `-log-dir` to `-hook-log-dir`
+- add `-hook-log-output`
+- add `-log-level`
+- remove `-debug`
+
+
+
+<a name="1.11.0"></a>
+# [1.11.0](https://github.com/ncarlier/webhookd/compare/v1.10.0...v1.11.0) (2020-10-14)
+
+
+### Bug Fixes
+
+* fix timeout parameter name ([f5f4838](https://github.com/ncarlier/webhookd/commit/f5f4838)), closes [#37](https://github.com/ncarlier/webhookd/issues/37)
+
+
+### Features
+
+* **notif:** add TLS and password support to the SMTP notifier ([f29a174](https://github.com/ncarlier/webhookd/commit/f29a174)), closes [#39](https://github.com/ncarlier/webhookd/issues/39)
+* serve static assets ([b049677](https://github.com/ncarlier/webhookd/commit/b049677))
 
 
 
