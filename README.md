@@ -26,7 +26,7 @@ $ go get -v github.com/ncarlier/webhookd
 ```bash
 $ sudo curl -s https://raw.githubusercontent.com/ncarlier/webhookd/master/install.sh | bash
 or
-$ curl -sf https://gobinaries.com/ncarlier/za | sh
+$ curl -sf https://gobinaries.com/ncarlier/webhookd | sh
 ```
 
 **Or** use Docker:
@@ -204,10 +204,12 @@ $ # Retrieve logs afterwards
 $ curl http://localhost:8080/echo/2
 ```
 
+If needed, you can also redirect hook logs to the server output (configured by the `WHD_HOOK_LOG_OUTPUT` environment variable).
+
 ### Post hook notifications
 
 The output of the script is collected and stored into a log file
-(configured by the `WHD_LOG_DIR` environment variable).
+(configured by the `WHD_HOOK_LOG_DIR` environment variable).
 
 Once the script is executed, you can send the result and this log file to a notification channel.
 Currently, only two channels are supported: `Email` and `HTTP`.
@@ -255,9 +257,11 @@ The following JSON payload is POST to the target URL:
 }
 ```
 
-Note that because the payload have a `text` attribute, you can use a [Mattermost][mattermost] webhook endpoint.
+Note that because the payload have a `text` attribute, you can use a [Mattermost][mattermost], [Slack][slack] or [Discord][discord] webhook endpoint.
 
 [mattermost]: https://docs.mattermost.com/developer/webhooks-incoming.html
+[discord]: https://discord.com/developers/docs/resources/webhook#execute-slackcompatible-webhook
+[slack]: https://api.slack.com/messaging/webhooks
 
 #### Email notification
 

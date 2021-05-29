@@ -24,7 +24,7 @@ func printWorkMessages(work *model.WorkRequest) {
 }
 
 func TestWorkRunner(t *testing.T) {
-	logger.Init("debug")
+	logger.Init("debug", "out")
 	script := "./test_simple.sh"
 	args := []string{
 		"name=foo",

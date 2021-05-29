@@ -33,7 +33,7 @@ func atoiFallback(str string, fallback int) int {
 func index(conf *config.Config) http.Handler {
 	defaultTimeout = conf.HookTimeout
 	scriptDir = conf.ScriptDir
-	outputDir = conf.LogDir
+	outputDir = conf.HookLogDir
 	return http.HandlerFunc(webhookHandler)
 }
 

@@ -88,6 +88,8 @@ func Run(work *model.WorkRequest) error {
 				logger.Error.Printf("hook %s#%d is over ; unable to write more data into the channel: %s\n", work.Name, work.ID, line)
 				break
 			}
+			// write to stdout if configured
+			logger.Output.Println(line)
 			// writing to outfile
 			if _, err := wLogFile.WriteString(line + "\n"); err != nil {
 				logger.Error.Println("error while writing into the log file:", logFile.Name(), err)

@@ -43,3 +43,8 @@ func Orange(text string) string {
 func Red(text string) string {
 	return colorize(text, red)
 }
+
+// Purple ANSI color applied to a string
+func Purple(text string) string {
+	return colorize(text, purple)
+}

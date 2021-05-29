@@ -30,14 +30,14 @@ func main() {
 		os.Exit(0)
 	}
 
-	level := "info"
-	if conf.Debug {
-		level = "debug"
+	if conf.HookLogOutput {
+		logger.Init(conf.LogLevel, "out")
+	} else {
+		logger.Init(conf.LogLevel)
 	}
-	logger.Init(level)
 
-	if conf.LogDir == "" {
-		conf.LogDir = os.TempDir()
+	if conf.HookLogDir == "" {
+		conf.HookLogDir = os.TempDir()
 	}
 
 	logger.Debug.Println("starting webhookd server...")
