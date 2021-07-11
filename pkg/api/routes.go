@@ -1,36 +1,67 @@
 package api
 
 import (
-	"net/http"
-
+	"github.com/ncarlier/webhookd/pkg/auth"
 	"github.com/ncarlier/webhookd/pkg/config"
+	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/middleware"
+	"github.com/ncarlier/webhookd/pkg/pubkey"
 )
 
-// HandlerFunc custom function handler
-type HandlerFunc func(conf *config.Config) http.Handler
-
-// Route is the structure of an HTTP route definition
-type Route struct {
-	Path        string
-	HandlerFunc HandlerFunc
-	Middlewares []middleware.Middleware
+var commonMiddlewares = middleware.Middlewares{
+	middleware.Cors,
+	middleware.Logger,
+	middleware.Tracing(nextRequestID),
 }
 
-func route(path string, handler HandlerFunc, middlewares ...middleware.Middleware) Route {
-	return Route{
-		Path:        path,
-		HandlerFunc: handler,
-		Middlewares: middlewares,
+func buildMiddlewares(conf *config.Config) middleware.Middlewares {
+	var middlewares = commonMiddlewares
+	if conf.TLS {
+		middlewares = middlewares.UseAfter(middleware.HSTS)
 	}
+
+	// Load trust store...
+	trustStore, err := pubkey.NewTrustStore(conf.TrustStoreFile)
+	if err != nil {
+		logger.Warning.Printf("unable to load trust store (\"%s\"): %s\n", conf.TrustStoreFile, err)
+	}
+	if trustStore != nil {
+		middlewares = middlewares.UseAfter(middleware.HTTPSignature(trustStore))
+	}
+
+	// Load authenticator...
+	authenticator, err := auth.NewHtpasswdFromFile(conf.PasswdFile)
+	if err != nil {
+		logger.Debug.Printf("unable to load htpasswd file (\"%s\"): %s\n", conf.PasswdFile, err)
+	}
+	if authenticator != nil {
+		middlewares = middlewares.UseAfter(middleware.AuthN(authenticator))
+	}
+	return middlewares
 }
 
-// Routes is a list of Route
-type Routes []Route
-
-var routes = Routes{
-	route("/", index, middleware.Methods("GET", "POST")),
-	route("/static/", static("/static/"), middleware.Methods("GET")),
-	route("/healthz", healthz, middleware.Methods("GET")),
-	route("/varz", varz, middleware.Methods("GET")),
+func routes(conf *config.Config) Routes {
+	middlewares := buildMiddlewares(conf)
+	return Routes{
+		route(
+			"/",
+			index,
+			middlewares.UseBefore(middleware.Methods("GET", "POST"))...,
+		),
+		route(
+			"/static/",
+			static("/static/"),
+			middlewares.UseBefore(middleware.Methods("GET"))...,
+		),
+		route(
+			"/healthz",
+			healthz,
+			commonMiddlewares.UseBefore(middleware.Methods("GET"))...,
+		),
+		route(
+			"/varz",
+			varz,
+			middlewares.UseBefore(middleware.Methods("GET"))...,
+		),
+	}
 }

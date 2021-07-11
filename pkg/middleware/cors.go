@@ -14,6 +14,5 @@ func Cors(inner http.Handler) http.Handler {
 		if r.Method != "OPTIONS" {
 			inner.ServeHTTP(w, r)
 		}
-		return
 	})
 }
