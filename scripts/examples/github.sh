@@ -12,7 +12,7 @@ debug() {
 
 # Validate Github hook
 signature=$(echo -n "$1" | openssl sha1 -hmac "$GITHUB_SECRET" | sed -e 's/^.* //')
-[ "$signature" != "$x_hub_signature" ] && die "bad hook signature: expecting $x_hub_signature and got $signature"
+[ "sha1=$signature" != "$x_hub_signature" ] && die "bad hook signature: expecting $x_hub_signature and got $signature"
 
 # Validate parameters
 payload=$1
