@@ -1,5 +1,11 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.12.0...v) (2021-05-29)
+# [](https://github.com/ncarlier/webhookd/compare/v1.12.0...v) (2021-12-05)
+
+
+### Features
+
+* configure static path ([9fa96ac](https://github.com/ncarlier/webhookd/commit/9fa96ac)), closes [#45](https://github.com/ncarlier/webhookd/issues/45)
+* **api:** refactore router ([6b3623f](https://github.com/ncarlier/webhookd/commit/6b3623f))
 
 
 
