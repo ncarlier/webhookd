@@ -1,7 +1,7 @@
 #########################################
 # Build stage
 #########################################
-FROM golang:1.14 AS builder
+FROM golang:1.17 AS builder
 
 # Repository location
 ARG REPOSITORY=github.com/ncarlier
@@ -33,7 +33,7 @@ ARG ARTIFACT=webhookd
 ARG COMPOSE_VERSION=1.25.4
 
 # Fix lib dep
-RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
+#RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
 
 # Install deps
 RUN apk add --no-cache git openssh-client jq bash curl
