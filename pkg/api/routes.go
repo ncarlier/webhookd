@@ -42,6 +42,7 @@ func buildMiddlewares(conf *config.Config) middleware.Middlewares {
 
 func routes(conf *config.Config) Routes {
 	middlewares := buildMiddlewares(conf)
+	staticPath := conf.StaticPath + "/"
 	return Routes{
 		route(
 			"/",
@@ -49,8 +50,8 @@ func routes(conf *config.Config) Routes {
 			middlewares.UseBefore(middleware.Methods("GET", "POST"))...,
 		),
 		route(
-			"/static/",
-			static("/static/"),
+			staticPath,
+			static(staticPath),
 			middlewares.UseBefore(middleware.Methods("GET"))...,
 		),
 		route(

@@ -1,5 +1,10 @@
 package config
 
+import (
+	"fmt"
+	"regexp"
+)
+
 // Config contain global configuration
 type Config struct {
 	ListenAddr      string `flag:"listen-addr" desc:"HTTP listen address" default:":8080"`
@@ -15,6 +20,14 @@ type Config struct {
 	PasswdFile      string `flag:"passwd-file" desc:"Password file for basic HTTP authentication" default:".htpasswd"`
 	LogLevel        string `flag:"log-level" desc:"Log level (debug, info, warn, error)" default:"info"`
 	StaticDir       string `flag:"static-dir" desc:"Static file directory to serve on /static path" default:""`
+	StaticPath      string `flag:"static-path" desc:"Path to serve static file directory" default:"/static"`
 	NotificationURI string `flag:"notification-uri" desc:"Notification URI"`
 	TrustStoreFile  string `flag:"trust-store-file" desc:"Trust store used by HTTP signature verifier (.pem or .p12)"`
+}
+
+func (c *Config) Validate() error {
+	if matched, _ := regexp.MatchString(`^/\w+$`, c.StaticPath); !matched {
+		return fmt.Errorf("invalid static path: %s", c.StaticPath)
+	}
+	return nil
 }

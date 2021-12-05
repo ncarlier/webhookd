@@ -40,6 +40,10 @@ func main() {
 		conf.HookLogDir = os.TempDir()
 	}
 
+	if err := conf.Validate(); err != nil {
+		logger.Error.Fatal("invalid configuration:", err)
+	}
+
 	logger.Debug.Println("starting webhookd server...")
 
 	srv := server.NewServer(conf)
