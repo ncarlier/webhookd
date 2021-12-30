@@ -6,8 +6,8 @@ export GO111MODULE=on
 APPNAME=webhookd
 
 # Go configuration
-GOOS?=linux
-GOARCH?=amd64
+GOOS?=$(shell go env GOHOSTOS)
+GOARCH?=$(shell go env GOHOSTARCH)
 
 # Add exe extension if windows target
 is_windows:=$(filter windows,$(GOOS))
