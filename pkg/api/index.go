@@ -20,6 +20,7 @@ var (
 	defaultTimeout int
 	scriptDir      string
 	outputDir      string
+	prefixEnabled  bool
 )
 
 func atoiFallback(str string, fallback int) int {
@@ -34,6 +35,7 @@ func index(conf *config.Config) http.Handler {
 	defaultTimeout = conf.HookTimeout
 	scriptDir = conf.ScriptDir
 	outputDir = conf.HookLogDir
+	prefixEnabled = conf.HookPrefix
 	return http.HandlerFunc(webhookHandler)
 }
 
@@ -105,7 +107,7 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		if r.Method == "GET" {
+		if r.Method == "GET" && prefixEnabled {
 			fmt.Fprintf(w, "data: %s\n\n", msg) // Send SSE response
 		} else {
 			fmt.Fprintf(w, "%s\n", msg) // Send chunked response

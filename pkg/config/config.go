@@ -16,6 +16,7 @@ type Config struct {
 	HookTimeout     int    `flag:"hook-timeout" desc:"Maximum hook execution time in second" default:"10"`
 	HookLogDir      string `flag:"hook-log-dir" desc:"Hook execution logs location" default:""`
 	HookLogOutput   bool   `flag:"hook-log-output" desc:"Output hook execution logs to server logs" default:"false"`
+	HookPrefix      bool   `flag:"hook-prefix" desc:"Prefix GET responses" default:"true"`
 	ScriptDir       string `flag:"scripts" desc:"Scripts location" default:"scripts"`
 	PasswdFile      string `flag:"passwd-file" desc:"Password file for basic HTTP authentication" default:".htpasswd"`
 	LogLevel        string `flag:"log-level" desc:"Log level (debug, info, warn, error)" default:"info"`
