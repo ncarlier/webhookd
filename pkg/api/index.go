@@ -87,7 +87,9 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 	// Put work in queue
 	worker.WorkQueue <- *work
 
-	if r.Method == "GET" {
+	// Use content negotiation to enable Server-Sent Events
+	useSSE := r.Method == "GET" && r.Header.Get("Accept") == "text/event-stream"
+	if useSSE {
 		// Send SSE response
 		w.Header().Set("Content-Type", "text/event-stream")
 	} else {
@@ -105,7 +107,7 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		if r.Method == "GET" {
+		if useSSE {
 			fmt.Fprintf(w, "data: %s\n\n", msg) // Send SSE response
 		} else {
 			fmt.Fprintf(w, "%s\n", msg) // Send chunked response

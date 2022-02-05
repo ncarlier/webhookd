@@ -91,11 +91,15 @@ The directory structure define the webhook URL.
 You can omit the script extension. If you do, webhookd will search for a `.sh` file.
 If the script exists, the output the will be streamed to the HTTP response.
 
-The streaming technology depends on the HTTP method used.
-With `POST` the response will be chunked.
-With `GET` the response will use [Server-sent events][sse].
+The streaming technology depends on the HTTP request:
+
+- [Server-sent events][sse] is used when:
+  - Using `GET` verb
+  - Using `text/event-stream` in `Accept` request header
+- [Chunked Transfer Coding][chunked] is used otherwise.
 
 [sse]: https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
+[chunked]: https://datatracker.ietf.org/doc/html/rfc2616#section-3.6.1
 
 *Example:*
 
@@ -108,7 +112,7 @@ echo "foo foo foo"
 echo "bar bar bar"
 ```
 
-Output using `POST` (`Chunked transfer encoding`):
+Output using `POST` or `GET` (`Chunked Transfer Coding`):
 
 ```bash
 $ curl -v -XPOST http://localhost:8080/foo/bar
@@ -120,10 +124,10 @@ foo foo foo
 bar bar bar
 ```
 
-Output using  `GET` (`Server-sent events`):
+Output using  `GET` and `Accept` header (`Server-sent events`):
 
 ```bash
-$ curl -v -XGET http://localhost:8080/foo/bar
+$ curl -v --header "Accept: text/event-stream" -XGET http://localhost:8080/foo/bar
 < HTTP/1.1 200 OK
 < Content-Type: text/event-stream
 < Transfer-Encoding: chunked

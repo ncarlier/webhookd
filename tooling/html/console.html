@@ -1,0 +1,38 @@
+ <!DOCTYPE html>
+<html>
+<head>
+    <title>Basic Webhookd UI</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <form onsubmit="return sendRequest(this)">
+        <input name="action" type="text" value="echo" required />
+        <button type="submit">GET</button>
+    </form>
+    <pre id="result">
+        <!--Server response will be inserted here-->
+    </pre>
+    
+    <script>
+        /**
+          * @param {HTMLFormElement} form - Form with action.
+          */
+        function sendRequest(form) {
+            const action = form.elements.namedItem("action").value;
+            const source = new EventSource(`http://localhost:8080/${action}`);
+            source.onopen = () => {
+                console.log('connected');
+            };
+            source.onmessage = (event) => {
+                console.log(event.data);
+                document.getElementById("result").innerHTML += event.data + "<br>";
+            };
+            source.onerror = event => {
+                console.log(event);
+                source.close()
+            };
+            return false;
+        }
+</script>
+</body>
+</html> 
