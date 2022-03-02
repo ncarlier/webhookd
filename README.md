@@ -169,7 +169,7 @@ $ curl --data @test.json http://localhost:8080/echo?foo=bar
 Hook information: name=echo, id=1
 Query parameter: foo=bar
 Header parameter: user-agent=curl/7.52.1
-Script parameter: {"foo": "bar"}
+Script parameter: {"message": "this is a test"}
 ```
 
 ### Webhook timeout configuration
