@@ -14,7 +14,7 @@ func TestQueryParamsToShellVars(t *testing.T) {
 		"string": []string{"foo"},
 		"list":   []string{"foo", "bar"},
 	}
-	values := api.QueryParamsToShellVars(tc)
+	values := api.URLValuesToShellVars(tc)
 	assert.ContainsStr(t, "string=foo", values, "")
 	assert.ContainsStr(t, "list=foo,bar", values, "")
 }

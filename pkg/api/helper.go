@@ -11,8 +11,8 @@ import (
 	"github.com/ncarlier/webhookd/pkg/strcase"
 )
 
-// QueryParamsToShellVars convert URL query parameters to shell vars.
-func QueryParamsToShellVars(q url.Values) []string {
+// URLValuesToShellVars convert URL values to shell vars.
+func URLValuesToShellVars(q url.Values) []string {
 	var params []string
 	for k, v := range q {
 		var buf bytes.Buffer

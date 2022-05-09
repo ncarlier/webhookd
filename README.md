@@ -39,14 +39,14 @@ $ docker run -d --name=webhookd \
   webhookd --scripts=/var/opt/webhookd/scripts
 ```
 
-> Note that this image extends `docker:dind` Docker image.
+> Note: This image extends `docker:dind` Docker image.
 > Therefore you are able to interact with a Docker daemon with yours shell scripts.
 
 **Or** use APT:
 
 Finally, it is possible to install Webhookd using the Debian packaging system through this [custom repository](https://packages.azlux.fr/).
 
-> Note that custom configuration variables can be set into `/etc/webhookd.env` file.
+> Note: Custom configuration variables can be set into `/etc/webhookd.env` file.
 > Sytemd service is already set and enable, you just have to start it with `systemctl start webhookd`.
 
 ## Configuration
@@ -78,7 +78,7 @@ You can override the default using the `WHD_SCRIPTS` environment variable or `-s
 |--> ...
 ```
 
-Note that Webhookd is able to run any type of file in this directory as long as the file is executable.
+> Note: Webhookd is able to run any type of file in this directory as long as the file is executable.
 For example, you can execute a Node.js file if you give execution rights to the file and add the appropriate `#!` header (in this case: `#!/usr/bin/env node`).
 
 You can find sample scripts in the [example folder](./scripts/examples).
@@ -139,15 +139,17 @@ data: bar bar bar
 
 ### Webhook parameters
 
-You have several way to provide parameters to your webhook script:
+You have several ways to provide parameters to your webhook script:
 
-- URL query parameters and HTTP headers are converted into environment variables.
-  Variable names follows "snakecase" naming convention.
-  Therefore the name can be altered.
+- URL request parameters are converted to script variables
+- HTTP headers are converted to script variables
+- Request body (depending the Media Type):
+  - `application/x-www-form-urlencoded`: keys and values are converted to script variables
+  - `text/*` or `application/json`: payload is transmit to the script as first parameter.
 
-  *ex: `CONTENT-TYPE` will become `content_type`.*
-
-- When using `POST`, body content (text/plain or application/json) is transmit to the script as parameter.
+> Note: Variable name follows "snakecase" naming convention.
+Therefore the name can be altered.
+*ex: `CONTENT-TYPE` will become `content_type`.*
 
 *Example:*
 
@@ -226,7 +228,7 @@ $ # or
 $ webhookd --notification-uri=http://requestb.in/v9b229v9
 ```
 
-Note that only the output of the script prefixed by "notify:" is sent to the notification channel.
+> Note: Only the output of the script prefixed by "notify:" is sent to the notification channel.
 If the output does not contain a prefixed line, no notification will be sent.
 
 **Example:**
@@ -261,7 +263,7 @@ The following JSON payload is POST to the target URL:
 }
 ```
 
-Note that because the payload have a `text` attribute, you can use a [Mattermost][mattermost], [Slack][slack] or [Discord][discord] webhook endpoint.
+> Note: that because the payload have a `text` attribute, you can use a [Mattermost][mattermost], [Slack][slack] or [Discord][discord] webhook endpoint.
 
 [mattermost]: https://docs.mattermost.com/developer/webhooks-incoming.html
 [discord]: https://discord.com/developers/docs/resources/webhook#execute-slackcompatible-webhook
@@ -293,8 +295,7 @@ $ htpasswd -B -c .htpasswd api
 ```
 This command will ask for a password and store it in the htpawsswd file.
 
-Please note that by default, the daemon will try to load the `.htpasswd` file.
-
+By default, the daemon will try to load the `.htpasswd` file.
 But you can override this behavior by specifying the location of the file:
 
 ```bash

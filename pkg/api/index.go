@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime"
 	"net/http"
 	"path"
 	"path/filepath"
@@ -51,7 +52,7 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 	// Check that streaming is supported
 	flusher, ok := w.(http.Flusher)
 	if !ok {
-		http.Error(w, "Streaming not supported!", http.StatusInternalServerError)
+		http.Error(w, "streaming not supported", http.StatusInternalServerError)
 		return
 	}
 
@@ -68,14 +69,28 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		logger.Error.Printf("error reading body: %v", err)
-		http.Error(w, "can't read body", http.StatusBadRequest)
+	if err = r.ParseForm(); err != nil {
+		logger.Error.Printf("error reading from-data: %v", err)
+		http.Error(w, "unable to parse request form", http.StatusBadRequest)
 		return
 	}
 
-	params := QueryParamsToShellVars(r.URL.Query())
+	// parse body
+	var body []byte
+	ct := r.Header.Get("Content-Type")
+	if ct != "" {
+		mediatype, _, _ := mime.ParseMediaType(ct)
+		if strings.HasPrefix(mediatype, "text/") || mediatype == "application/json" {
+			body, err = ioutil.ReadAll(r.Body)
+			if err != nil {
+				logger.Error.Printf("error reading body: %v", err)
+				http.Error(w, "unable to read request body", http.StatusBadRequest)
+				return
+			}
+		}
+	}
+
+	params := URLValuesToShellVars(r.Form)
 	params = append(params, HTTPHeadersToShellVars(r.Header)...)
 
 	// logger.Debug.Printf("API REQUEST: \"%s\" with params %s...\n", p, params)
