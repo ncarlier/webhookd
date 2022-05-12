@@ -47,7 +47,7 @@ func routes(conf *config.Config) Routes {
 		route(
 			"/",
 			index,
-			middlewares.UseBefore(middleware.Methods("GET", "POST"))...,
+			middlewares.UseBefore(middleware.Methods("GET", "PATCH", "POST"))...,
 		),
 		route(
 			staticPath,
