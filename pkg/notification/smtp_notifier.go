@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/ncarlier/webhookd/pkg/logger"
-	"github.com/ncarlier/webhookd/pkg/model"
 )
 
 // SMTPNotifier is able to send notification to a email destination.
@@ -41,15 +40,15 @@ func newSMTPNotifier(uri *url.URL) *SMTPNotifier {
 	}
 }
 
-func (n *SMTPNotifier) buildEmailPayload(work *model.WorkRequest) string {
+func (n *SMTPNotifier) buildEmailPayload(result HookResult) string {
 	// Get email body
-	body := work.GetLogContent(n.PrefixFilter)
+	body := result.Logs(n.PrefixFilter)
 	if strings.TrimSpace(body) == "" {
 		return ""
 	}
 
 	// Build email subject
-	subject := buildSubject(n.Subject, work)
+	subject := buildSubject(n.Subject, result)
 
 	// Build email headers
 	headers := make(map[string]string)
@@ -67,9 +66,9 @@ func (n *SMTPNotifier) buildEmailPayload(work *model.WorkRequest) string {
 }
 
 // Notify send a notification to a email destination.
-func (n *SMTPNotifier) Notify(work *model.WorkRequest) error {
+func (n *SMTPNotifier) Notify(result HookResult) error {
 	hostname, _, _ := net.SplitHostPort(n.Host)
-	payload := n.buildEmailPayload(work)
+	payload := n.buildEmailPayload(result)
 	if payload == "" {
 		// Nothing to notify, abort
 		return nil
@@ -127,15 +126,15 @@ func (n *SMTPNotifier) Notify(work *model.WorkRequest) error {
 		return err
 	}
 
-	logger.Info.Printf("job %s#%d notification sent to %s\n", work.Name, work.ID, n.To)
+	logger.Info.Printf("job %s#%d notification sent to %s\n", result.Name(), result.ID(), n.To)
 
 	// Send the QUIT command and close the connection.
 	return client.Quit()
 }
 
-func buildSubject(template string, work *model.WorkRequest) string {
-	result := strings.ReplaceAll(template, "{name}", work.Name)
-	result = strings.ReplaceAll(result, "{id}", strconv.FormatUint(uint64(work.ID), 10))
-	result = strings.ReplaceAll(result, "{status}", work.StatusLabel())
-	return result
+func buildSubject(template string, result HookResult) string {
+	subject := strings.ReplaceAll(template, "{name}", result.Name())
+	subject = strings.ReplaceAll(subject, "{id}", strconv.FormatUint(uint64(result.ID()), 10))
+	subject = strings.ReplaceAll(subject, "{status}", result.StatusLabel())
+	return subject
 }

@@ -12,8 +12,8 @@ import (
 	"strings"
 
 	"github.com/ncarlier/webhookd/pkg/config"
+	"github.com/ncarlier/webhookd/pkg/hook"
 	"github.com/ncarlier/webhookd/pkg/logger"
-	"github.com/ncarlier/webhookd/pkg/model"
 	"github.com/ncarlier/webhookd/pkg/worker"
 )
 
@@ -56,13 +56,13 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get script location
-	p := strings.TrimPrefix(r.URL.Path, "/")
-	if p == "" {
+	// Get hook location
+	hookName := strings.TrimPrefix(r.URL.Path, "/")
+	if hookName == "" {
 		infoHandler(w, r)
 		return
 	}
-	script, err := worker.ResolveScript(scriptDir, p)
+	_, err := hook.ResolveScript(scriptDir, hookName)
 	if err != nil {
 		logger.Error.Println(err.Error())
 		http.Error(w, "hook not found", http.StatusNotFound)
@@ -97,10 +97,23 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 
 	// Create work
 	timeout := atoiFallback(r.Header.Get("X-Hook-Timeout"), defaultTimeout)
-	work := model.NewWorkRequest(p, script, string(body), outputDir, params, timeout)
+	job, err := hook.NewHookJob(&hook.Request{
+		Name:      hookName,
+		Method:    r.Method,
+		Payload:   string(body),
+		Args:      params,
+		Timeout:   timeout,
+		BaseDir:   scriptDir,
+		OutputDir: outputDir,
+	})
+	if err != nil {
+		logger.Error.Printf("error creating hook job: %v", err)
+		http.Error(w, "unable to create hook job", http.StatusInternalServerError)
+		return
+	}
 
 	// Put work in queue
-	worker.WorkQueue <- *work
+	worker.WorkQueue <- job
 
 	// Use content negotiation to enable Server-Sent Events
 	useSSE := r.Method == "GET" && r.Header.Get("Accept") == "text/event-stream"
@@ -113,21 +126,18 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
-	w.Header().Set("X-Hook-ID", strconv.FormatUint(work.ID, 10))
+	w.Header().Set("X-Hook-ID", strconv.FormatUint(job.ID(), 10))
 
 	for {
-		msg, open := <-work.MessageChan
-
+		msg, open := <-job.MessageChan
 		if !open {
 			break
 		}
-
 		if useSSE {
 			fmt.Fprintf(w, "data: %s\n\n", msg) // Send SSE response
 		} else {
 			fmt.Fprintf(w, "%s\n", msg) // Send chunked response
 		}
-
 		// Flush the data immediately instead of buffering it for later.
 		flusher.Flush()
 	}
@@ -138,8 +148,8 @@ func getWebhookLog(w http.ResponseWriter, r *http.Request) {
 	id := path.Base(r.URL.Path)
 
 	// Get script location
-	name := path.Dir(strings.TrimPrefix(r.URL.Path, "/"))
-	_, err := worker.ResolveScript(scriptDir, name)
+	hookName := path.Dir(strings.TrimPrefix(r.URL.Path, "/"))
+	_, err := hook.ResolveScript(scriptDir, hookName)
 	if err != nil {
 		logger.Error.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusNotFound)
@@ -147,7 +157,7 @@ func getWebhookLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Retrieve log file
-	logFile, err := worker.RetrieveLogFile(id, name, outputDir)
+	logFile, err := hook.Logs(id, hookName, outputDir)
 	if err != nil {
 		logger.Error.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)

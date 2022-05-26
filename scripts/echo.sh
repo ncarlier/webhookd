@@ -4,7 +4,7 @@
 
 echo "This is a simple echo hook."
 
-echo "Hook information: name=$hook_name, id=$hook_id"
+echo "Hook information: name=$hook_name, id=$hook_id, method=$hook_method"
 
 echo "Command result: hostname=`hostname`"
 
