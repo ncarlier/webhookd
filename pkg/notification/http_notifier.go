@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/ncarlier/webhookd/pkg/logger"
-	"github.com/ncarlier/webhookd/pkg/model"
 )
 
 type notifPayload struct {
@@ -34,18 +33,18 @@ func newHTTPNotifier(uri *url.URL) *HTTPNotifier {
 }
 
 // Notify send a notification to a HTTP endpoint.
-func (n *HTTPNotifier) Notify(work *model.WorkRequest) error {
-	payload := work.GetLogContent(n.PrefixFilter)
+func (n *HTTPNotifier) Notify(result HookResult) error {
+	payload := result.Logs(n.PrefixFilter)
 	if strings.TrimSpace(payload) == "" {
 		// Nothing to notify, abort
 		return nil
 	}
 
 	notif := &notifPayload{
-		ID:    strconv.FormatUint(work.ID, 10),
-		Name:  work.Name,
+		ID:    strconv.FormatUint(result.ID(), 10),
+		Name:  result.Name(),
 		Text:  payload,
-		Error: work.Err,
+		Error: result.Err(),
 	}
 	notifJSON, err := json.Marshal(notif)
 	if err != nil {
@@ -64,6 +63,6 @@ func (n *HTTPNotifier) Notify(work *model.WorkRequest) error {
 		return err
 	}
 	resp.Body.Close()
-	logger.Info.Printf("job %s#%d notification sent to %s\n", work.Name, work.ID, n.URL.String())
+	logger.Info.Printf("job %s#%d notification sent to %s\n", result.Name(), result.ID(), n.URL.String())
 	return nil
 }

@@ -1,4 +1,4 @@
-package worker
+package hook
 
 import (
 	"fmt"
@@ -9,8 +9,8 @@ import (
 	"github.com/ncarlier/webhookd/pkg/strcase"
 )
 
-// RetrieveLogFile retrieve work log with its name and id
-func RetrieveLogFile(id, name, base string) (*os.File, error) {
+// Logs get hook log with its name and id
+func Logs(id, name, base string) (*os.File, error) {
 	logPattern := path.Join(base, fmt.Sprintf("%s_%s_*.txt", strcase.ToSnake(name), id))
 	files, err := filepath.Glob(logPattern)
 	if err != nil {

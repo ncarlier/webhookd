@@ -6,23 +6,22 @@ import (
 	"strings"
 
 	"github.com/ncarlier/webhookd/pkg/logger"
-	"github.com/ncarlier/webhookd/pkg/model"
 )
 
 // Notifier is able to send a notification.
 type Notifier interface {
-	Notify(work *model.WorkRequest) error
+	Notify(result HookResult) error
 }
 
 var notifier Notifier
 
-// Notify is the global method to notify work
-func Notify(work *model.WorkRequest) {
+// Notify is the global method to notify hook result
+func Notify(result HookResult) {
 	if notifier == nil {
 		return
 	}
-	if err := notifier.Notify(work); err != nil {
-		logger.Error.Printf("unable to send notification for webhook %s#%d: %v\n", work.Name, work.ID, err)
+	if err := notifier.Notify(result); err != nil {
+		logger.Error.Printf("unable to send notification for webhook %s#%d: %v\n", result.Name(), result.ID(), err)
 	}
 }
 
