@@ -22,7 +22,7 @@ import (
 
 type config struct {
 	KeyID   string `flag:"key-id" desc:"Signature key ID"`
-	KeyFile string `flag:"key-file" desc:"Public key file (PEM format)" default:"./key.pem"`
+	KeyFile string `flag:"key-file" desc:"Private key file (PEM format)" default:"./key.pem"`
 	JSON    string `flag:"json" desc:"JSON payload"`
 }
 
