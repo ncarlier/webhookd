@@ -25,13 +25,9 @@ func Logger(next http.Handler) http.Handler {
 			if !ok {
 				requestID = "0"
 			}
-			addr := r.RemoteAddr
-			if i := strings.LastIndex(addr, ":"); i != -1 {
-				addr = addr[:i]
-			}
 			logger.Info.Printf(
 				"%s - - [%s] %q %d %d %q %q %q",
-				addr,
+				getRequestIP(r),
 				start.Format("02/Jan/2006:15:04:05 -0700"),
 				fmt.Sprintf("%s %s %s", r.Method, r.URL, r.Proto),
 				o.status,
@@ -43,6 +39,21 @@ func Logger(next http.Handler) http.Handler {
 		}()
 		next.ServeHTTP(o, r)
 	})
+}
+
+func getRequestIP(r *http.Request) string {
+	ip := r.Header.Get("X-Forwarded-For")
+	if ip == "" {
+		ip = r.RemoteAddr
+	}
+	if comma := strings.Index(ip, ","); comma != -1 {
+		ip = ip[0:comma]
+	}
+	if colon := strings.LastIndex(ip, ":"); colon != -1 {
+		ip = ip[:colon]
+	}
+
+	return ip
 }
 
 type responseObserver struct {
