@@ -19,6 +19,25 @@ WORKDIR /go/src/$REPOSITORY/$ARTIFACT
 RUN make
 
 #########################################
+# "slim" Distribution stage
+#########################################
+FROM alpine:latest AS slim
+
+# Repository location
+ARG REPOSITORY=github.com/ncarlier
+
+# Artifact name
+ARG ARTIFACT=webhookd
+
+# Install binary *only*
+COPY --from=builder /go/src/$REPOSITORY/$ARTIFACT/release/$ARTIFACT /usr/local/bin/$ARTIFACT
+
+VOLUME [ "/scripts" ]
+EXPOSE 8080
+
+CMD [ "webhookd" ]
+
+#########################################
 # Distribution stage
 #########################################
 FROM docker:dind

@@ -46,7 +46,7 @@ clean:
 build:
 	-mkdir -p release
 	echo "Building: $(EXECUTABLE) $(VERSION) for $(GOOS)-$(GOARCH) ..."
-	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -ldflags "$(LDFLAGS)" -o release/$(EXECUTABLE)
+	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 go build -tags netgo -ldflags "$(LDFLAGS)" -o release/$(EXECUTABLE)
 .PHONY: build
 
 release/$(EXECUTABLE): build
@@ -66,6 +66,12 @@ install: release/$(EXECUTABLE)
 image:
 	echo "Building Docker image ..."
 	docker build --rm -t ncarlier/$(APPNAME) .
+.PHONY: image
+
+## Create "slim" Docker image
+image-slim:
+	echo "Building slim Docker image ..."
+	docker build --rm --target slim -t ncarlier/$(APPNAME)-slim .
 .PHONY: image
 
 ## Generate changelog
