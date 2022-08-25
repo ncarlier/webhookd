@@ -33,10 +33,20 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN  }}      
       
-      - name: Build and push Docker image
+      - name: Build and push Docker image (slim)
         uses: docker/build-push-action@v2
         with:
           context: .
+          target: slim
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+      
+      - name: Build and push Docker image (distrib)
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          target: distrib
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}-distrib
           labels: ${{ steps.meta.outputs.labels }}

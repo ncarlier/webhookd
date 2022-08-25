@@ -1,7 +1,7 @@
 #########################################
 # Build stage
 #########################################
-FROM golang:1.17 AS builder
+FROM golang:1.18 AS builder
 
 # Repository location
 ARG REPOSITORY=github.com/ncarlier
@@ -21,7 +21,7 @@ RUN make
 #########################################
 # Distribution stage
 #########################################
-FROM docker:dind
+FROM alpine:latest AS slim
 
 # Repository location
 ARG REPOSITORY=github.com/ncarlier
@@ -29,30 +29,76 @@ ARG REPOSITORY=github.com/ncarlier
 # Artifact name
 ARG ARTIFACT=webhookd
 
-# Docker Compose version
-ARG COMPOSE_VERSION=1.25.4
+# User
+ARG USER=webhookd
+ARG UID=1000
 
-# Fix lib dep
-#RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
+# Create non-root user
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "$(pwd)" \
+    --no-create-home \
+    --uid "$UID" \
+    "$USER"
 
 # Install deps
-RUN apk add --no-cache git openssh-client jq bash curl
+RUN apk add --no-cache bash gcompat
+
+# Install binary
+COPY --from=builder /go/src/$REPOSITORY/$ARTIFACT/release/$ARTIFACT /usr/local/bin/$ARTIFACT
+
+VOLUME [ "/scripts" ]
+
+EXPOSE 8080
+
+USER $USER
+
+CMD [ "webhookd" ]
+
+#########################################
+# Distribution stage with some tooling
+#########################################
+FROM alpinelinux/docker-cli:latest AS distrib
+
+# Repository location
+ARG REPOSITORY=github.com/ncarlier
+
+# Artifact name
+ARG ARTIFACT=webhookd
+
+# User
+ARG USER=webhookd
+ARG UID=1000
+
+# Create non-root user
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "$(pwd)" \
+    --no-create-home \
+    --uid "$UID" \
+    "$USER"
+
+# Install deps
+RUN apk add --no-cache bash gcompat git openssh-client curl jq
 
 # Install docker-compose
-RUN curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/run.sh" \
-    -o /usr/local/bin/docker-compose && \
-    chmod +x /usr/local/bin/docker-compose
+RUN curl -L --fail https://raw.githubusercontent.com/linuxserver/docker-docker-compose/master/run.sh \
+     -o /usr/local/bin/docker-compose && \
+     chmod +x /usr/local/bin/docker-compose
 
-# Create folder structure
-RUN mkdir -p /var/opt/webhookd/scripts /var/opt/webhookd/work
-
-# Install binary and default scripts
+# Install binary and entrypoint
 COPY --from=builder /go/src/$REPOSITORY/$ARTIFACT/release/$ARTIFACT /usr/local/bin/$ARTIFACT
-COPY --from=builder /go/src/$REPOSITORY/$ARTIFACT/scripts /var/opt/webhookd/scripts
 COPY docker-entrypoint.sh /
 
 # Define entrypoint
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
-# Define command
-CMD webhookd
+VOLUME [ "/scripts" ]
+
+EXPOSE 8080
+
+USER $USER
+
+CMD [ "webhookd" ]
