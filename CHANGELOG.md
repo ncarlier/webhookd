@@ -1,5 +1,17 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.15.0...v) (2022-05-26)
+# [](https://github.com/ncarlier/webhookd/compare/v1.15.0...v) (2022-10-01)
+
+
+### Bug Fixes
+
+* **tooling:** correct help message ([ab4dc1e](https://github.com/ncarlier/webhookd/commit/ab4dc1e)), closes [#58](https://github.com/ncarlier/webhookd/issues/58)
+
+
+### Features
+
+* **docker:** add ARM Docker image ([ed1f5da](https://github.com/ncarlier/webhookd/commit/ed1f5da))
+* **docker:** create slim and distrib Docker image ([5f8a76f](https://github.com/ncarlier/webhookd/commit/5f8a76f))
+* trace real IP ([50bcb16](https://github.com/ncarlier/webhookd/commit/50bcb16))
 
 
 
