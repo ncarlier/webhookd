@@ -166,7 +166,7 @@ echo "Script parameters: $1"
 The result:
 
 ```bash
-$ curl --data @test.json http://localhost:8080/echo?foo=bar
+$ curl --data @test.json -H 'Content-Type: application/json' http://localhost:8080/echo?foo=bar
 Hook information: name=echo, id=1, method=POST
 Query parameter: foo=bar
 Header parameter: user-agent=curl/7.52.1
