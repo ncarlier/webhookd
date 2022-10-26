@@ -90,8 +90,8 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	params := URLValuesToShellVars(r.Form)
-	params = append(params, HTTPHeadersToShellVars(r.Header)...)
+	params := HTTPParamsToShellVars(r.Form)
+	params = append(params, HTTPParamsToShellVars(r.Header)...)
 
 	// logger.Debug.Printf("API REQUEST: \"%s\" with params %s...\n", p, params)
 

@@ -11,10 +11,10 @@ import (
 	"github.com/ncarlier/webhookd/pkg/strcase"
 )
 
-// URLValuesToShellVars convert URL values to shell vars.
-func URLValuesToShellVars(q url.Values) []string {
-	var params []string
-	for k, v := range q {
+// HTTPParamsToShellVars convert URL values to shell vars.
+func HTTPParamsToShellVars[T url.Values | http.Header](params T) []string {
+	var result []string
+	for k, v := range params {
 		var buf bytes.Buffer
 		value, err := url.QueryUnescape(strings.Join(v[:], ","))
 		if err != nil {
@@ -23,26 +23,9 @@ func URLValuesToShellVars(q url.Values) []string {
 		buf.WriteString(strcase.ToSnake(k))
 		buf.WriteString("=")
 		buf.WriteString(value)
-		params = append(params, buf.String())
+		result = append(result, buf.String())
 	}
-	return params
-}
-
-// HTTPHeadersToShellVars convert HTTP headers to shell vars.
-func HTTPHeadersToShellVars(h http.Header) []string {
-	var params []string
-	for k, v := range h {
-		var buf bytes.Buffer
-		value, err := url.QueryUnescape(strings.Join(v[:], ","))
-		if err != nil {
-			continue
-		}
-		buf.WriteString(strcase.ToSnake(k))
-		buf.WriteString("=")
-		buf.WriteString(value)
-		params = append(params, buf.String())
-	}
-	return params
+	return result
 }
 
 func nextRequestID() string {
