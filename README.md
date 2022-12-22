@@ -18,7 +18,7 @@ A very simple webhook server to launch shell scripts.
 Run the following command:
 
 ```bash
-$ go get -v github.com/ncarlier/webhookd
+$ go install github.com/ncarlier/webhookd@latest
 ```
 
 **Or** download the binary regarding your architecture:
