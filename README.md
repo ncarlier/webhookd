@@ -311,9 +311,14 @@ $ curl -u api:test -XPOST "http://localhost:8080/echo?msg=hello"
 
 ### Signature
 
-You can ensure message integrity (and authenticity) with [HTTP Signatures](https://www.ietf.org/archive/id/draft-cavage-http-signatures-12.txt).
+You can ensure message integrity (and authenticity) by signing HTTP requests.
 
-To activate HTTP signature verification, you have to configure the trust store:
+Webhookd supports 2 signature methods:
+
+- [HTTP Signatures](https://www.ietf.org/archive/id/draft-cavage-http-signatures-12.txt)
+- [Ed25519 Signature](https://ed25519.cr.yp.to/) (used by [Discord](https://discord.com/developers/docs/interactions/receiving-and-responding#security-and-authorization))
+
+To activate request signature verification, you have to configure the trust store:
 
 ```bash
 $ export WHD_TRUST_STORE_FILE=/etc/webhookd/pubkey.pem
@@ -323,17 +328,24 @@ $ webhookd --trust-store-file /etc/webhookd/pubkey.pem
 
 Public key is stored in PEM format.
 
-Once configured, you must call webhooks using a valid HTTP signature:
+Once configured, you must call webhooks using a valid signature:
 
 ```bash
+# Using HTTP Signature:
 $ curl -X POST \
   -H 'Date: <req-date>' \
   -H 'Signature: keyId=<key-id>,algorithm="rsa-sha256",headers="(request-target) date",signature=<signature-string>' \
   -H 'Accept: application/json' \
   "http://localhost:8080/echo?msg=hello"
+# or using Ed25519 Signature:
+$ curl -X POST \
+  -H 'X-Signature-Timestamp: <timestamp>' \
+  -H 'X-Signature-Ed25519: <signature-string>' \
+  -H 'Accept: application/json' \
+  "http://localhost:8080/echo?msg=hello"
 ```
 
-You can find a small HTTP client in the ["tooling" directory](./tooling/httpsig/README.md) that is capable of forging HTTP signatures.
+You can find a small HTTP client in the ["tooling" directory](./tooling/httpsig/README.md) that is capable of forging `HTTP signatures`.
 
 ### TLS
 

@@ -5,7 +5,7 @@ import (
 	"github.com/ncarlier/webhookd/pkg/config"
 	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/middleware"
-	"github.com/ncarlier/webhookd/pkg/pubkey"
+	"github.com/ncarlier/webhookd/pkg/truststore"
 )
 
 var commonMiddlewares = middleware.Middlewares{
@@ -21,12 +21,12 @@ func buildMiddlewares(conf *config.Config) middleware.Middlewares {
 	}
 
 	// Load trust store...
-	trustStore, err := pubkey.NewTrustStore(conf.TrustStoreFile)
+	ts, err := truststore.New(conf.TrustStoreFile)
 	if err != nil {
 		logger.Warning.Printf("unable to load trust store (\"%s\"): %s\n", conf.TrustStoreFile, err)
 	}
-	if trustStore != nil {
-		middlewares = middlewares.UseAfter(middleware.HTTPSignature(trustStore))
+	if ts != nil {
+		middlewares = middlewares.UseAfter(middleware.Signature(ts))
 	}
 
 	// Load authenticator...
