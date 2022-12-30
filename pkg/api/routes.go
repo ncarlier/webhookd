@@ -9,6 +9,7 @@ import (
 )
 
 var commonMiddlewares = middleware.Middlewares{
+	middleware.XFF,
 	middleware.Cors,
 	middleware.Logger,
 	middleware.Tracing(nextRequestID),
