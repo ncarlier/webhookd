@@ -15,8 +15,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/ncarlier/webhookd/pkg/helper"
 	"github.com/ncarlier/webhookd/pkg/logger"
-	"github.com/ncarlier/webhookd/pkg/strcase"
 )
 
 var hookID uint64
@@ -54,7 +54,7 @@ func NewHookJob(request *Request) (*Job, error) {
 		MessageChan: make(chan []byte),
 		status:      Idle,
 	}
-	job.logFilename = path.Join(request.OutputDir, fmt.Sprintf("%s_%d_%s.txt", strcase.ToSnake(job.name), job.id, time.Now().Format("20060102_1504")))
+	job.logFilename = path.Join(request.OutputDir, fmt.Sprintf("%s_%d_%s.txt", helper.ToSnake(job.name), job.id, time.Now().Format("20060102_1504")))
 	return job, nil
 }
 

@@ -1,4 +1,4 @@
-package notification
+package http
 
 import (
 	"bytes"
@@ -8,7 +8,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ncarlier/webhookd/pkg/helper"
 	"github.com/ncarlier/webhookd/pkg/logger"
+	"github.com/ncarlier/webhookd/pkg/notification"
 )
 
 type notifPayload struct {
@@ -18,22 +20,22 @@ type notifPayload struct {
 	Error error  `json:"error,omitempty"`
 }
 
-// HTTPNotifier is able to send a notification to a HTTP endpoint.
-type HTTPNotifier struct {
+// httpNotifier is able to send a notification to a HTTP endpoint.
+type httpNotifier struct {
 	URL          *url.URL
 	PrefixFilter string
 }
 
-func newHTTPNotifier(uri *url.URL) *HTTPNotifier {
+func newHTTPNotifier(uri *url.URL) (notification.Notifier, error) {
 	logger.Info.Println("using HTTP notification system: ", uri.String())
-	return &HTTPNotifier{
+	return &httpNotifier{
 		URL:          uri,
-		PrefixFilter: getValueOrAlt(uri.Query(), "prefix", "notify:"),
-	}
+		PrefixFilter: helper.GetValueOrAlt(uri.Query(), "prefix", "notify:"),
+	}, nil
 }
 
 // Notify send a notification to a HTTP endpoint.
-func (n *HTTPNotifier) Notify(result HookResult) error {
+func (n *httpNotifier) Notify(result notification.HookResult) error {
 	payload := result.Logs(n.PrefixFilter)
 	if strings.TrimSpace(payload) == "" {
 		// Nothing to notify, abort
@@ -65,4 +67,9 @@ func (n *HTTPNotifier) Notify(result HookResult) error {
 	resp.Body.Close()
 	logger.Info.Printf("job %s#%d notification sent to %s\n", result.Name(), result.ID(), n.URL.String())
 	return nil
+}
+
+func init() {
+	notification.Register("http", newHTTPNotifier)
+	notification.Register("https", newHTTPNotifier)
 }

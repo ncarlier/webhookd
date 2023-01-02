@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ncarlier/webhookd/pkg/strcase"
+	"github.com/ncarlier/webhookd/pkg/helper"
 )
 
 // Bind conf struct tags with flags
@@ -103,7 +103,7 @@ func Bind(conf interface{}, prefix string) error {
 }
 
 func getEnvKey(prefix, key string) string {
-	return strcase.ToScreamingSnake(prefix + "_" + key)
+	return helper.ToScreamingSnake(prefix + "_" + key)
 }
 
 func getEnvValue(prefix, key, fallback string) string {

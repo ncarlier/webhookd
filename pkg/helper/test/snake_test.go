@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/ncarlier/webhookd/pkg/assert"
-	"github.com/ncarlier/webhookd/pkg/strcase"
+	"github.com/ncarlier/webhookd/pkg/helper"
 )
 
 func TestToSnakeCase(t *testing.T) {
@@ -19,7 +19,7 @@ func TestToSnakeCase(t *testing.T) {
 		{"Hello/world", "hello_world"},
 	}
 	for _, tc := range testCases {
-		value := strcase.ToSnake(tc.value)
+		value := helper.ToSnake(tc.value)
 		assert.Equal(t, tc.expected, value, "")
 	}
 }

@@ -23,8 +23,7 @@
  * SOFTWARE.
  */
 
-// Package strcase converts strings to snake_case or CamelCase
-package strcase
+package helper
 
 import (
 	"strings"

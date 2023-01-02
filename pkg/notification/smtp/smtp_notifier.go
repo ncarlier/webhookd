@@ -1,4 +1,4 @@
-package notification
+package smtp
 
 import (
 	"crypto/tls"
@@ -10,11 +10,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ncarlier/webhookd/pkg/helper"
 	"github.com/ncarlier/webhookd/pkg/logger"
+	"github.com/ncarlier/webhookd/pkg/notification"
 )
 
-// SMTPNotifier is able to send notification to a email destination.
-type SMTPNotifier struct {
+// smtpNotifier is able to send notification to a email destination.
+type smtpNotifier struct {
 	Host         string
 	Username     string
 	Password     string
@@ -25,22 +27,22 @@ type SMTPNotifier struct {
 	PrefixFilter string
 }
 
-func newSMTPNotifier(uri *url.URL) *SMTPNotifier {
+func newSMTPNotifier(uri *url.URL) (notification.Notifier, error) {
 	logger.Info.Println("using SMTP notification system:", uri.Opaque)
 	q := uri.Query()
-	return &SMTPNotifier{
-		Host:         getValueOrAlt(q, "smtp", "localhost:25"),
-		Username:     getValueOrAlt(q, "username", ""),
-		Password:     getValueOrAlt(q, "password", ""),
-		Conn:         getValueOrAlt(q, "conn", "plain"),
-		From:         getValueOrAlt(q, "from", "noreply@nunux.org"),
+	return &smtpNotifier{
+		Host:         helper.GetValueOrAlt(q, "smtp", "localhost:25"),
+		Username:     helper.GetValueOrAlt(q, "username", ""),
+		Password:     helper.GetValueOrAlt(q, "password", ""),
+		Conn:         helper.GetValueOrAlt(q, "conn", "plain"),
+		From:         helper.GetValueOrAlt(q, "from", "noreply@nunux.org"),
 		To:           uri.Opaque,
-		Subject:      getValueOrAlt(uri.Query(), "subject", "[whd-notification] {name}#{id} {status}"),
-		PrefixFilter: getValueOrAlt(uri.Query(), "prefix", "notify:"),
-	}
+		Subject:      helper.GetValueOrAlt(uri.Query(), "subject", "[whd-notification] {name}#{id} {status}"),
+		PrefixFilter: helper.GetValueOrAlt(uri.Query(), "prefix", "notify:"),
+	}, nil
 }
 
-func (n *SMTPNotifier) buildEmailPayload(result HookResult) string {
+func (n *smtpNotifier) buildEmailPayload(result notification.HookResult) string {
 	// Get email body
 	body := result.Logs(n.PrefixFilter)
 	if strings.TrimSpace(body) == "" {
@@ -66,7 +68,7 @@ func (n *SMTPNotifier) buildEmailPayload(result HookResult) string {
 }
 
 // Notify send a notification to a email destination.
-func (n *SMTPNotifier) Notify(result HookResult) error {
+func (n *smtpNotifier) Notify(result notification.HookResult) error {
 	hostname, _, _ := net.SplitHostPort(n.Host)
 	payload := n.buildEmailPayload(result)
 	if payload == "" {
@@ -132,9 +134,13 @@ func (n *SMTPNotifier) Notify(result HookResult) error {
 	return client.Quit()
 }
 
-func buildSubject(template string, result HookResult) string {
+func buildSubject(template string, result notification.HookResult) string {
 	subject := strings.ReplaceAll(template, "{name}", result.Name())
 	subject = strings.ReplaceAll(subject, "{id}", strconv.FormatUint(uint64(result.ID()), 10))
 	subject = strings.ReplaceAll(subject, "{status}", result.StatusLabel())
 	return subject
+}
+
+func init() {
+	notification.Register("mailto", newSMTPNotifier)
 }

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ncarlier/webhookd/pkg/strcase"
+	"github.com/ncarlier/webhookd/pkg/helper"
 )
 
 // HTTPParamsToShellVars convert URL values to shell vars.
@@ -20,7 +20,7 @@ func HTTPParamsToShellVars[T url.Values | http.Header](params T) []string {
 		if err != nil {
 			continue
 		}
-		buf.WriteString(strcase.ToSnake(k))
+		buf.WriteString(helper.ToSnake(k))
 		buf.WriteString("=")
 		buf.WriteString(value)
 		result = append(result, buf.String())

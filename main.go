@@ -14,6 +14,7 @@ import (
 	configflag "github.com/ncarlier/webhookd/pkg/config/flag"
 	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/notification"
+	_ "github.com/ncarlier/webhookd/pkg/notification/all"
 	"github.com/ncarlier/webhookd/pkg/server"
 	"github.com/ncarlier/webhookd/pkg/version"
 	"github.com/ncarlier/webhookd/pkg/worker"

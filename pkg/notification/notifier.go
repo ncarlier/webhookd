@@ -1,10 +1,6 @@
 package notification
 
 import (
-	"fmt"
-	"net/url"
-	"strings"
-
 	"github.com/ncarlier/webhookd/pkg/logger"
 )
 
@@ -25,30 +21,8 @@ func Notify(result HookResult) {
 	}
 }
 
-// Init creates a notifier regarding the URI.
-func Init(uri string) error {
-	if uri == "" {
-		return nil
-	}
-	u, err := url.Parse(uri)
-	if err != nil {
-		return fmt.Errorf("invalid notification URL: %s", uri)
-	}
-	switch u.Scheme {
-	case "mailto":
-		notifier = newSMTPNotifier(u)
-	case "http", "https":
-		notifier = newHTTPNotifier(u)
-	default:
-		return fmt.Errorf("unable to create notifier: %v", err)
-	}
-
-	return nil
-}
-
-func getValueOrAlt(values url.Values, key, alt string) string {
-	if val, ok := values[key]; ok {
-		return strings.Join(val[:], ",")
-	}
-	return alt
+// Init creates the notifier singleton regarding the URI.
+func Init(uri string) (err error) {
+	notifier, err = NewNotifier(uri)
+	return err
 }
