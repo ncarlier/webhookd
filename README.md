@@ -150,6 +150,14 @@ You have several ways to provide parameters to your webhook script:
 Therefore the name can be altered.
 *ex: `CONTENT-TYPE` will become `content_type`.*
 
+Webhookd adds some additional parameters to the script:
+
+- `hook_id`: hook ID (auto-increment)
+- `hook_name`: hook name
+- `hook_method`: HTTP request method
+- `x_forwarded_for`: client IP
+- `x_webauth_user`: username if authentication is enabled
+
 *Example:*
 
 The script:
