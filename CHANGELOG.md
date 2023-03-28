@@ -1,5 +1,10 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.15.1...v) (2023-03-28)
+# [](https://github.com/ncarlier/webhookd/compare/v1.16.0...v) (2023-03-28)
+
+
+
+<a name="1.16.0"></a>
+# [1.16.0](https://github.com/ncarlier/webhookd/compare/v1.15.1...v1.16.0) (2023-03-28)
 
 
 ### Features
