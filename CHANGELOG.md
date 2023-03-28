@@ -1,5 +1,12 @@
 <a name=""></a>
-# [](https://github.com/ncarlier/webhookd/compare/v1.15.1...v) (2022-10-01)
+# [](https://github.com/ncarlier/webhookd/compare/v1.15.1...v) (2023-03-28)
+
+
+### Features
+
+* **auth:** add username header ([2fb8e9a](https://github.com/ncarlier/webhookd/commit/2fb8e9a))
+* **middleware:** add X-Forwarded-For middleware ([dba7604](https://github.com/ncarlier/webhookd/commit/dba7604)), closes [#73](https://github.com/ncarlier/webhookd/issues/73)
+* **signature:** signature refactoring ([f2054d2](https://github.com/ncarlier/webhookd/commit/f2054d2)), closes [#72](https://github.com/ncarlier/webhookd/issues/72)
 
 
 
