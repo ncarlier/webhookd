@@ -81,12 +81,7 @@ RUN adduser \
     "$USER"
 
 # Install deps
-RUN apk add --no-cache bash gcompat git openssl openssh-client curl jq
-
-# Install docker-compose
-RUN curl -L --fail https://raw.githubusercontent.com/linuxserver/docker-docker-compose/master/run.sh \
-     -o /usr/local/bin/docker-compose && \
-     chmod +x /usr/local/bin/docker-compose
+RUN apk add --no-cache bash gcompat git openssl openssh-client curl jq docker-cli-compose
 
 # Install binary and entrypoint
 COPY --from=builder /go/src/$REPOSITORY/$ARTIFACT/release/$ARTIFACT /usr/local/bin/$ARTIFACT
