@@ -1,4 +1,9 @@
-# [1.17.0](https://github.com/ncarlier/webhookd/compare/v1.16.0...v0.1.0) (2023-10-03)
+# [0.2.0](https://github.com/ncarlier/webhookd/compare/v1.16.0...v0.2.0) (2023-10-03)
+
+
+### Bug Fixes
+
+* **ci:** fix CHANGELOG version ([fa489bc](https://github.com/ncarlier/webhookd/commit/fa489bc58f914a0460717c1b683aa33cc2c975c0))
 
 
 ### Features
