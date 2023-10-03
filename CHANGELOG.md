@@ -1,17 +1,18 @@
-## [1.17.1](https://github.com/ncarlier/webhookd/compare/v0.2.0...v1.17.1) (2023-10-03)
+## [1.17.2](https://github.com/ncarlier/webhookd/compare/v1.17.1...v1.17.2) (2023-10-03)
+
+
+### Bug Fixes
+
+* lint code ([af39ad7](https://github.com/ncarlier/webhookd/commit/af39ad75c6bf34abeb0c7f35bdf7fd16adb43421))
+
+
+
+## [1.17.1](https://github.com/ncarlier/webhookd/compare/v1.16.0...v1.17.1) (2023-10-03)
 
 
 ### Bug Fixes
 
 * **ci:** fix CHANGELOG version ([cd5f88a](https://github.com/ncarlier/webhookd/commit/cd5f88a3aa4b4725d577d9ee3c6bbd3f7d87d895))
-
-
-
-# [0.2.0](https://github.com/ncarlier/webhookd/compare/v1.16.0...v0.2.0) (2023-10-03)
-
-
-### Bug Fixes
-
 * **ci:** fix CHANGELOG version ([fa489bc](https://github.com/ncarlier/webhookd/commit/fa489bc58f914a0460717c1b683aa33cc2c975c0))
 
 
