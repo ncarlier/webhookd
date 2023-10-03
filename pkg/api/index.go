@@ -92,8 +92,6 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 	params := HTTPParamsToShellVars(r.Form)
 	params = append(params, HTTPParamsToShellVars(r.Header)...)
 
-	// logger.Debug.Printf("API REQUEST: \"%s\" with params %s...\n", p, params)
-
 	// Create work
 	timeout := atoiFallback(r.Header.Get("X-Hook-Timeout"), defaultTimeout)
 	job, err := hook.NewHookJob(&hook.Request{

@@ -16,7 +16,7 @@ func HTTPParamsToShellVars[T url.Values | http.Header](params T) []string {
 	var result []string
 	for k, v := range params {
 		var buf bytes.Buffer
-		value, err := url.QueryUnescape(strings.Join(v[:], ","))
+		value, err := url.QueryUnescape(strings.Join(v, ","))
 		if err != nil {
 			continue
 		}

@@ -14,9 +14,7 @@ func AuthN(authenticator auth.Authenticator) Middleware {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Del(xWebAuthUser)
 			if ok, username := authenticator.Validate(r); ok {
-				if username != nil {
-					w.Header().Set(xWebAuthUser, *username)
-				}
+				w.Header().Set(xWebAuthUser, username)
 				next.ServeHTTP(w, r)
 				return
 			}

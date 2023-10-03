@@ -34,16 +34,14 @@ func TestHTTPSignature(t *testing.T) {
 		},
 	}
 
-	//pk := assertPrivateKey(t)
 	signer := assertSigner(t)
 	var body []byte
-	req, err := http.NewRequest("GET", "/", nil)
+	req, err := http.NewRequest("GET", "/", http.NoBody)
 	assert.Nil(t, err, "")
 	req.Header.Add("date", time.Now().UTC().Format(http.TimeFormat))
 	err = signer.SignRequest(privkey, "default", req, body)
 	assert.Nil(t, err, "")
 
-	// ts := assertTrustStore(t)
 	err = signature.HTTPSignatureHandler(req, ts)
 	assert.Nil(t, err, "")
 }

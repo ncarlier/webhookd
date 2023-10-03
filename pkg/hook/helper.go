@@ -10,7 +10,7 @@ import (
 // ResolveScript is resolving the target script.
 func ResolveScript(dir, name string) (string, error) {
 	if path.Ext(name) == "" {
-		name = name + ".sh"
+		name += ".sh"
 	}
 	script := path.Clean(path.Join(dir, name))
 	if !strings.HasPrefix(script, dir) {

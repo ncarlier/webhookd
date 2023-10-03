@@ -59,7 +59,7 @@ func Bind(conf interface{}, prefix string) error {
 		case reflect.Bool:
 			bVal, err := strconv.ParseBool(val)
 			if err != nil {
-				return fmt.Errorf("Invalid boolean value for %s: %v", key, err)
+				return fmt.Errorf("invalid boolean value for %s: %v", key, err)
 			}
 			field.SetBool(bVal)
 			ptr, _ := field.Addr().Interface().(*bool)
@@ -68,7 +68,7 @@ func Bind(conf interface{}, prefix string) error {
 			if field.Kind() == reflect.Int64 && field.Type().PkgPath() == "time" && field.Type().Name() == "Duration" {
 				d, err := time.ParseDuration(val)
 				if err != nil {
-					return fmt.Errorf("Invalid duration value for %s: %v", key, err)
+					return fmt.Errorf("invalid duration value for %s: %v", key, err)
 				}
 				field.SetInt(int64(d))
 				ptr, _ := field.Addr().Interface().(*time.Duration)
@@ -76,7 +76,7 @@ func Bind(conf interface{}, prefix string) error {
 			} else {
 				i64Val, err := strconv.ParseInt(val, 0, fieldType.Type.Bits())
 				if err != nil {
-					return fmt.Errorf("Invalid number value for %s: %v", key, err)
+					return fmt.Errorf("invalid number value for %s: %v", key, err)
 				}
 				field.SetInt(i64Val)
 				ptr, _ := field.Addr().Interface().(*int)
@@ -85,12 +85,10 @@ func Bind(conf interface{}, prefix string) error {
 		case reflect.Slice:
 			sliceType := field.Type().Elem()
 			if sliceType.Kind() == reflect.String {
-				if len(strings.TrimSpace(val)) != 0 {
+				if strings.TrimSpace(val) != "" {
 					vals := strings.Split(val, ",")
-					sl := make([]string, len(vals), len(vals))
-					for i, v := range vals {
-						sl[i] = v
-					}
+					sl := make([]string, len(vals))
+					copy(sl, vals)
 					field.Set(reflect.ValueOf(sl))
 					ptr, _ := field.Addr().Interface().(*[]string)
 					af := newArrayFlags(ptr)

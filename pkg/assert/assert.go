@@ -25,7 +25,7 @@ func NotNil(t *testing.T, actual interface{}, message string) {
 }
 
 // Equal assert that an object is equal to an expected value
-func Equal(t *testing.T, expected interface{}, actual interface{}, message string) {
+func Equal(t *testing.T, expected, actual interface{}, message string) {
 	if message == "" {
 		message = "Equal assertion failed"
 	}
@@ -35,7 +35,7 @@ func Equal(t *testing.T, expected interface{}, actual interface{}, message strin
 }
 
 // NotEqual assert that an object is not equal to an expected value
-func NotEqual(t *testing.T, expected interface{}, actual interface{}, message string) {
+func NotEqual(t *testing.T, expected, actual interface{}, message string) {
 	if message == "" {
 		message = "Not equal assertion failed"
 	}

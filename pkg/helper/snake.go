@@ -56,7 +56,6 @@ func ToDelimited(s string, del uint8) string {
 
 // ToScreamingDelimited converts a string to SCREAMING.DELIMITED.SNAKE.CASE (in this case `del = '.'; screaming = true`) or delimited.snake.case (in this case `del = '.'; screaming = false`)
 func ToScreamingDelimited(s string, del uint8, screaming bool) string {
-	// s = addWordBoundariesToNumbers(s)
 	s = strings.Trim(s, " ")
 	n := ""
 	for i, v := range s {
@@ -80,7 +79,7 @@ func ToScreamingDelimited(s string, del uint8, screaming bool) string {
 			// replace spaces/underscores with delimiters
 			n += string(del)
 		} else {
-			n = n + string(v)
+			n += string(v)
 		}
 	}
 
