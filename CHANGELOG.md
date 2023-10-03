@@ -1,3 +1,12 @@
+## [1.17.1](https://github.com/ncarlier/webhookd/compare/v0.2.0...v1.17.1) (2023-10-03)
+
+
+### Bug Fixes
+
+* **ci:** fix CHANGELOG version ([cd5f88a](https://github.com/ncarlier/webhookd/commit/cd5f88a3aa4b4725d577d9ee3c6bbd3f7d87d895))
+
+
+
 # [0.2.0](https://github.com/ncarlier/webhookd/compare/v1.16.0...v0.2.0) (2023-10-03)
 
 
@@ -45,16 +54,6 @@
 ### Features
 
 * adding HTTP PATCH support to API calls ([bc1de4e](https://github.com/ncarlier/webhookd/commit/bc1de4e5da4e6cfe3154096ecf4bfbba0b9bc9bd))
-
-
-
-# [1.14.0](https://github.com/ncarlier/webhookd/compare/v1.13.0...v1.14.0) (2022-05-09)
-
-
-### Features
-
-* improve control on streaming protocol ([4e6298d](https://github.com/ncarlier/webhookd/commit/4e6298dda713d816855818282cc32caca108c597)), closes [#51](https://github.com/ncarlier/webhookd/issues/51)
-* support application/x-www-form-urlencoded ([173ba6c](https://github.com/ncarlier/webhookd/commit/173ba6c347e3a4a158fa976cb8a3a7913aa4cede))
 
 
 
