@@ -60,19 +60,22 @@ func NewHookJob(request *Request) (*Job, error) {
 	return job, nil
 }
 
+// ID returns job ID
 func (job *Job) ID() uint64 {
 	return job.id
 }
 
+// Name returns job name
 func (job *Job) Name() string {
 	return job.name
 }
 
+// Err returns job error
 func (job *Job) Err() error {
 	return job.err
 }
 
-// Meta return job meta
+// Meta returns job meta
 func (job *Job) Meta() []string {
 	return []string{
 		"hook_id=" + strconv.FormatUint(job.id, 10),

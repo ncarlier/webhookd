@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	defaultKeyId        = "default"
+	defaultKeyID        = "default"
 	xSignatureEd25519   = "X-Signature-Ed25519"
 	xSignatureTimestamp = "X-Signature-Timestamp"
 )
@@ -25,9 +25,9 @@ func IsEd25519SignatureRequest(headers http.Header) bool {
 
 // Ed25519SignatureHandler validate request HTTP signature
 func Ed25519SignatureHandler(r *http.Request, ts truststore.TrustStore) error {
-	pubkey := ts.GetPublicKey(defaultKeyId)
+	pubkey := ts.GetPublicKey(defaultKeyID)
 	if pubkey == nil {
-		return fmt.Errorf("public key not found: %s", defaultKeyId)
+		return fmt.Errorf("public key not found: %s", defaultKeyID)
 	}
 
 	key, ok := pubkey.(ed25519.PublicKey)

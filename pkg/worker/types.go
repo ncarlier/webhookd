@@ -10,6 +10,7 @@ func (c *ChanWriter) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
+// Work is a dispatched work given to a worker
 type Work interface {
 	ID() uint64
 	Name() string

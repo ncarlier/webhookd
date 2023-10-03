@@ -17,6 +17,7 @@ type InMemoryTrustStore struct {
 	Keys map[string]crypto.PublicKey
 }
 
+// GetPublicKey returns the public key with this key ID
 func (ts *InMemoryTrustStore) GetPublicKey(keyID string) crypto.PublicKey {
 	if key, ok := ts.Keys[keyID]; ok {
 		return key

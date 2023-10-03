@@ -7,7 +7,9 @@ import (
 )
 
 var (
-	HookOutputEnabled    = false
+	// HookOutputEnabled writes hook output into logs if true
+	HookOutputEnabled = false
+	// RequestOutputEnabled writes HTTP request into logs if true
 	RequestOutputEnabled = false
 )
 

@@ -27,6 +27,7 @@ type Config struct {
 	TrustStoreFile  string `flag:"trust-store-file" desc:"Trust store used by HTTP signature verifier (.pem or .p12)"`
 }
 
+// Validate configuration
 func (c *Config) Validate() error {
 	if matched, _ := regexp.MatchString(`^/\w+$`, c.StaticPath); !matched {
 		return fmt.Errorf("invalid static path: %s", c.StaticPath)
