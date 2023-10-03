@@ -1,4 +1,4 @@
-# [0.1.0](https://github.com/ncarlier/webhookd/compare/v1.16.0...v0.1.0) (2023-10-03)
+# [1.17.0](https://github.com/ncarlier/webhookd/compare/v1.16.0...v0.1.0) (2023-10-03)
 
 
 ### Features
