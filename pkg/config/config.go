@@ -15,10 +15,12 @@ type Config struct {
 	NbWorkers       int    `flag:"nb-workers" desc:"Number of workers to start" default:"2"`
 	HookTimeout     int    `flag:"hook-timeout" desc:"Maximum hook execution time in second" default:"10"`
 	HookLogDir      string `flag:"hook-log-dir" desc:"Hook execution logs location" default:""`
-	HookLogOutput   bool   `flag:"hook-log-output" desc:"Output hook execution logs to server logs" default:"false"`
 	ScriptDir       string `flag:"scripts" desc:"Scripts location" default:"scripts"`
 	PasswdFile      string `flag:"passwd-file" desc:"Password file for basic HTTP authentication" default:".htpasswd"`
 	LogLevel        string `flag:"log-level" desc:"Log level (debug, info, warn, error)" default:"info"`
+	LogFormat       string `flag:"log-format" desc:"Log format (json, text)" default:"text"`
+	LogHookOutput   bool   `flag:"log-hook-output" desc:"Log hook execution output" default:"false"`
+	LogHTTPRequest  bool   `flag:"log-http-request" desc:"Log HTTP request" default:"false"`
 	StaticDir       string `flag:"static-dir" desc:"Static file directory to serve on /static path" default:""`
 	StaticPath      string `flag:"static-path" desc:"Path to serve static file directory" default:"/static"`
 	NotificationURI string `flag:"notification-uri" desc:"Notification URI"`

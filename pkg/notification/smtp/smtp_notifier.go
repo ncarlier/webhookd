@@ -3,6 +3,7 @@ package smtp
 import (
 	"crypto/tls"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/smtp"
 	"net/url"
@@ -11,7 +12,6 @@ import (
 	"time"
 
 	"github.com/ncarlier/webhookd/pkg/helper"
-	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/notification"
 )
 
@@ -28,7 +28,7 @@ type smtpNotifier struct {
 }
 
 func newSMTPNotifier(uri *url.URL) (notification.Notifier, error) {
-	logger.Info.Println("using SMTP notification system:", uri.Opaque)
+	slog.Info("using SMTP notification system", "uri", uri.Opaque)
 	q := uri.Query()
 	return &smtpNotifier{
 		Host:         helper.GetValueOrAlt(q, "smtp", "localhost:25"),
@@ -128,7 +128,7 @@ func (n *smtpNotifier) Notify(result notification.HookResult) error {
 		return err
 	}
 
-	logger.Info.Printf("job %s#%d notification sent to %s\n", result.Name(), result.ID(), n.To)
+	slog.Info("notification sent", "hook", result.Name(), "id", result.ID(), "to", n.To)
 
 	// Send the QUIT command and close the connection.
 	return client.Quit()

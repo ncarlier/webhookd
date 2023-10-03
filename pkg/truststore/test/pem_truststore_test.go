@@ -5,13 +5,10 @@ import (
 	"testing"
 
 	"github.com/ncarlier/webhookd/pkg/assert"
-	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/truststore"
 )
 
 func TestTrustStoreWithNoKeyID(t *testing.T) {
-	logger.Init("warn")
-
 	ts, err := truststore.New("test-key-01.pem")
 	assert.Nil(t, err, "")
 	assert.NotNil(t, ts, "")
@@ -24,8 +21,6 @@ func TestTrustStoreWithNoKeyID(t *testing.T) {
 }
 
 func TestTrustStoreWithKeyID(t *testing.T) {
-	logger.Init("warn")
-
 	ts, err := truststore.New("test-key-02.pem")
 	assert.Nil(t, err, "")
 	assert.NotNil(t, ts, "")
@@ -36,8 +31,6 @@ func TestTrustStoreWithKeyID(t *testing.T) {
 }
 
 func TestTrustStoreWithCertificate(t *testing.T) {
-	logger.Init("warn")
-
 	ts, err := truststore.New("test-cert.pem")
 	assert.Nil(t, err, "")
 	assert.NotNil(t, ts, "")
@@ -48,8 +41,6 @@ func TestTrustStoreWithCertificate(t *testing.T) {
 }
 
 func TestTrustStoreWithMultipleEntries(t *testing.T) {
-	logger.Init("warn")
-
 	ts, err := truststore.New("test-multi.pem")
 	assert.Nil(t, err, "")
 	assert.NotNil(t, ts, "")

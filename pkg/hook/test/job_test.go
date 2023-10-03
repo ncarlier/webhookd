@@ -1,13 +1,13 @@
 package test
 
 import (
+	"log/slog"
 	"os"
 	"strconv"
 	"testing"
 
 	"github.com/ncarlier/webhookd/pkg/assert"
 	"github.com/ncarlier/webhookd/pkg/hook"
-	"github.com/ncarlier/webhookd/pkg/logger"
 )
 
 func printJobMessages(job *hook.Job) {
@@ -17,13 +17,12 @@ func printJobMessages(job *hook.Job) {
 			if !open {
 				break
 			}
-			logger.Info.Println(string(msg))
+			slog.Info(string(msg))
 		}
 	}()
 }
 
 func TestHookJob(t *testing.T) {
-	logger.Init("debug", "out")
 	req := &hook.Request{
 		Name:    "test_simple",
 		Method:  "GET",
@@ -54,7 +53,6 @@ func TestHookJob(t *testing.T) {
 }
 
 func TestWorkRunnerWithError(t *testing.T) {
-	logger.Init("debug")
 	req := &hook.Request{
 		Name:      "test_error",
 		Method:    "POST",
@@ -75,7 +73,6 @@ func TestWorkRunnerWithError(t *testing.T) {
 }
 
 func TestWorkRunnerWithTimeout(t *testing.T) {
-	logger.Init("debug")
 	req := &hook.Request{
 		Name:      "test_timeout",
 		Method:    "POST",

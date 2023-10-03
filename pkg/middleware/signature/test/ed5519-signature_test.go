@@ -12,14 +12,11 @@ import (
 	"time"
 
 	"github.com/ncarlier/webhookd/pkg/assert"
-	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/middleware/signature"
 	"github.com/ncarlier/webhookd/pkg/truststore"
 )
 
 func TestEd5519Signature(t *testing.T) {
-	logger.Init("warn")
-
 	pubkey, privkey, err := ed25519.GenerateKey(rand.Reader)
 	assert.Nil(t, err, "")
 

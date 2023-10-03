@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/user"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/ncarlier/webhookd/pkg/api"
 	"github.com/ncarlier/webhookd/pkg/config"
-	"github.com/ncarlier/webhookd/pkg/logger"
 
 	"golang.org/x/crypto/acme/autocert"
 )
@@ -48,12 +48,13 @@ func (s *Server) Shutdown(ctx context.Context) error {
 
 // NewServer create new HTTP(s) server
 func NewServer(cfg *config.Config) *Server {
+	logger := slog.NewLogLogger(slog.Default().Handler(), slog.LevelError)
 	server := &Server{
 		tls: cfg.TLS,
 		self: &http.Server{
 			Addr:     cfg.ListenAddr,
 			Handler:  api.NewRouter(cfg),
-			ErrorLog: logger.Error,
+			ErrorLog: logger,
 		},
 	}
 	if server.tls {

@@ -2,14 +2,14 @@ package truststore
 
 import (
 	"crypto"
-	"io/ioutil"
+	"log/slog"
+	"os"
 
-	"github.com/ncarlier/webhookd/pkg/logger"
 	"golang.org/x/crypto/pkcs12"
 )
 
 func newP12TrustStore(filename string) (TrustStore, error) {
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +25,7 @@ func newP12TrustStore(filename string) (TrustStore, error) {
 
 	keyID := string(cert.Subject.CommonName)
 	result.Keys[keyID] = cert.PublicKey
-	logger.Debug.Printf("certificate \"%s\" loaded into the trustore", keyID)
+	slog.Debug("certificate loaded into the trustore", "id", keyID)
 
 	return result, nil
 }

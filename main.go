@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"flag"
+	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -31,31 +33,29 @@ func main() {
 		os.Exit(0)
 	}
 
-	if conf.HookLogOutput {
-		logger.Init(conf.LogLevel, "out")
-	} else {
-		logger.Init(conf.LogLevel)
-	}
-
 	if conf.HookLogDir == "" {
 		conf.HookLogDir = os.TempDir()
 	}
 
 	if err := conf.Validate(); err != nil {
-		logger.Error.Fatal("invalid configuration:", err)
+		log.Fatal("invalid configuration:", err)
 	}
 
-	logger.Debug.Println("starting webhookd server...")
+	logger.Configure(conf.LogFormat, conf.LogLevel)
+	logger.HookOutputEnabled = conf.LogHookOutput
+	logger.RequestOutputEnabled = conf.LogHTTPRequest
+
+	slog.Debug("starting webhookd server...")
 
 	srv := server.NewServer(conf)
 
 	// Configure notification
 	if err := notification.Init(conf.NotificationURI); err != nil {
-		logger.Error.Fatalf("unable to create notification channel: %v\n", err)
+		slog.Error("unable to create notification channel", "err", err)
 	}
 
 	// Start the dispatcher.
-	logger.Debug.Printf("starting the dispatcher with %d workers...\n", conf.NbWorkers)
+	slog.Debug("starting the dispatcher...", "workers", conf.NbWorkers)
 	worker.StartDispatcher(conf.NbWorkers)
 
 	done := make(chan bool)
@@ -64,24 +64,25 @@ func main() {
 
 	go func() {
 		<-quit
-		logger.Debug.Println("server is shutting down...")
+		slog.Debug("server is shutting down...")
 		api.Shutdown()
 
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
 		if err := srv.Shutdown(ctx); err != nil {
-			logger.Error.Fatalf("could not gracefully shutdown the server: %v\n", err)
+			slog.Error("could not gracefully shutdown the server", "err", err)
 		}
 		close(done)
 	}()
 
-	logger.Info.Println("server is ready to handle requests at", conf.ListenAddr)
 	api.Start()
+	slog.Info("server started", "addr", conf.ListenAddr)
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		logger.Error.Fatalf("could not listen on %s : %v\n", conf.ListenAddr, err)
+		slog.Error("unable to start the server", "addr", conf.ListenAddr, "err", err)
+		os.Exit(1)
 	}
 
 	<-done
-	logger.Debug.Println("server stopped")
+	slog.Debug("server stopped")
 }

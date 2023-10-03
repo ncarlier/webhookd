@@ -2,10 +2,10 @@ package worker
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/ncarlier/webhookd/pkg/metric"
 
-	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/notification"
 )
 
@@ -41,7 +41,7 @@ func (w Worker) Start() {
 			select {
 			case work := <-w.Work:
 				// Receive a work request.
-				logger.Debug.Printf("worker #%d received hook request: %s#%d\n", w.ID, work.Name(), work.ID())
+				slog.Debug("hook execution request received", "worker", w.ID, "hook", work.Name(), "id", work.ID())
 				metric.Requests.Add(1)
 				err := work.Run()
 				if err != nil {
@@ -53,7 +53,7 @@ func (w Worker) Start() {
 
 				work.Close()
 			case <-w.QuitChan:
-				logger.Debug.Printf("stopping worker #%d...\n", w.ID)
+				slog.Debug("stopping worker...", "worker", w.ID)
 				return
 			}
 		}

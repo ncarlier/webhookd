@@ -3,9 +3,8 @@ package truststore
 import (
 	"crypto"
 	"fmt"
+	"log/slog"
 	"path/filepath"
-
-	"github.com/ncarlier/webhookd/pkg/logger"
 )
 
 // TrustStore is a generic interface to retrieve a public key
@@ -31,7 +30,7 @@ func New(filename string) (store TrustStore, err error) {
 		return nil, nil
 	}
 
-	logger.Debug.Printf("loading trust store: %s", filename)
+	slog.Debug("loading trust store...", "filname", filename)
 	switch filepath.Ext(filename) {
 	case ".pem":
 		store, err = newPEMTrustStore(filename)

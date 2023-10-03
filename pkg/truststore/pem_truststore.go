@@ -5,13 +5,12 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
-
-	"github.com/ncarlier/webhookd/pkg/logger"
+	"log/slog"
+	"os"
 )
 
 func newPEMTrustStore(filename string) (TrustStore, error) {
-	raw, err := ioutil.ReadFile(filename)
+	raw, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +36,7 @@ func newPEMTrustStore(filename string) (TrustStore, error) {
 			}
 
 			result.Keys[keyID] = key
-			logger.Debug.Printf("public key \"%s\" loaded into the trustore", keyID)
+			slog.Debug("public key loaded into the trustore", "id", keyID)
 		case "CERTIFICATE":
 			cert, err := x509.ParseCertificate(block.Bytes)
 			if err != nil {
@@ -45,7 +44,7 @@ func newPEMTrustStore(filename string) (TrustStore, error) {
 			}
 			keyID := string(cert.Subject.CommonName)
 			result.Keys[keyID] = cert.PublicKey
-			logger.Debug.Printf("certificate \"%s\" loaded into the trustore", keyID)
+			slog.Debug("certificate loaded into the trustore", "id", keyID)
 		}
 		raw = rest
 	}

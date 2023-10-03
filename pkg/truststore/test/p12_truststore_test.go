@@ -5,13 +5,11 @@ import (
 	"testing"
 
 	"github.com/ncarlier/webhookd/pkg/assert"
-	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/truststore"
 )
 
 func TestTrustStoreWithP12(t *testing.T) {
 	t.Skip()
-	logger.Init("warn")
 
 	ts, err := truststore.New("test.p12")
 	assert.Nil(t, err, "")

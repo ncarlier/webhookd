@@ -1,7 +1,7 @@
 package worker
 
 import (
-	"github.com/ncarlier/webhookd/pkg/logger"
+	"log/slog"
 )
 
 // WorkerQueue is the global queue of Workers
@@ -17,7 +17,7 @@ func StartDispatcher(nworkers int) {
 
 	// Now, create all of our workers.
 	for i := 0; i < nworkers; i++ {
-		logger.Debug.Printf("starting worker #%d ...\n", i+1)
+		slog.Debug("starting worker...", "worker", i+1)
 		worker := NewWorker(i+1, WorkerQueue)
 		worker.Start()
 	}
@@ -29,7 +29,7 @@ func StartDispatcher(nworkers int) {
 				go func() {
 					worker := <-WorkerQueue
 
-					logger.Debug.Printf("dispatching hook request: %s#%d", work.Name(), work.ID())
+					slog.Debug("dispatching hook request", "hook", work.Name(), "id", work.ID())
 					worker <- work
 				}()
 			}

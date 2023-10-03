@@ -1,7 +1,7 @@
 package notification
 
 import (
-	"github.com/ncarlier/webhookd/pkg/logger"
+	"log/slog"
 )
 
 // Notifier is able to send a notification.
@@ -17,7 +17,7 @@ func Notify(result HookResult) {
 		return
 	}
 	if err := notifier.Notify(result); err != nil {
-		logger.Error.Printf("unable to send notification for webhook %s#%d: %v\n", result.Name(), result.ID(), err)
+		slog.Error("unable to send notification", "webhook", result.Name(), "id", result.ID(), "err", err)
 	}
 }
 

@@ -8,11 +8,11 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -45,7 +45,7 @@ func main() {
 		log.Fatal("invalid target URL")
 	}
 
-	keyBytes, err := ioutil.ReadFile(conf.KeyFile)
+	keyBytes, err := os.ReadFile(conf.KeyFile)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -64,7 +64,7 @@ func main() {
 	var jsonBytes []byte
 	if conf.JSON != "" {
 		var err error
-		jsonBytes, err = ioutil.ReadFile(conf.JSON)
+		jsonBytes, err = os.ReadFile(conf.JSON)
 		if err != nil {
 			log.Fatal(err.Error())
 		}

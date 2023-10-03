@@ -3,13 +3,13 @@ package http
 import (
 	"bytes"
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/ncarlier/webhookd/pkg/helper"
-	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/notification"
 )
 
@@ -27,7 +27,7 @@ type httpNotifier struct {
 }
 
 func newHTTPNotifier(uri *url.URL) (notification.Notifier, error) {
-	logger.Info.Println("using HTTP notification system: ", uri.String())
+	slog.Info("using HTTP notification system ", "üri", uri.Opaque)
 	return &httpNotifier{
 		URL:          uri,
 		PrefixFilter: helper.GetValueOrAlt(uri.Query(), "prefix", "notify:"),
@@ -65,7 +65,7 @@ func (n *httpNotifier) Notify(result notification.HookResult) error {
 		return err
 	}
 	resp.Body.Close()
-	logger.Info.Printf("job %s#%d notification sent to %s\n", result.Name(), result.ID(), n.URL.String())
+	slog.Info("notification sent", "hook", result.Name(), "id", result.ID(), "to", n.URL.Opaque)
 	return nil
 }
 

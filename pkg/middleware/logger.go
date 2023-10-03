@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
@@ -25,16 +26,18 @@ func Logger(next http.Handler) http.Handler {
 			if !ok {
 				requestID = "0"
 			}
-			logger.Info.Printf(
-				"%s - - [%s] %q %d %d %q %q %q",
-				getRequestIP(r),
-				start.Format("02/Jan/2006:15:04:05 -0700"),
+			logger.LogIf(
+				logger.RequestOutputEnabled,
+				slog.LevelInfo+1,
 				fmt.Sprintf("%s %s %s", r.Method, r.URL, r.Proto),
-				o.status,
-				o.written,
-				r.Referer(),
-				r.UserAgent(),
-				fmt.Sprintf("REQID=%s", requestID),
+				"ip", getRequestIP(r),
+				"time", start.Format("02/Jan/2006:15:04:05 -0700"),
+				"duration", time.Since(start).Milliseconds(),
+				"status", o.status,
+				"bytes", o.written,
+				"referer", r.Referer(),
+				"ua", r.UserAgent(),
+				"reqid", requestID,
 			)
 		}()
 		next.ServeHTTP(o, r)

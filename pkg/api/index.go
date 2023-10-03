@@ -3,7 +3,7 @@ package api
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
+	"log/slog"
 	"mime"
 	"net/http"
 	"path"
@@ -13,7 +13,6 @@ import (
 
 	"github.com/ncarlier/webhookd/pkg/config"
 	"github.com/ncarlier/webhookd/pkg/hook"
-	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/worker"
 )
 
@@ -64,13 +63,13 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 	_, err := hook.ResolveScript(scriptDir, hookName)
 	if err != nil {
-		logger.Error.Println(err.Error())
+		slog.Error("hooke not found", "err", err.Error())
 		http.Error(w, "hook not found", http.StatusNotFound)
 		return
 	}
 
 	if err = r.ParseForm(); err != nil {
-		logger.Error.Printf("error reading from-data: %v", err)
+		slog.Error("error reading from-data", "err", err)
 		http.Error(w, "unable to parse request form", http.StatusBadRequest)
 		return
 	}
@@ -81,9 +80,9 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 	if ct != "" {
 		mediatype, _, _ := mime.ParseMediaType(ct)
 		if strings.HasPrefix(mediatype, "text/") || mediatype == "application/json" {
-			body, err = ioutil.ReadAll(r.Body)
+			body, err = io.ReadAll(r.Body)
 			if err != nil {
-				logger.Error.Printf("error reading body: %v", err)
+				slog.Error("error reading body", "err", err)
 				http.Error(w, "unable to read request body", http.StatusBadRequest)
 				return
 			}
@@ -107,7 +106,7 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 		OutputDir: outputDir,
 	})
 	if err != nil {
-		logger.Error.Printf("error creating hook job: %v", err)
+		slog.Error("error creating hook job", "err", err)
 		http.Error(w, "unable to create hook job", http.StatusInternalServerError)
 		return
 	}
@@ -151,7 +150,7 @@ func getWebhookLog(w http.ResponseWriter, r *http.Request) {
 	hookName := path.Dir(strings.TrimPrefix(r.URL.Path, "/"))
 	_, err := hook.ResolveScript(scriptDir, hookName)
 	if err != nil {
-		logger.Error.Println(err.Error())
+		slog.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
@@ -159,7 +158,7 @@ func getWebhookLog(w http.ResponseWriter, r *http.Request) {
 	// Retrieve log file
 	logFile, err := hook.Logs(id, hookName, outputDir)
 	if err != nil {
-		logger.Error.Println(err.Error())
+		slog.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

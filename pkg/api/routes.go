@@ -1,9 +1,10 @@
 package api
 
 import (
+	"log/slog"
+
 	"github.com/ncarlier/webhookd/pkg/auth"
 	"github.com/ncarlier/webhookd/pkg/config"
-	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/middleware"
 	"github.com/ncarlier/webhookd/pkg/truststore"
 )
@@ -24,7 +25,7 @@ func buildMiddlewares(conf *config.Config) middleware.Middlewares {
 	// Load trust store...
 	ts, err := truststore.New(conf.TrustStoreFile)
 	if err != nil {
-		logger.Warning.Printf("unable to load trust store (\"%s\"): %s\n", conf.TrustStoreFile, err)
+		slog.Warn("unable to load trust store", "filename", conf.TrustStoreFile, "err", err)
 	}
 	if ts != nil {
 		middlewares = middlewares.UseAfter(middleware.Signature(ts))
@@ -33,7 +34,7 @@ func buildMiddlewares(conf *config.Config) middleware.Middlewares {
 	// Load authenticator...
 	authenticator, err := auth.NewHtpasswdFromFile(conf.PasswdFile)
 	if err != nil {
-		logger.Debug.Printf("unable to load htpasswd file (\"%s\"): %s\n", conf.PasswdFile, err)
+		slog.Debug("unable to load htpasswd file", "filename", conf.PasswdFile, "err", err)
 	}
 	if authenticator != nil {
 		middlewares = middlewares.UseAfter(middleware.AuthN(authenticator))

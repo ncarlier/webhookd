@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-fed/httpsig"
 	"github.com/ncarlier/webhookd/pkg/assert"
-	"github.com/ncarlier/webhookd/pkg/logger"
 	"github.com/ncarlier/webhookd/pkg/middleware/signature"
 	"github.com/ncarlier/webhookd/pkg/truststore"
 )
@@ -25,8 +24,6 @@ func assertSigner(t *testing.T) httpsig.Signer {
 }
 
 func TestHTTPSignature(t *testing.T) {
-	logger.Init("warn")
-
 	privkey, err := rsa.GenerateKey(rand.Reader, 2048)
 	assert.Nil(t, err, "")
 	pubkey := &privkey.PublicKey

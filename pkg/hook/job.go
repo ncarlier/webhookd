@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 	"os/exec"
 	"path"
@@ -31,6 +32,7 @@ type Job struct {
 	args        []string
 	MessageChan chan []byte
 	timeout     int
+	start       time.Time
 	status      Status
 	logFilename string
 	err         error
@@ -83,14 +85,27 @@ func (job *Job) Meta() []string {
 func (job *Job) Terminate(err error) error {
 	job.mutex.Lock()
 	defer job.mutex.Unlock()
+	job.status = Success
 	if err != nil {
 		job.status = Error
 		job.err = err
-		logger.Info.Printf("hook %s#%d done [ERROR]\n", job.Name(), job.ID())
+		slog.Error(
+			"hook executed",
+			"hook", job.Name(),
+			"id", job.ID(),
+			"status", "error",
+			"err", err,
+			"took", time.Since(job.start).Microseconds(),
+		)
 		return err
 	}
-	job.status = Success
-	logger.Info.Printf("hook %s#%d done [SUCCESS]\n", job.Name(), job.ID())
+	slog.Info(
+		"hook executed",
+		"hook", job.Name(),
+		"id", job.ID(),
+		"status", "success",
+		"took", time.Since(job.start).Microseconds(),
+	)
 	return nil
 }
 
@@ -160,9 +175,8 @@ func (job *Job) Run() error {
 		return fmt.Errorf("unable to run job: status=%s", job.StatusLabel())
 	}
 	job.status = Running
-	logger.Info.Printf("hook %s#%d started...\n", job.name, job.id)
-	logger.Debug.Printf("hook %s#%d script: %s\n", job.name, job.id, job.script)
-	logger.Debug.Printf("hook %s#%d parameter: %v\n", job.name, job.id, job.args)
+	job.start = time.Now()
+	slog.Info("executing hook...", "hook", job.name, "id", job.id)
 
 	binary, err := exec.LookPath(job.script)
 	if err != nil {
@@ -184,7 +198,7 @@ func (job *Job) Run() error {
 		return job.Terminate(err)
 	}
 	defer logFile.Close()
-	logger.Debug.Printf("hook %s#%d output file: %s\n", job.name, job.id, logFile.Name())
+	slog.Debug("hook details", "hook", job.name, "id", job.id, "script", job.script, "args", job.args, "output", logFile.Name())
 
 	wLogFile := bufio.NewWriter(logFile)
 	defer wLogFile.Flush()
@@ -219,26 +233,32 @@ func (job *Job) Run() error {
 			if !job.IsTerminated() {
 				job.MessageChan <- []byte(line)
 			} else {
-				logger.Error.Printf("hook %s#%d is over ; unable to write more data into the channel: %s\n", job.name, job.id, line)
+				slog.Error("hook execution done ; unable to write more data into the channel", "hook", job.name, "id", job.id, "line", line)
 				break
 			}
 			// write to stdout if configured
-			logger.Output.Println(line)
+			logger.LogIf(
+				logger.HookOutputEnabled,
+				slog.LevelInfo+1,
+				line,
+				"hook", job.name,
+				"id", job.id,
+			)
 			// writing to outfile
 			if _, err := wLogFile.WriteString(line + "\n"); err != nil {
-				logger.Error.Println("error while writing into the log file:", logFile.Name(), err)
+				slog.Error("error while writing into the log file", "filename", logFile.Name(), "err", err)
 				break
 			}
 		}
 		if err := scanner.Err(); err != nil {
-			logger.Error.Printf("hook %s#%d is unable to read script stdout: %v\n", job.name, job.id, err)
+			slog.Error("hook is unable to read script stdout", "hook", job.name, "id", job.id, "err", err)
 		}
 		wg.Done()
 	}(cmdReader)
 
 	// Start timeout timer
 	timer := time.AfterFunc(time.Duration(job.timeout)*time.Second, func() {
-		logger.Warning.Printf("hook %s#%d has timed out (%ds): killing process #%d ...\n", job.name, job.id, job.timeout, cmd.Process.Pid)
+		slog.Warn("hook has timed out: killing process...", "hook", job.name, "id", job.id, "timeout", job.timeout, "pid", cmd.Process.Pid)
 		syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
 	})
 
