@@ -1,3 +1,12 @@
+## [1.17.3](https://github.com/ncarlier/webhookd/compare/v1.17.2...v1.17.3) (2023-10-03)
+
+
+### Bug Fixes
+
+* **ci:** fix release step ([b19a1c1](https://github.com/ncarlier/webhookd/commit/b19a1c1f7e36104ec3ec03c728562c2e59c80a97))
+
+
+
 ## [1.17.2](https://github.com/ncarlier/webhookd/compare/v1.17.1...v1.17.2) (2023-10-03)
 
 
@@ -46,15 +55,6 @@
 * **docker:** add ARM Docker image ([ed1f5da](https://github.com/ncarlier/webhookd/commit/ed1f5da6c27121c1a3879c39e1a79bea99f542ce))
 * **docker:** create slim and distrib Docker image ([5f8a76f](https://github.com/ncarlier/webhookd/commit/5f8a76f5f25dde7e2bf5752a02e11fdcb7833b33))
 * trace real IP ([50bcb16](https://github.com/ncarlier/webhookd/commit/50bcb16c715c50860d8114c7893419c71eb17ae9))
-
-
-
-# [1.15.0](https://github.com/ncarlier/webhookd/compare/v1.14.0...v1.15.0) (2022-05-26)
-
-
-### Features
-
-* adding HTTP PATCH support to API calls ([bc1de4e](https://github.com/ncarlier/webhookd/commit/bc1de4e5da4e6cfe3154096ecf4bfbba0b9bc9bd))
 
 
 
