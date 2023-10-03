@@ -23,17 +23,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
     - name: Conventional CHANGELOG
       id: changelog
       uses: TriPSs/conventional-changelog-action@v3
       if: github.ref == 'refs/heads/master'
       with:
         github-token: ${{ secrets.github_token }}
-
     - name: Distribution
       run: make distribution
       if: github.ref == 'refs/heads/master' && steps.changelog.outputs.skipped == 'false'
-      
     - name: Release
       uses: softprops/action-gh-release@v1
       if: github.ref == 'refs/heads/master' && steps.changelog.outputs.skipped == 'false'
