@@ -24,15 +24,13 @@ func StartDispatcher(nworkers int) {
 
 	go func() {
 		for {
-			select {
-			case work := <-WorkQueue:
-				go func() {
-					worker := <-WorkerQueue
+			work := <-WorkQueue
+			go func() {
+				worker := <-WorkerQueue
+				slog.Debug("dispatching hook request", "hook", work.Name(), "id", work.ID())
+				worker <- work
+			}()
 
-					slog.Debug("dispatching hook request", "hook", work.Name(), "id", work.ID())
-					worker <- work
-				}()
-			}
 		}
 	}()
 }

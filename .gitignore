@@ -3,3 +3,4 @@ release/
 .htpasswd
 *.pem
 *.key
+CHANGELOG.md
