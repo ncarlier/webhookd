@@ -217,7 +217,7 @@ $ # Retrieve logs afterwards
 $ curl http://localhost:8080/echo/2
 ```
 
-If needed, you can also redirect hook logs to the server output (configured by the `WHD_HOOK_LOG_OUTPUT` environment variable).
+If needed, you can also redirect hook logs to the server output (configured by the `WHD_LOG_HOOK_OUTPUT` environment variable).
 
 ### Post hook notifications
 
