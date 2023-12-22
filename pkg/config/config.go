@@ -13,6 +13,7 @@ type Config struct {
 	TLSKeyFile      string `flag:"tls-key-file" desc:"TLS key file" default:"server.key"`
 	TLSDomain       string `flag:"tls-domain" desc:"TLS domain name used by ACME"`
 	NbWorkers       int    `flag:"nb-workers" desc:"Number of workers to start" default:"2"`
+	HookDefaultExt  string `flag:"hook-default-ext" desc:"Default extension for hook scripts" default:"sh"`
 	HookTimeout     int    `flag:"hook-timeout" desc:"Maximum hook execution time in second" default:"10"`
 	HookLogDir      string `flag:"hook-log-dir" desc:"Hook execution logs location" default:""`
 	ScriptDir       string `flag:"scripts" desc:"Scripts location" default:"scripts"`

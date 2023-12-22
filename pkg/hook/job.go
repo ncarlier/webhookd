@@ -41,14 +41,10 @@ type Job struct {
 
 // NewHookJob creates new hook job
 func NewHookJob(request *Request) (*Job, error) {
-	script, err := ResolveScript(request.BaseDir, request.Name)
-	if err != nil {
-		return nil, err
-	}
 	job := &Job{
 		id:          atomic.AddUint64(&hookID, 1),
 		name:        request.Name,
-		script:      script,
+		script:      request.Script,
 		method:      request.Method,
 		payload:     request.Payload,
 		args:        request.Args,

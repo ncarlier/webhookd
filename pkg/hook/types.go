@@ -17,10 +17,10 @@ const (
 // Request is a hook request
 type Request struct {
 	Name      string
+	Script    string
 	Method    string
 	Payload   string
 	Args      []string
 	Timeout   int
-	BaseDir   string
 	OutputDir string
 }

@@ -63,7 +63,7 @@ All configuration variables are described in [etc/default/webhookd.env](./etc/de
 Webhooks are simple scripts within a directory structure.
 
 By default inside the `./scripts` directory.
-You can override the default using the `WHD_SCRIPTS` environment variable or `-script` parameter.
+You can change the default directory using the `WHD_SCRIPTS` environment variable or `-script` parameter.
 
 *Example:*
 
@@ -87,7 +87,8 @@ In particular, examples of integration with Gitlab and Github.
 
 The directory structure define the webhook URL.
 
-You can omit the script extension. If you do, webhookd will search for a `.sh` file.
+You can omit the script extension. If you do, webhookd will search by default for a `.sh` file.
+You can change the default extension using the `WHD_HOOK_DEFAULT_EXT` environment variable or `-hook-default-ext` parameter.
 If the script exists, the output the will be streamed to the HTTP response.
 
 The streaming technology depends on the HTTP request:

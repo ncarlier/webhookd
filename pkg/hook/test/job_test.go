@@ -25,6 +25,7 @@ func printJobMessages(job *hook.Job) {
 func TestHookJob(t *testing.T) {
 	req := &hook.Request{
 		Name:    "test_simple",
+		Script:  "../test/test_simple.sh",
 		Method:  "GET",
 		Payload: "{\"foo\": \"bar\"}",
 		Args: []string{
@@ -32,7 +33,6 @@ func TestHookJob(t *testing.T) {
 			"user_agent=test",
 		},
 		Timeout:   5,
-		BaseDir:   "../test",
 		OutputDir: os.TempDir(),
 	}
 	job, err := hook.NewHookJob(req)
@@ -55,11 +55,11 @@ func TestHookJob(t *testing.T) {
 func TestWorkRunnerWithError(t *testing.T) {
 	req := &hook.Request{
 		Name:      "test_error",
+		Script:    "../test/test_error.sh",
 		Method:    "POST",
 		Payload:   "",
 		Args:      []string{},
 		Timeout:   5,
-		BaseDir:   "../test",
 		OutputDir: os.TempDir(),
 	}
 	job, err := hook.NewHookJob(req)
@@ -75,11 +75,11 @@ func TestWorkRunnerWithError(t *testing.T) {
 func TestWorkRunnerWithTimeout(t *testing.T) {
 	req := &hook.Request{
 		Name:      "test_timeout",
+		Script:    "../test/test_timeout.sh",
 		Method:    "POST",
 		Payload:   "",
 		Args:      []string{},
 		Timeout:   1,
-		BaseDir:   "../test",
 		OutputDir: os.TempDir(),
 	}
 	job, err := hook.NewHookJob(req)

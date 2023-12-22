@@ -8,9 +8,9 @@ import (
 )
 
 // ResolveScript is resolving the target script.
-func ResolveScript(dir, name string) (string, error) {
+func ResolveScript(dir, name, defaultExt string) (string, error) {
 	if path.Ext(name) == "" {
-		name += ".sh"
+		name += "." + defaultExt
 	}
 	script := path.Clean(path.Join(dir, name))
 	if !strings.HasPrefix(script, dir) {

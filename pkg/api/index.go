@@ -18,6 +18,7 @@ import (
 
 var (
 	defaultTimeout int
+	defaultExt     string
 	scriptDir      string
 	outputDir      string
 )
@@ -32,6 +33,7 @@ func atoiFallback(str string, fallback int) int {
 // index is the main handler of the API.
 func index(conf *config.Config) http.Handler {
 	defaultTimeout = conf.HookTimeout
+	defaultExt = conf.HookDefaultExt
 	scriptDir = conf.ScriptDir
 	outputDir = conf.HookLogDir
 	return http.HandlerFunc(webhookHandler)
@@ -61,7 +63,7 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 		infoHandler(w, r)
 		return
 	}
-	_, err := hook.ResolveScript(scriptDir, hookName)
+	script, err := hook.ResolveScript(scriptDir, hookName, defaultExt)
 	if err != nil {
 		slog.Error("hooke not found", "err", err.Error())
 		http.Error(w, "hook not found", http.StatusNotFound)
@@ -92,15 +94,15 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 	params := HTTPParamsToShellVars(r.Form)
 	params = append(params, HTTPParamsToShellVars(r.Header)...)
 
-	// Create work
+	// Create hook job
 	timeout := atoiFallback(r.Header.Get("X-Hook-Timeout"), defaultTimeout)
 	job, err := hook.NewHookJob(&hook.Request{
 		Name:      hookName,
+		Script:    script,
 		Method:    r.Method,
 		Payload:   string(body),
 		Args:      params,
 		Timeout:   timeout,
-		BaseDir:   scriptDir,
 		OutputDir: outputDir,
 	})
 	if err != nil {
@@ -146,7 +148,7 @@ func getWebhookLog(w http.ResponseWriter, r *http.Request) {
 
 	// Get script location
 	hookName := path.Dir(strings.TrimPrefix(r.URL.Path, "/"))
-	_, err := hook.ResolveScript(scriptDir, hookName)
+	_, err := hook.ResolveScript(scriptDir, hookName, defaultExt)
 	if err != nil {
 		slog.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusNotFound)
