@@ -1,7 +1,5 @@
 .SILENT :
 
-export GO111MODULE=on
-
 # App name
 APPNAME=webhookd
 
@@ -27,7 +25,8 @@ BUILT:=`date`
 define LDFLAGS
 -X '$(PKG_VERSION).Version=$(VERSION)' \
 -X '$(PKG_VERSION).GitCommit=$(GIT_COMMIT)' \
--X '$(PKG_VERSION).Built=$(BUILT)'
+-X '$(PKG_VERSION).Built=$(BUILT)' \
+-s -w -buildid=
 endef
 
 all: build
@@ -46,7 +45,7 @@ clean:
 build:
 	-mkdir -p release
 	echo ">>> Building: $(EXECUTABLE) $(VERSION) for $(GOOS)-$(GOARCH) ..."
-	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -ldflags "$(LDFLAGS)" -o release/$(EXECUTABLE)
+	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -tags osusergo,netgo -ldflags "$(LDFLAGS)" -o release/$(EXECUTABLE)
 .PHONY: build
 
 release/$(EXECUTABLE): build
