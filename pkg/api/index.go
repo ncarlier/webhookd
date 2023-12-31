@@ -65,14 +65,16 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 	script, err := hook.ResolveScript(scriptDir, hookName, defaultExt)
 	if err != nil {
-		slog.Error("hooke not found", "err", err.Error())
-		http.Error(w, "hook not found", http.StatusNotFound)
+		msg := "hook not found"
+		slog.Error(msg, "err", err.Error())
+		http.Error(w, msg, http.StatusNotFound)
 		return
 	}
 
 	if err = r.ParseForm(); err != nil {
-		slog.Error("error reading from-data", "err", err)
-		http.Error(w, "unable to parse request form", http.StatusBadRequest)
+		msg := "unable to parse form-data"
+		slog.Error(msg, "err", err)
+		http.Error(w, msg, http.StatusBadRequest)
 		return
 	}
 
@@ -84,8 +86,9 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(mediatype, "text/") || mediatype == "application/json" {
 			body, err = io.ReadAll(r.Body)
 			if err != nil {
-				slog.Error("error reading body", "err", err)
-				http.Error(w, "unable to read request body", http.StatusBadRequest)
+				msg := "unable to read request body"
+				slog.Error(msg, "err", err)
+				http.Error(w, msg, http.StatusBadRequest)
 				return
 			}
 		}
@@ -106,8 +109,9 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 		OutputDir: outputDir,
 	})
 	if err != nil {
-		slog.Error("error creating hook job", "err", err)
-		http.Error(w, "unable to create hook job", http.StatusInternalServerError)
+		msg := "unable to create hook execution job"
+		slog.Error(msg, "err", err)
+		http.Error(w, msg, http.StatusInternalServerError)
 		return
 	}
 
@@ -163,7 +167,7 @@ func getWebhookLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if logFile == nil {
-		http.Error(w, "job not found", http.StatusNotFound)
+		http.Error(w, "hook execution log not found", http.StatusNotFound)
 		return
 	}
 	defer logFile.Close()

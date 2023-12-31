@@ -5,6 +5,7 @@ import (
 	"regexp"
 )
 
+// Config store root configuration
 type Config struct {
 	ListenAddr     string             `flag:"listen-addr" desc:"HTTP listen address" default:":8080"`
 	PasswdFile     string             `flag:"passwd-file" desc:"Password file for basic HTTP authentication" default:".htpasswd"`
@@ -17,7 +18,7 @@ type Config struct {
 	OldConfig      `flag:""`
 }
 
-// HookConfig manage Hook execution configuration
+// HookConfig store Hook execution configuration
 type HookConfig struct {
 	DefaultExt string `flag:"default-ext" desc:"Default extension for hook scripts" default:"sh"`
 	Timeout    int    `flag:"timeout" desc:"Maximum hook execution time in second" default:"10"`
@@ -26,25 +27,25 @@ type HookConfig struct {
 	Workers    int    `flag:"workers" desc:"Number of workers to start" default:"2"`
 }
 
-// LogConfig manage the logger configuration
+// LogConfig store logger configuration
 type LogConfig struct {
 	Level   string   `flag:"level" desc:"Log level (debug, info, warn or error)" default:"info"`
 	Format  string   `flag:"format" desc:"Log format (json or text)" default:"text"`
 	Modules []string `flag:"modules" desc:"Logging modules to activate (http,hook)" default:""`
 }
 
-// NotificationConfig manage notification configuration
+// NotificationConfig store notification configuration
 type NotificationConfig struct {
 	URI string `flag:"uri" desc:"Notification URI"`
 }
 
-// StaticConfig manage static assets configuration
+// StaticConfig store static assets configuration
 type StaticConfig struct {
 	Dir  string `flag:"dir" desc:"Static file directory to serve on /static path" default:""`
 	Path string `flag:"path" desc:"Path to serve static file directory" default:"/static"`
 }
 
-// TLSConfig manage TLS configuration
+// TLSConfig store TLS configuration
 type TLSConfig struct {
 	Enabled  bool   `flag:"enabled" desc:"Enable TLS" default:"false"`
 	CertFile string `flag:"cert-file" desc:"TLS certificate file (unused if ACME used)" default:"server.pem"`
@@ -52,7 +53,7 @@ type TLSConfig struct {
 	Domain   string `flag:"domain" desc:"TLS domain name used by ACME"`
 }
 
-// Validate configuration
+// Validate the configuration
 func (c *Config) Validate() error {
 	if matched, _ := regexp.MatchString(`^/\w+$`, c.Static.Path); !matched {
 		return fmt.Errorf("invalid static path: %s", c.Static.Path)

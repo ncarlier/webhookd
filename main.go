@@ -23,9 +23,11 @@ import (
 	"github.com/ncarlier/webhookd/pkg/worker"
 )
 
+const envPrefix = "WHD"
+
 func main() {
 	conf := &config.Config{}
-	configflag.Bind(conf, "WHD")
+	configflag.Bind(conf, envPrefix)
 
 	flag.Parse()
 
@@ -46,7 +48,7 @@ func main() {
 	logger.HookOutputEnabled = slices.Contains(conf.Log.Modules, "hook")
 	logger.RequestOutputEnabled = slices.Contains(conf.Log.Modules, "http")
 
-	conf.ManageDeprecatedFlags()
+	conf.ManageDeprecatedFlags(envPrefix)
 
 	slog.Debug("starting webhookd server...")
 

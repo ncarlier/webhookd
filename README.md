@@ -89,7 +89,7 @@ The directory structure define the webhook URL.
 
 You can omit the script extension. If you do, webhookd will search by default for a `.sh` file.
 You can change the default extension using the `WHD_HOOK_DEFAULT_EXT` environment variable or `-hook-default-ext` parameter.
-If the script exists, the output the will be streamed to the HTTP response.
+If the script exists, the output will be streamed to the HTTP response.
 
 The streaming technology depends on the HTTP request:
 

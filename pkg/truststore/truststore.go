@@ -31,14 +31,14 @@ func New(filename string) (store TrustStore, err error) {
 		return nil, nil
 	}
 
-	slog.Debug("loading trust store...", "filname", filename)
+	slog.Debug("loading truststore...", "filname", filename)
 	switch filepath.Ext(filename) {
 	case ".pem":
 		store, err = newPEMTrustStore(filename)
 	case ".p12":
 		store, err = newP12TrustStore(filename)
 	default:
-		err = fmt.Errorf("unsupported trust store file format: %s", filename)
+		err = fmt.Errorf("unsupported truststore file format: %s", filename)
 	}
 
 	return
