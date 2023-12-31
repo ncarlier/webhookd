@@ -18,14 +18,14 @@ var commonMiddlewares = middleware.Middlewares{
 
 func buildMiddlewares(conf *config.Config) middleware.Middlewares {
 	var middlewares = commonMiddlewares
-	if conf.TLS {
+	if conf.TLS.Enabled {
 		middlewares = middlewares.UseAfter(middleware.HSTS)
 	}
 
 	// Load trust store...
-	ts, err := truststore.New(conf.TrustStoreFile)
+	ts, err := truststore.New(conf.TruststoreFile)
 	if err != nil {
-		slog.Warn("unable to load trust store", "filename", conf.TrustStoreFile, "err", err)
+		slog.Warn("unable to load trust store", "filename", conf.TruststoreFile, "err", err)
 	}
 	if ts != nil {
 		middlewares = middlewares.UseAfter(middleware.Signature(ts))
@@ -44,7 +44,7 @@ func buildMiddlewares(conf *config.Config) middleware.Middlewares {
 
 func routes(conf *config.Config) Routes {
 	middlewares := buildMiddlewares(conf)
-	staticPath := conf.StaticPath + "/"
+	staticPath := conf.Static.Path + "/"
 	return Routes{
 		route(
 			"/",

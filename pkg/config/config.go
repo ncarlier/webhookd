@@ -5,33 +5,57 @@ import (
 	"regexp"
 )
 
-// Config contain global configuration
 type Config struct {
-	ListenAddr      string `flag:"listen-addr" desc:"HTTP listen address" default:":8080"`
-	TLS             bool   `flag:"tls" desc:"Activate TLS" default:"false"`
-	TLSCertFile     string `flag:"tls-cert-file" desc:"TLS certificate file" default:"server.pem"`
-	TLSKeyFile      string `flag:"tls-key-file" desc:"TLS key file" default:"server.key"`
-	TLSDomain       string `flag:"tls-domain" desc:"TLS domain name used by ACME"`
-	NbWorkers       int    `flag:"nb-workers" desc:"Number of workers to start" default:"2"`
-	HookDefaultExt  string `flag:"hook-default-ext" desc:"Default extension for hook scripts" default:"sh"`
-	HookTimeout     int    `flag:"hook-timeout" desc:"Maximum hook execution time in second" default:"10"`
-	HookLogDir      string `flag:"hook-log-dir" desc:"Hook execution logs location" default:""`
-	ScriptDir       string `flag:"scripts" desc:"Scripts location" default:"scripts"`
-	PasswdFile      string `flag:"passwd-file" desc:"Password file for basic HTTP authentication" default:".htpasswd"`
-	LogLevel        string `flag:"log-level" desc:"Log level (debug, info, warn, error)" default:"info"`
-	LogFormat       string `flag:"log-format" desc:"Log format (json, text)" default:"text"`
-	LogHookOutput   bool   `flag:"log-hook-output" desc:"Log hook execution output" default:"false"`
-	LogHTTPRequest  bool   `flag:"log-http-request" desc:"Log HTTP request" default:"false"`
-	StaticDir       string `flag:"static-dir" desc:"Static file directory to serve on /static path" default:""`
-	StaticPath      string `flag:"static-path" desc:"Path to serve static file directory" default:"/static"`
-	NotificationURI string `flag:"notification-uri" desc:"Notification URI"`
-	TrustStoreFile  string `flag:"trust-store-file" desc:"Trust store used by HTTP signature verifier (.pem or .p12)"`
+	ListenAddr     string             `flag:"listen-addr" desc:"HTTP listen address" default:":8080"`
+	PasswdFile     string             `flag:"passwd-file" desc:"Password file for basic HTTP authentication" default:".htpasswd"`
+	TruststoreFile string             `flag:"truststore-file" desc:"Truststore used by HTTP signature verifier (.pem or .p12)"`
+	Hook           HookConfig         `flag:"hook"`
+	Log            LogConfig          `flag:"log"`
+	Notification   NotificationConfig `flag:"notification"`
+	Static         StaticConfig       `flag:"static"`
+	TLS            TLSConfig          `flag:"tls"`
+	OldConfig      `flag:""`
+}
+
+// HookConfig manage Hook execution configuration
+type HookConfig struct {
+	DefaultExt string `flag:"default-ext" desc:"Default extension for hook scripts" default:"sh"`
+	Timeout    int    `flag:"timeout" desc:"Maximum hook execution time in second" default:"10"`
+	ScriptsDir string `flag:"scripts" desc:"Scripts location" default:"scripts"`
+	LogDir     string `flag:"log-dir" desc:"Hook execution logs location" default:""`
+	Workers    int    `flag:"workers" desc:"Number of workers to start" default:"2"`
+}
+
+// LogConfig manage the logger configuration
+type LogConfig struct {
+	Level   string   `flag:"level" desc:"Log level (debug, info, warn or error)" default:"info"`
+	Format  string   `flag:"format" desc:"Log format (json or text)" default:"text"`
+	Modules []string `flag:"modules" desc:"Logging modules to activate (http,hook)" default:""`
+}
+
+// NotificationConfig manage notification configuration
+type NotificationConfig struct {
+	URI string `flag:"uri" desc:"Notification URI"`
+}
+
+// StaticConfig manage static assets configuration
+type StaticConfig struct {
+	Dir  string `flag:"dir" desc:"Static file directory to serve on /static path" default:""`
+	Path string `flag:"path" desc:"Path to serve static file directory" default:"/static"`
+}
+
+// TLSConfig manage TLS configuration
+type TLSConfig struct {
+	Enabled  bool   `flag:"enabled" desc:"Enable TLS" default:"false"`
+	CertFile string `flag:"cert-file" desc:"TLS certificate file (unused if ACME used)" default:"server.pem"`
+	KeyFile  string `flag:"key-file" desc:"TLS key file (unused if ACME used)" default:"server.key"`
+	Domain   string `flag:"domain" desc:"TLS domain name used by ACME"`
 }
 
 // Validate configuration
 func (c *Config) Validate() error {
-	if matched, _ := regexp.MatchString(`^/\w+$`, c.StaticPath); !matched {
-		return fmt.Errorf("invalid static path: %s", c.StaticPath)
+	if matched, _ := regexp.MatchString(`^/\w+$`, c.Static.Path); !matched {
+		return fmt.Errorf("invalid static path: %s", c.Static.Path)
 	}
 	return nil
 }

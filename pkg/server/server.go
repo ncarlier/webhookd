@@ -50,7 +50,7 @@ func (s *Server) Shutdown(ctx context.Context) error {
 func NewServer(cfg *config.Config) *Server {
 	logger := slog.NewLogLogger(slog.Default().Handler(), slog.LevelError)
 	server := &Server{
-		tls: cfg.TLS,
+		tls: cfg.TLS.Enabled,
 		self: &http.Server{
 			Addr:     cfg.ListenAddr,
 			Handler:  api.NewRouter(cfg),
@@ -59,14 +59,14 @@ func NewServer(cfg *config.Config) *Server {
 	}
 	if server.tls {
 		// HTTPs server
-		if cfg.TLSDomain == "" {
-			server.certFile = cfg.TLSCertFile
-			server.keyFile = cfg.TLSKeyFile
+		if cfg.TLS.Domain == "" {
+			server.certFile = cfg.TLS.CertFile
+			server.keyFile = cfg.TLS.KeyFile
 		} else {
 			m := &autocert.Manager{
 				Cache:      autocert.DirCache(cacheDir()),
 				Prompt:     autocert.AcceptTOS,
-				HostPolicy: autocert.HostWhitelist(cfg.TLSDomain),
+				HostPolicy: autocert.HostWhitelist(cfg.TLS.Domain),
 			}
 			server.self.TLSConfig = m.TLSConfig()
 			server.certFile = ""
