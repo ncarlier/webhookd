@@ -25,27 +25,27 @@ func NotNil(t *testing.T, actual interface{}, message string) {
 }
 
 // Equal assert that an object is equal to an expected value
-func Equal(t *testing.T, expected, actual interface{}, message string) {
+func Equal[K comparable](t *testing.T, expected, actual K, message string) {
 	if message == "" {
 		message = "Equal assertion failed"
 	}
 	if actual != expected {
-		t.Fatalf("%s - expected: %s, actual: %s", message, expected, actual)
+		t.Fatalf("%s - expected: %v, actual: %v", message, expected, actual)
 	}
 }
 
 // NotEqual assert that an object is not equal to an expected value
-func NotEqual(t *testing.T, expected, actual interface{}, message string) {
+func NotEqual[K comparable](t *testing.T, expected, actual K, message string) {
 	if message == "" {
 		message = "Not equal assertion failed"
 	}
 	if actual == expected {
-		t.Fatalf("%s - unexpected: %s, actual: %s", message, expected, actual)
+		t.Fatalf("%s - unexpected: %v, actual: %v", message, expected, actual)
 	}
 }
 
 // ContainsStr assert that an array contains an expected value
-func ContainsStr(t *testing.T, expected string, array []string, message string) {
+func Contains[K comparable](t *testing.T, expected K, array []K, message string) {
 	if message == "" {
 		message = "Array don't contains expected value"
 	}
@@ -54,7 +54,7 @@ func ContainsStr(t *testing.T, expected string, array []string, message string) 
 			return
 		}
 	}
-	t.Fatalf("%s - array: %v, expected value: %s", message, array, expected)
+	t.Fatalf("%s - array: %v, expected value: %v", message, array, expected)
 }
 
 // True assert that an expression is true
