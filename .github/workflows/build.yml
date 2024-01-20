@@ -75,10 +75,11 @@ jobs:
       uses: docker/metadata-action@v3
       with:
         images: ncarlier/webhookd
+        flavor: suffix=${{ matrix.suffix }}
         tags: |
           type=edge
-          type=semver,pattern={{major}},suffix=${{ matrix.suffix }}
-          type=semver,pattern={{version}},suffix=${{ matrix.suffix }}
+          type=semver,pattern={{major}}
+          type=semver,pattern={{version}}
     - uses: docker/setup-qemu-action@v1
       with:
         image: tonistiigi/binfmt:latest
