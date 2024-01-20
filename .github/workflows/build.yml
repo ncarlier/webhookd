@@ -58,6 +58,14 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: slim
+            suffix: ''
+          - target: distrib
+            suffix: -distrib
     steps:
     - uses: actions/checkout@v4
       with:
@@ -69,7 +77,8 @@ jobs:
         images: ncarlier/webhookd
         tags: |
           type=edge
-          type=semver,pattern={{version}}
+          type=semver,pattern={{major}},suffix=${{ matrix.suffix }}
+          type=semver,pattern={{version}},suffix=${{ matrix.suffix }}
     - uses: docker/setup-qemu-action@v1
       with:
         image: tonistiigi/binfmt:latest
@@ -80,21 +89,12 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN  }}      
-    - name: Build and push Docker image (slim)
+    - name: Build and push Docker image (${{ matrix.target }})
       uses: docker/build-push-action@v2
       with:
         context: .
-        target: slim
+        target: ${{ matrix.target }}
         platforms: linux/amd64,linux/arm64,linux/arm/v7
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-    - name: Build and push Docker image (distrib)
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        target: distrib
-        platforms: linux/amd64,linux/arm64,linux/arm/v7
-        push: ${{ github.event_name != 'pull_request' }}
-        tags: ${{ steps.meta.outputs.tags }}-distrib
         labels: ${{ steps.meta.outputs.labels }}
