@@ -63,7 +63,7 @@ All configuration variables are described in [etc/default/webhookd.env](./etc/de
 Webhooks are simple scripts within a directory structure.
 
 By default inside the `./scripts` directory.
-You can change the default directory using the `WHD_SCRIPTS` environment variable or `-script` parameter.
+You can change the default directory using the `WHD_HOOK_SCRIPTS` environment variable or `-hook-scripts` parameter.
 
 *Example:*
 
@@ -89,7 +89,7 @@ The directory structure define the webhook URL.
 
 You can omit the script extension. If you do, webhookd will search by default for a `.sh` file.
 You can change the default extension using the `WHD_HOOK_DEFAULT_EXT` environment variable or `-hook-default-ext` parameter.
-If the script exists, the output the will be streamed to the HTTP response.
+If the script exists, the output will be streamed to the HTTP response.
 
 The streaming technology depends on the HTTP request:
 
@@ -218,7 +218,7 @@ $ # Retrieve logs afterwards
 $ curl http://localhost:8080/echo/2
 ```
 
-If needed, you can also redirect hook logs to the server output (configured by the `WHD_LOG_HOOK_OUTPUT` environment variable).
+If needed, you can also redirect hook logs to the server output (configured by the `WHD_LOG_MODULES=hook` environment variable).
 
 ### Post hook notifications
 
@@ -327,12 +327,12 @@ Webhookd supports 2 signature methods:
 - [HTTP Signatures](https://www.ietf.org/archive/id/draft-cavage-http-signatures-12.txt)
 - [Ed25519 Signature](https://ed25519.cr.yp.to/) (used by [Discord](https://discord.com/developers/docs/interactions/receiving-and-responding#security-and-authorization))
 
-To activate request signature verification, you have to configure the trust store:
+To activate request signature verification, you have to configure the truststore:
 
 ```bash
-$ export WHD_TRUST_STORE_FILE=/etc/webhookd/pubkey.pem
+$ export WHD_TRUSTSTORE_FILE=/etc/webhookd/pubkey.pem
 $ # or
-$ webhookd --trust-store-file /etc/webhookd/pubkey.pem
+$ webhookd --truststore-file /etc/webhookd/pubkey.pem
 ```
 
 Public key is stored in PEM format.
@@ -361,9 +361,9 @@ You can find a small HTTP client in the ["tooling" directory](./tooling/httpsig/
 You can activate TLS to secure communications:
 
 ```bash
-$ export WHD_TLS=true
+$ export WHD_TLS_ENABLED=true
 $ # or
-$ webhookd --tls
+$ webhookd --tls-enabled
 ```
 
 By default webhookd is expecting a certificate and key file (`./server.pem` and `./server.key`).
@@ -373,10 +373,10 @@ Webhookd also support [ACME](https://ietf-wg-acme.github.io/acme/) protocol.
 You can activate ACME by setting a fully qualified domain name:
 
 ```bash
-$ export WHD_TLS=true
+$ export WHD_TLS_ENABLED=true
 $ export WHD_TLS_DOMAIN=hook.example.com
 $ # or
-$ webhookd --tls --tls-domain=hook.example.com
+$ webhookd --tls-enabled --tls-domain=hook.example.com
 ```
 
 **Note:**

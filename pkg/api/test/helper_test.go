@@ -15,8 +15,8 @@ func TestQueryParamsToShellVars(t *testing.T) {
 		"list":   []string{"foo", "bar"},
 	}
 	values := api.HTTPParamsToShellVars(tc)
-	assert.ContainsStr(t, "string=foo", values, "")
-	assert.ContainsStr(t, "list=foo,bar", values, "")
+	assert.Contains(t, "string=foo", values, "")
+	assert.Contains(t, "list=foo,bar", values, "")
 }
 
 func TestHTTPHeadersToShellVars(t *testing.T) {
@@ -25,6 +25,6 @@ func TestHTTPHeadersToShellVars(t *testing.T) {
 		"X-Foo-Bar":    []string{"foo", "bar"},
 	}
 	values := api.HTTPParamsToShellVars(tc)
-	assert.ContainsStr(t, "content_type=text/plain", values, "")
-	assert.ContainsStr(t, "x_foo_bar=foo,bar", values, "")
+	assert.Contains(t, "content_type=text/plain", values, "")
+	assert.Contains(t, "x_foo_bar=foo,bar", values, "")
 }

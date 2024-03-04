@@ -30,7 +30,6 @@ func StartDispatcher(nworkers int) {
 				slog.Debug("dispatching hook request", "hook", work.Name(), "id", work.ID())
 				worker <- work
 			}()
-
 		}
 	}()
 }

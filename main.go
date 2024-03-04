@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"slices"
 	"syscall"
 	"time"
 
@@ -22,9 +23,11 @@ import (
 	"github.com/ncarlier/webhookd/pkg/worker"
 )
 
+const envPrefix = "WHD"
+
 func main() {
 	conf := &config.Config{}
-	configflag.Bind(conf, "WHD")
+	configflag.Bind(conf, envPrefix)
 
 	flag.Parse()
 
@@ -33,30 +36,32 @@ func main() {
 		os.Exit(0)
 	}
 
-	if conf.HookLogDir == "" {
-		conf.HookLogDir = os.TempDir()
+	if conf.Hook.LogDir == "" {
+		conf.Hook.LogDir = os.TempDir()
 	}
 
 	if err := conf.Validate(); err != nil {
 		log.Fatal("invalid configuration:", err)
 	}
 
-	logger.Configure(conf.LogFormat, conf.LogLevel)
-	logger.HookOutputEnabled = conf.LogHookOutput
-	logger.RequestOutputEnabled = conf.LogHTTPRequest
+	logger.Configure(conf.Log.Format, conf.Log.Level)
+	logger.HookOutputEnabled = slices.Contains(conf.Log.Modules, "hook")
+	logger.RequestOutputEnabled = slices.Contains(conf.Log.Modules, "http")
+
+	conf.ManageDeprecatedFlags(envPrefix)
 
 	slog.Debug("starting webhookd server...")
 
 	srv := server.NewServer(conf)
 
 	// Configure notification
-	if err := notification.Init(conf.NotificationURI); err != nil {
+	if err := notification.Init(conf.Notification.URI); err != nil {
 		slog.Error("unable to create notification channel", "err", err)
 	}
 
 	// Start the dispatcher.
-	slog.Debug("starting the dispatcher...", "workers", conf.NbWorkers)
-	worker.StartDispatcher(conf.NbWorkers)
+	slog.Debug("starting the dispatcher...", "workers", conf.Hook.Workers)
+	worker.StartDispatcher(conf.Hook.Workers)
 
 	done := make(chan bool)
 	quit := make(chan os.Signal, 1)

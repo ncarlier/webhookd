@@ -68,17 +68,18 @@ func ToScreamingDelimited(s string, del uint8, screaming bool) string {
 			}
 		}
 
-		if i > 0 && n[len(n)-1] != del && nextCaseIsChanged {
+		switch {
+		case i > 0 && n[len(n)-1] != del && nextCaseIsChanged:
 			// add underscore if next letter case type is changed
 			if v >= 'A' && v <= 'Z' {
 				n += string(del) + string(v)
 			} else if v >= 'a' && v <= 'z' {
 				n += string(v) + string(del)
 			}
-		} else if v == ' ' || v == '_' || v == '-' || v == '/' {
+		case v == ' ' || v == '_' || v == '-' || v == '/':
 			// replace spaces/underscores with delimiters
 			n += string(del)
-		} else {
+		default:
 			n += string(v)
 		}
 	}

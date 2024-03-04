@@ -94,7 +94,7 @@ func (job *Job) Terminate(err error) error {
 			"id", job.ID(),
 			"status", "error",
 			"err", err,
-			"took", time.Since(job.start).Microseconds(),
+			"took", time.Since(job.start).Milliseconds(),
 		)
 		return err
 	}
@@ -103,7 +103,7 @@ func (job *Job) Terminate(err error) error {
 		"hook", job.Name(),
 		"id", job.ID(),
 		"status", "success",
-		"took", time.Since(job.start).Microseconds(),
+		"took", time.Since(job.start).Milliseconds(),
 	)
 	return nil
 }

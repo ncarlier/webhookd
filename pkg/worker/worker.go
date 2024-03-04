@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	"github.com/ncarlier/webhookd/pkg/metric"
-
 	"github.com/ncarlier/webhookd/pkg/notification"
 )
 
