@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/ncarlier/webhookd/pkg/config"
+	"github.com/ncarlier/webhookd/pkg/helper"
 	"github.com/ncarlier/webhookd/pkg/hook"
 	"github.com/ncarlier/webhookd/pkg/worker"
 )
@@ -22,6 +23,8 @@ var (
 	scriptDir      string
 	outputDir      string
 )
+
+var supportedContentTypes = []string{"text/plain", "text/event-stream", "application/json", "text/*"}
 
 func atoiFallback(str string, fallback int) int {
 	if value, err := strconv.Atoi(str); err == nil && value > 0 {
@@ -118,17 +121,14 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 	// Put work in queue
 	worker.WorkQueue <- job
 
-	// Use content negotiation to enable Server-Sent Events
-	useSSE := r.Method == "GET" && r.Header.Get("Accept") == "text/event-stream"
-	if useSSE {
-		// Send SSE response
-		w.Header().Set("Content-Type", "text/event-stream")
-	} else {
-		// Send chunked response
-		w.Header().Set("X-Content-Type-Options", "nosniff")
-	}
+	// Use content negotiation
+	ct = helper.NegotiateContentType(r, supportedContentTypes, "text/plain")
+
+	// set respons headers
+	w.Header().Set("Content-Type", ct+"; charset=utf-8")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.Header().Set("X-Hook-ID", strconv.FormatUint(job.ID(), 10))
 
 	for {
@@ -136,7 +136,7 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 		if !open {
 			break
 		}
-		if useSSE {
+		if ct == "text/event-stream" {
 			fmt.Fprintf(w, "data: %s\n\n", msg) // Send SSE response
 		} else {
 			fmt.Fprintf(w, "%s\n", msg) // Send chunked response
