@@ -19,7 +19,7 @@ EXECUTABLE=$(APPNAME)$(EXT)
 
 # Extract version infos
 PKG_VERSION:=github.com/ncarlier/$(APPNAME)/pkg/version
-VERSION:=`git describe --always --dirty`
+VERSION:=`git describe --always --tags --dirty`
 GIT_COMMIT:=`git rev-list -1 HEAD --abbrev-commit`
 BUILT:=`date`
 define LDFLAGS
