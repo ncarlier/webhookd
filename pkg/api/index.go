@@ -1,6 +1,8 @@
 package api
 
 import (
+	"bytes"
+	"container/ring"
 	"fmt"
 	"io"
 	"log/slog"
@@ -24,7 +26,13 @@ var (
 	outputDir      string
 )
 
-var supportedContentTypes = []string{"text/plain", "text/event-stream", "application/json", "text/*"}
+const (
+	DefaultBufferLength = 100
+	MaxBufferLength     = 10000
+	SSEContentType      = "text/event-stream"
+)
+
+var supportedContentTypes = []string{"text/plain", SSEContentType, "application/json", "text/*"}
 
 func atoiFallback(str string, fallback int) int {
 	if value, err := strconv.Atoi(str); err == nil && value > 0 {
@@ -53,9 +61,21 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func triggerWebhook(w http.ResponseWriter, r *http.Request) {
+	// Manage content negotiation
+	negociatedContentType := helper.NegotiateContentType(r, supportedContentTypes, "text/plain")
+
+	// Extract streaming method
+	streamingMethod := "none"
+	transfertEncoding := r.Header.Get("X-Hook-TE")
+	if transfertEncoding == "chunked" {
+		streamingMethod = "chunked"
+	}
+	if negociatedContentType == SSEContentType {
+		streamingMethod = "sse"
+	}
+
 	// Check that streaming is supported
-	flusher, ok := w.(http.Flusher)
-	if !ok {
+	if _, ok := w.(http.Flusher); !ok && streamingMethod != "none" {
 		http.Error(w, "streaming not supported", http.StatusInternalServerError)
 		return
 	}
@@ -121,29 +141,96 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 	// Put work in queue
 	worker.WorkQueue <- job
 
-	// Use content negotiation
-	ct = helper.NegotiateContentType(r, supportedContentTypes, "text/plain")
+	// Write hook ouput to the response regarding the asked method
+	if streamingMethod != "none" {
+		// Write hook response as Server Sent Event stream
+		writeStreamedResponse(w, negociatedContentType, job, streamingMethod)
+	} else {
+		maxBufferLength := atoiFallback(r.Header.Get("X-Hook-MaxOutputLines"), DefaultBufferLength)
+		if maxBufferLength > MaxBufferLength {
+			maxBufferLength = MaxBufferLength
+		}
+		// Write hook response after hook execution
+		writeStandardResponse(w, negociatedContentType, job, maxBufferLength)
+	}
+}
 
-	// set respons headers
-	w.Header().Set("Content-Type", ct+"; charset=utf-8")
-	w.Header().Set("Cache-Control", "no-cache")
-	w.Header().Set("Connection", "keep-alive")
-	w.Header().Set("X-Content-Type-Options", "nosniff")
-	w.Header().Set("X-Hook-ID", strconv.FormatUint(job.ID(), 10))
-
+func writeStreamedResponse(w http.ResponseWriter, negociatedContentType string, job *hook.Job, method string) {
+	writeHeaders(w, negociatedContentType, job.ID())
 	for {
 		msg, open := <-job.MessageChan
 		if !open {
 			break
 		}
-		if ct == "text/event-stream" {
-			fmt.Fprintf(w, "data: %s\n\n", msg) // Send SSE response
+
+		if method == "sse" {
+			// Send SSE response
+			prefix := "data: "
+			if bytes.HasPrefix(msg, []byte("error:")) {
+				prefix = ""
+			}
+			fmt.Fprintf(w, "%s%s\n\n", prefix, msg)
 		} else {
-			fmt.Fprintf(w, "%s\n", msg) // Send chunked response
+			// Send chunked response
+			fmt.Fprintf(w, "%s\n", msg)
 		}
+
 		// Flush the data immediately instead of buffering it for later.
-		flusher.Flush()
+		if flusher, ok := w.(http.Flusher); ok {
+			flusher.Flush()
+		}
 	}
+}
+
+func writeStandardResponse(w http.ResponseWriter, negociatedContentType string, job *hook.Job, maxBufferLength int) {
+	buffer := ring.New(maxBufferLength)
+	overflow := false
+	lines := 0
+
+	// Consume messages into a ring buffer
+	for {
+		msg, open := <-job.MessageChan
+		if !open {
+			break
+		}
+		buffer.Value = msg
+		buffer = buffer.Next()
+		lines++
+		if lines > maxBufferLength {
+			overflow = true
+		}
+	}
+
+	writeHeaders(w, negociatedContentType, job.ID())
+	w.WriteHeader(getJobStatusCode(job))
+	if overflow {
+		w.Write([]byte("[output truncated]\n"))
+	}
+	// Write buffer to HTTP response
+	buffer.Do(func(data interface{}) {
+		if data != nil {
+			fmt.Fprintf(w, "%s\n", data.([]byte))
+		}
+	})
+}
+
+func getJobStatusCode(job *hook.Job) int {
+	switch {
+	case job.ExitCode() == 0:
+		return http.StatusOK
+	case job.ExitCode() >= 100:
+		return job.ExitCode() + 300
+	default:
+		return http.StatusInternalServerError
+	}
+}
+
+func writeHeaders(w http.ResponseWriter, contentType string, hookId uint64) {
+	w.Header().Set("Content-Type", contentType+"; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.Header().Set("X-Hook-ID", strconv.FormatUint(hookId, 10))
 }
 
 func getWebhookLog(w http.ResponseWriter, r *http.Request) {
@@ -160,7 +247,7 @@ func getWebhookLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Retrieve log file
-	logFile, err := hook.Logs(id, hookName, outputDir)
+	logFile, err := hook.GetLogFile(id, hookName, outputDir)
 	if err != nil {
 		slog.Error(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
