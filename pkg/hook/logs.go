@@ -9,8 +9,8 @@ import (
 	"github.com/ncarlier/webhookd/pkg/helper"
 )
 
-// Logs get hook log with its name and id
-func Logs(id, name, base string) (*os.File, error) {
+// GetLogFile get hook log with its name and id
+func GetLogFile(id, name, base string) (*os.File, error) {
 	logPattern := path.Join(base, fmt.Sprintf("%s_%s_*.txt", helper.ToSnake(name), id))
 	files, err := filepath.Glob(logPattern)
 	if err != nil {

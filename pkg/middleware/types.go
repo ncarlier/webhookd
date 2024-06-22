@@ -8,7 +8,7 @@ type Middleware func(inner http.Handler) http.Handler
 // Middlewares list
 type Middlewares []Middleware
 
-// UseBefore insert a middleware at the begining of the middleware chain
+// UseBefore insert a middleware at the beginning of the middleware chain
 func (ms Middlewares) UseBefore(m Middleware) Middlewares {
 	return append([]Middleware{m}, ms...)
 }

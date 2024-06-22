@@ -36,6 +36,7 @@ type Job struct {
 	status      Status
 	logFilename string
 	err         error
+	exitCode    int
 	mutex       sync.Mutex
 }
 
@@ -85,7 +86,11 @@ func (job *Job) Terminate(err error) error {
 	job.mutex.Lock()
 	defer job.mutex.Unlock()
 	job.status = Success
+
 	if err != nil {
+		if exiterr, ok := err.(*exec.ExitError); ok {
+			job.exitCode = exiterr.ExitCode()
+		}
 		job.status = Error
 		job.err = err
 		slog.Error(
@@ -93,6 +98,7 @@ func (job *Job) Terminate(err error) error {
 			"hook", job.Name(),
 			"id", job.ID(),
 			"status", "error",
+			"exitCode", job.exitCode,
 			"err", err,
 			"took", time.Since(job.start).Milliseconds(),
 		)
@@ -134,14 +140,25 @@ func (job *Job) StatusLabel() string {
 	}
 }
 
+// ExitCode of the underlying process job
+// Can be 0 if the process is not over
+func (job *Job) ExitCode() int {
+	return job.exitCode
+}
+
 // SendMessage send message to the message channel
 func (job *Job) SendMessage(message string) {
 	job.MessageChan <- []byte(message)
 }
 
+// OpenLogFile open job log file
+func (job *Job) OpenLogFile() (*os.File, error) {
+	return os.Open(job.logFilename)
+}
+
 // Logs returns job logs filtered with the prefix
 func (job *Job) Logs(prefixFilter string) string {
-	file, err := os.Open(job.logFilename)
+	file, err := job.OpenLogFile()
 	if err != nil {
 		return err.Error()
 	}
