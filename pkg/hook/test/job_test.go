@@ -46,7 +46,7 @@ func TestHookJob(t *testing.T) {
 
 	// Test that we can retrieve log file afterward
 	id := strconv.FormatUint(job.ID(), 10)
-	logFile, err := hook.Logs(id, "test", os.TempDir())
+	logFile, err := hook.GetLogFile(id, "test", os.TempDir())
 	assert.Nil(t, err, "Log file should exists")
 	defer logFile.Close()
 	assert.NotNil(t, logFile, "Log file should be retrieve")
@@ -70,6 +70,7 @@ func TestWorkRunnerWithError(t *testing.T) {
 	assert.NotNil(t, err, "")
 	assert.Equal(t, job.Status(), hook.Error, "")
 	assert.Equal(t, "exit status 1", err.Error(), "")
+	assert.Equal(t, 1, job.ExitCode(), "")
 }
 
 func TestWorkRunnerWithTimeout(t *testing.T) {

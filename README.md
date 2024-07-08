@@ -83,23 +83,36 @@ For example, you can execute a Node.js file if you give execution rights to the 
 You can find sample scripts in the [example folder](./scripts/examples).
 In particular, examples of integration with Gitlab and Github.
 
-### Webhook URL
+### Webhook call
 
 The directory structure define the webhook URL.
 
 You can omit the script extension. If you do, webhookd will search by default for a `.sh` file.
 You can change the default extension using the `WHD_HOOK_DEFAULT_EXT` environment variable or `-hook-default-ext` parameter.
-If the script exists, the output will be streamed to the HTTP response.
+If the script exists, the output will be send to the HTTP response.
 
-The streaming technology depends on the HTTP request:
+Depending on the HTTP request, the HTTP response will be a HTTP `200` code with the script's output in real time (streaming), or the HTTP response will wait until the end of the script's execution and return the output (tuncated) of the script as well as an HTTP code relative to the script's output code.
 
-- [Server-sent events][sse] is used when:
-  - Using `GET` verb
-  - Using `text/event-stream` in `Accept` request header
-- [Chunked Transfer Coding][chunked] is used otherwise.
+The streaming protocol depends on the HTTP request:
+
+- [Server-sent events][sse] is used when `Accept` HTTP header is equal to `text/event-stream`.
+- [Chunked Transfer Coding][chunked] is used when `X-Hook-Mode` HTTP header is equal to `chunked`.
+It's the default mode.
+You can change the default mode using the `WHD_HOOK_DEFAULT_MODE` environment variable or `-hook-default-mode` parameter.
 
 [sse]: https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
 [chunked]: https://datatracker.ietf.org/doc/html/rfc2616#section-3.6.1
+
+If no streaming protocol is needed, yous must set `X-Hook-Mode` HTTP header to `buffered`.
+The HTTP reponse will block until the script is over:
+
+- Sends script output limited to the last 100 lines. You can modify this limit via the HTTP header `X-Hook-MaxBufferedLines`.
+- Convert the script exit code to HTTP code as follow:
+  - 0: `200 OK`
+  - Between 1 and 99: `500 Internal Server Error`
+  - Between 100 and 255: Add 300 to get HTTP code between 400 and 555
+
+> Remember: a process exit code is between 0 and 255. 0 means that the execution is successful.
 
 *Example:*
 
@@ -110,21 +123,11 @@ The script: `./scripts/foo/bar.sh`
 
 echo "foo foo foo"
 echo "bar bar bar"
+
+exit 118
 ```
 
-Output using `POST` or `GET` (`Chunked Transfer Coding`):
-
-```bash
-$ curl -v -XPOST http://localhost:8080/foo/bar
-< HTTP/1.1 200 OK
-< Content-Type: text/plain; charset=utf-8
-< Transfer-Encoding: chunked
-< X-Hook-Id: 7
-foo foo foo
-bar bar bar
-```
-
-Output using  `GET` and `Accept` header (`Server-sent events`):
+Streamed output using  `Server-sent events`:
 
 ```bash
 $ curl -v --header "Accept: text/event-stream" -XGET http://localhost:8080/foo/bar
@@ -132,10 +135,43 @@ $ curl -v --header "Accept: text/event-stream" -XGET http://localhost:8080/foo/b
 < Content-Type: text/event-stream
 < Transfer-Encoding: chunked
 < X-Hook-Id: 8
+
 data: foo foo foo
 
 data: bar bar bar
+
+error: exit status 118
 ```
+
+Streamed output using `Chunked Transfer Coding`:
+
+```bash
+$ curl -v -XPOST --header "X-Hook-Mode: chunked" http://localhost:8080/foo/bar
+< HTTP/1.1 200 OK
+< Content-Type: text/plain; charset=utf-8
+< Transfer-Encoding: chunked
+< X-Hook-Id: 7
+
+foo foo foo
+bar bar bar
+error: exit status 118
+
+```
+
+Blocking HTTP request:
+
+```bash
+$ curl -v -XPOST --header "X-Hook-Mode: buffered" http://localhost:8080/foo/bar
+< HTTP/1.1 418 I m a teapot
+< Content-Type: text/plain; charset=utf-8
+< X-Hook-Id: 9
+
+foo foo foo
+bar bar bar
+error: exit status 118
+```
+
+> Note that in this last example the HTTP response is equal to `exit code + 300` : `318 I'm a teapot`.
 
 ### Webhook parameters
 
@@ -211,7 +247,7 @@ $ # Call webhook
 $ curl -v http://localhost:8080/echo?foo=bar
 ...
 < HTTP/1.1 200 OK
-< Content-Type: text/event-stream
+< Content-Type: text/plain
 < X-Hook-Id: 2
 ...
 $ # Retrieve logs afterwards
