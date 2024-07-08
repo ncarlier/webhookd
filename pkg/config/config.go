@@ -20,11 +20,12 @@ type Config struct {
 
 // HookConfig store Hook execution configuration
 type HookConfig struct {
-	DefaultExt string `flag:"default-ext" desc:"Default extension for hook scripts" default:"sh"`
-	Timeout    int    `flag:"timeout" desc:"Maximum hook execution time in second" default:"10"`
-	ScriptsDir string `flag:"scripts" desc:"Scripts location" default:"scripts"`
-	LogDir     string `flag:"log-dir" desc:"Hook execution logs location" default:""`
-	Workers    int    `flag:"workers" desc:"Number of workers to start" default:"2"`
+	DefaultExt  string `flag:"default-ext" desc:"Default extension for hook scripts" default:"sh"`
+	DefaultMode string `flag:"default-mode" desc:"Hook default response mode (chuncked,buffered)" default:"chuncked"`
+	Timeout     int    `flag:"timeout" desc:"Maximum hook execution time in second" default:"10"`
+	ScriptsDir  string `flag:"scripts" desc:"Scripts location" default:"scripts"`
+	LogDir      string `flag:"log-dir" desc:"Hook execution logs location" default:""`
+	Workers     int    `flag:"workers" desc:"Number of workers to start" default:"2"`
 }
 
 // LogConfig store logger configuration

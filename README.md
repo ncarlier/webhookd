@@ -91,19 +91,22 @@ You can omit the script extension. If you do, webhookd will search by default fo
 You can change the default extension using the `WHD_HOOK_DEFAULT_EXT` environment variable or `-hook-default-ext` parameter.
 If the script exists, the output will be send to the HTTP response.
 
-Depending on the HTTP request, the HTTP response will be a HTTP `200` code with the script's output in real time (streaming), or the HTTP response will wait until the end of the script's execution and return the output (tuncated) of the script as well as an HTTP code relative to the script's output code :
+Depending on the HTTP request, the HTTP response will be a HTTP `200` code with the script's output in real time (streaming), or the HTTP response will wait until the end of the script's execution and return the output (tuncated) of the script as well as an HTTP code relative to the script's output code.
 
 The streaming protocol depends on the HTTP request:
 
 - [Server-sent events][sse] is used when `Accept` HTTP header is equal to `text/event-stream`.
-- [Chunked Transfer Coding][chunked] is used when `X-Hook-TE` HTTP header is equal to `chunked`.
+- [Chunked Transfer Coding][chunked] is used when `X-Hook-Mode` HTTP header is equal to `chunked`.
+It's the default mode.
+You can change the default mode using the `WHD_HOOK_DEFAULT_MODE` environment variable or `-hook-default-mode` parameter.
 
 [sse]: https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
 [chunked]: https://datatracker.ietf.org/doc/html/rfc2616#section-3.6.1
 
-If no streaming protocol is asked, the HTTP reponse block until the script is over:
+If no streaming protocol is needed, yous must set `X-Hook-Mode` HTTP header to `buffered`.
+The HTTP reponse will block until the script is over:
 
-- Sends script output limited to the last 100 lines. You can modify this limit via the HTTP header `X-Hook-MaxOutputLines`.
+- Sends script output limited to the last 100 lines. You can modify this limit via the HTTP header `X-Hook-MaxBufferedLines`.
 - Convert the script exit code to HTTP code as follow:
   - 0: `200 OK`
   - Between 1 and 99: `500 Internal Server Error`
@@ -143,7 +146,7 @@ error: exit status 118
 Streamed output using `Chunked Transfer Coding`:
 
 ```bash
-$ curl -v -XPOST --header "X-Hook-TE: chunked" http://localhost:8080/foo/bar
+$ curl -v -XPOST --header "X-Hook-Mode: chunked" http://localhost:8080/foo/bar
 < HTTP/1.1 200 OK
 < Content-Type: text/plain; charset=utf-8
 < Transfer-Encoding: chunked
@@ -158,7 +161,7 @@ error: exit status 118
 Blocking HTTP request:
 
 ```bash
-$ curl -v -XPOST http://localhost:8080/foo/bar
+$ curl -v -XPOST --header "X-Hook-Mode: buffered" http://localhost:8080/foo/bar
 < HTTP/1.1 418 I m a teapot
 < Content-Type: text/plain; charset=utf-8
 < X-Hook-Id: 9

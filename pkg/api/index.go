@@ -22,6 +22,7 @@ import (
 var (
 	defaultTimeout int
 	defaultExt     string
+	defaultMode    string
 	scriptDir      string
 	outputDir      string
 )
@@ -47,6 +48,7 @@ func index(conf *config.Config) http.Handler {
 	defaultExt = conf.Hook.DefaultExt
 	scriptDir = conf.Hook.ScriptsDir
 	outputDir = conf.Hook.LogDir
+	defaultMode = conf.Hook.DefaultMode
 	return http.HandlerFunc(webhookHandler)
 }
 
@@ -65,17 +67,16 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 	negociatedContentType := helper.NegotiateContentType(r, supportedContentTypes, "text/plain")
 
 	// Extract streaming method
-	streamingMethod := "none"
-	transfertEncoding := r.Header.Get("X-Hook-TE")
-	if transfertEncoding == "chunked" {
-		streamingMethod = "chunked"
+	mode := r.Header.Get("X-Hook-Mode")
+	if mode != "buffered" && mode != "chunked" {
+		mode = defaultMode
 	}
 	if negociatedContentType == SSEContentType {
-		streamingMethod = "sse"
+		mode = "sse"
 	}
 
 	// Check that streaming is supported
-	if _, ok := w.(http.Flusher); !ok && streamingMethod != "none" {
+	if _, ok := w.(http.Flusher); !ok && mode != "buffered" {
 		http.Error(w, "streaming not supported", http.StatusInternalServerError)
 		return
 	}
@@ -142,11 +143,11 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 	worker.WorkQueue <- job
 
 	// Write hook ouput to the response regarding the asked method
-	if streamingMethod != "none" {
+	if mode != "buffered" {
 		// Write hook response as Server Sent Event stream
-		writeStreamedResponse(w, negociatedContentType, job, streamingMethod)
+		writeStreamedResponse(w, negociatedContentType, job, mode)
 	} else {
-		maxBufferLength := atoiFallback(r.Header.Get("X-Hook-MaxOutputLines"), DefaultBufferLength)
+		maxBufferLength := atoiFallback(r.Header.Get("X-Hook-MaxBufferedLines"), DefaultBufferLength)
 		if maxBufferLength > MaxBufferLength {
 			maxBufferLength = MaxBufferLength
 		}
@@ -155,7 +156,7 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func writeStreamedResponse(w http.ResponseWriter, negociatedContentType string, job *hook.Job, method string) {
+func writeStreamedResponse(w http.ResponseWriter, negociatedContentType string, job *hook.Job, mode string) {
 	writeHeaders(w, negociatedContentType, job.ID())
 	for {
 		msg, open := <-job.MessageChan
@@ -163,7 +164,7 @@ func writeStreamedResponse(w http.ResponseWriter, negociatedContentType string, 
 			break
 		}
 
-		if method == "sse" {
+		if mode == "sse" {
 			// Send SSE response
 			prefix := "data: "
 			if bytes.HasPrefix(msg, []byte("error:")) {
