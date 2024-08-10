@@ -107,7 +107,8 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 	ct := r.Header.Get("Content-Type")
 	if ct != "" {
 		mediatype, _, _ := mime.ParseMediaType(ct)
-		if strings.HasPrefix(mediatype, "text/") || mediatype == "application/json" {
+		switch {
+		case mediatype == "application/json", strings.HasPrefix(mediatype, "text/"):
 			body, err = io.ReadAll(r.Body)
 			if err != nil {
 				msg := "unable to read request body"
@@ -115,6 +116,15 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, msg, http.StatusBadRequest)
 				return
 			}
+		case mediatype == "multipart/form-data":
+			if err := r.ParseMultipartForm(8 << 20); err != nil {
+				msg := "unable to parse multipart/form-data"
+				slog.Error(msg, "err", err)
+				http.Error(w, msg, http.StatusBadRequest)
+				return
+			}
+		default:
+			slog.Debug("unsuported media type", "media_type", mediatype)
 		}
 	}
 
