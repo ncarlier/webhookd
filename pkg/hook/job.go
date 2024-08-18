@@ -242,9 +242,17 @@ func (job *Job) Run() error {
 
 	// Write script output to log file and the work message channel
 	go func(reader io.Reader) {
-		scanner := bufio.NewScanner(reader)
-		for scanner.Scan() {
-			line := scanner.Text()
+		r := bufio.NewReader(reader)
+		for {
+			line, err := r.ReadString('\n')
+			if err != nil {
+				if err == io.EOF {
+					break
+				}
+				slog.Error("error while reading hook std[out/err]", "hook", job.name, "id", job.id, "err", err)
+				break
+			}
+			line, _ = strings.CutSuffix(line, "\r")
 			// writing to the work channel
 			if !job.IsTerminated() {
 				job.MessageChan <- []byte(line)
@@ -265,9 +273,6 @@ func (job *Job) Run() error {
 				slog.Error("error while writing into the log file", "filename", logFile.Name(), "err", err)
 				break
 			}
-		}
-		if err := scanner.Err(); err != nil {
-			slog.Error("hook is unable to read script stdout", "hook", job.name, "id", job.id, "err", err)
 		}
 		wg.Done()
 	}(cmdReader)
