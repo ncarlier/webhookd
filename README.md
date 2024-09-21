@@ -103,7 +103,7 @@ You can change the default mode using the `WHD_HOOK_DEFAULT_MODE` environment va
 [sse]: https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
 [chunked]: https://datatracker.ietf.org/doc/html/rfc2616#section-3.6.1
 
-If no streaming protocol is needed, yous must set `X-Hook-Mode` HTTP header to `buffered`.
+If no streaming protocol is needed, you must set `X-Hook-Mode` HTTP header to `buffered`.
 The HTTP reponse will block until the script is over:
 
 - Sends script output limited to the last 100 lines. You can modify this limit via the HTTP header `X-Hook-MaxBufferedLines`.
@@ -171,7 +171,7 @@ bar bar bar
 error: exit status 118
 ```
 
-> Note that in this last example the HTTP response is equal to `exit code + 300` : `318 I'm a teapot`.
+> Note that in this last example the HTTP response is equal to `exit code + 300` : `418 I'm a teapot`.
 
 ### Webhook parameters
 
