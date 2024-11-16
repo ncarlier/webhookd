@@ -180,10 +180,10 @@ func writeStreamedResponse(w http.ResponseWriter, negociatedContentType string, 
 			if bytes.HasPrefix(msg, []byte("error:")) {
 				prefix = ""
 			}
-			fmt.Fprintf(w, "%s%s\n\n", prefix, msg)
+			fmt.Fprintf(w, "%s%s\n", prefix, msg)
 		} else {
 			// Send chunked response
-			fmt.Fprintf(w, "%s\n", msg)
+			w.Write(msg)
 		}
 
 		// Flush the data immediately instead of buffering it for later.
@@ -220,7 +220,7 @@ func writeStandardResponse(w http.ResponseWriter, negociatedContentType string, 
 	// Write buffer to HTTP response
 	buffer.Do(func(data interface{}) {
 		if data != nil {
-			fmt.Fprintf(w, "%s\n", data.([]byte))
+			w.Write(data.([]byte))
 		}
 	})
 }
