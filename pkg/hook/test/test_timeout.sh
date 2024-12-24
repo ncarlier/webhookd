@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
 echo "Running timeout test script..."
 
-for i in {1..5}; do
+for i in `seq 5`; do
   sleep .5
   echo "running..."
 done
