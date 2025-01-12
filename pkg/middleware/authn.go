@@ -12,9 +12,9 @@ const xWebAuthUser = "X-WebAuth-User"
 func AuthN(authenticator auth.Authenticator) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Del(xWebAuthUser)
+			r.Header.Del(xWebAuthUser)
 			if ok, username := authenticator.Validate(r); ok {
-				w.Header().Set(xWebAuthUser, username)
+				r.Header.Set(xWebAuthUser, username)
 				next.ServeHTTP(w, r)
 				return
 			}
