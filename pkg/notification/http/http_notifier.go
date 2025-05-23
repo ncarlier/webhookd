@@ -27,7 +27,7 @@ type httpNotifier struct {
 }
 
 func newHTTPNotifier(uri *url.URL) (notification.Notifier, error) {
-	slog.Info("using HTTP notification system ", "uri", uri.Opaque)
+	slog.Info("using HTTP notification system", "uri", uri.Redacted())
 	return &httpNotifier{
 		URL:          uri,
 		PrefixFilter: helper.GetValueOrAlt(uri.Query(), "prefix", "notify:"),

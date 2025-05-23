@@ -28,7 +28,7 @@ type smtpNotifier struct {
 }
 
 func newSMTPNotifier(uri *url.URL) (notification.Notifier, error) {
-	slog.Info("using SMTP notification system", "uri", uri.Opaque)
+	slog.Info("using SMTP notification system", "uri", uri.Redacted())
 	q := uri.Query()
 	return &smtpNotifier{
 		Host:         helper.GetValueOrAlt(q, "smtp", "localhost:25"),
