@@ -3,7 +3,6 @@ package hook
 import (
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 
 	"github.com/ncarlier/webhookd/pkg/helper"
@@ -11,7 +10,7 @@ import (
 
 // GetLogFile get hook log with its name and id
 func GetLogFile(id, name, base string) (*os.File, error) {
-	logPattern := path.Join(base, fmt.Sprintf("%s_%s_*.txt", helper.ToSnake(name), id))
+	logPattern := filepath.Join(base, fmt.Sprintf("%s_%s_*.txt", helper.ToSnake(name), id))
 	files, err := filepath.Glob(logPattern)
 	if err != nil {
 		return nil, err

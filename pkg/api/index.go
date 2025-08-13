@@ -249,7 +249,7 @@ func getWebhookLog(w http.ResponseWriter, r *http.Request) {
 	id := path.Base(r.URL.Path)
 
 	// Get script location
-	hookName := path.Dir(strings.TrimPrefix(r.URL.Path, "/"))
+	hookName := filepath.Dir(strings.TrimPrefix(r.URL.Path, "/"))
 	_, err := hook.ResolveScript(scriptDir, hookName, defaultExt)
 	if err != nil {
 		slog.Error(err.Error())

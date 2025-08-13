@@ -3,16 +3,16 @@ package hook
 import (
 	"errors"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 )
 
 // ResolveScript is resolving the target script.
 func ResolveScript(dir, name, defaultExt string) (string, error) {
-	if path.Ext(name) == "" {
+	if filepath.Ext(name) == "" {
 		name += "." + defaultExt
 	}
-	script := path.Clean(path.Join(dir, name))
+	script := filepath.Clean(filepath.Join(dir, name))
 	if !strings.HasPrefix(script, dir) {
 		return "", errors.New("Invalid script path: " + name)
 	}

@@ -8,12 +8,11 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
-	"syscall"
 	"time"
 
 	"github.com/ncarlier/webhookd/pkg/helper"
@@ -53,7 +52,7 @@ func NewHookJob(request *Request) (*Job, error) {
 		MessageChan: make(chan []byte),
 		status:      Idle,
 	}
-	job.logFilename = path.Join(request.OutputDir, fmt.Sprintf("%s_%d_%s.txt", helper.ToSnake(job.name), job.id, time.Now().Format("20060102_1504")))
+	job.logFilename = filepath.Join(request.OutputDir, fmt.Sprintf("%s_%d_%s.txt", helper.ToSnake(job.name), job.id, time.Now().Format("20060102_1504")))
 	return job, nil
 }
 
@@ -206,7 +205,7 @@ func (job *Job) Run() error {
 	// and hook meta...
 	cmd.Env = append(cmd.Env, job.Meta()...)
 	// using a process group...
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	setupProcessGroup(cmd)
 
 	// Open the log file for writing
 	logFile, err := os.Create(job.logFilename)
@@ -280,7 +279,7 @@ func (job *Job) Run() error {
 	// Start timeout timer
 	timer := time.AfterFunc(time.Duration(job.timeout)*time.Second, func() {
 		slog.Warn("hook has timed out: killing process...", "hook", job.name, "id", job.id, "timeout", job.timeout, "pid", cmd.Process.Pid)
-		syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+		killProcess(cmd.Process.Pid)
 	})
 
 	// Wait for command output completion
