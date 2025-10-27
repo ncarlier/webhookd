@@ -37,8 +37,6 @@ ARG UID=1000
 RUN adduser \
     --disabled-password \
     --gecos "" \
-    --home "$(pwd)" \
-    --no-create-home \
     --uid "$UID" \
     "$USER"
 
@@ -75,8 +73,6 @@ ARG UID=1000
 RUN adduser \
     --disabled-password \
     --gecos "" \
-    --home "$(pwd)" \
-    --no-create-home \
     --uid "$UID" \
     "$USER"
 
