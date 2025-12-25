@@ -21,7 +21,7 @@ Run the following command:
 $ go install github.com/ncarlier/webhookd@latest
 ```
 
-**Or** download the binary regarding your architecture:
+**Or** download the binary for your architecture:
 
 ```bash
 $ sudo curl -s https://raw.githubusercontent.com/ncarlier/webhookd/master/install.sh | bash
@@ -46,7 +46,7 @@ $ docker run -d --name=webhookd \
 Finally, it is possible to install Webhookd using the Debian packaging system through this [custom repository](https://packages.azlux.fr/).
 
 > Note: Custom configuration variables can be set into `/etc/webhookd.env` file.
-> Sytemd service is already set and enable, you just have to start it with `systemctl start webhookd`.
+> Systemd service is already set and enabled, you just have to start it with `systemctl start webhookd`.
 
 ## Configuration
 
@@ -85,13 +85,13 @@ In particular, examples of integration with Gitlab and Github.
 
 ### Webhook call
 
-The directory structure define the webhook URL.
+The directory structure defines the webhook URL.
 
 You can omit the script extension. If you do, webhookd will search by default for a `.sh` file.
 You can change the default extension using the `WHD_HOOK_DEFAULT_EXT` environment variable or `-hook-default-ext` parameter.
-If the script exists, the output will be send to the HTTP response.
+If the script exists, the output will be sent to the HTTP response.
 
-Depending on the HTTP request, the HTTP response will be a HTTP `200` code with the script's output in real time (streaming), or the HTTP response will wait until the end of the script's execution and return the output (tuncated) of the script as well as an HTTP code relative to the script's output code.
+Depending on the HTTP request, the HTTP response will be a HTTP `200` code with the script's output in real time (streaming), or the HTTP response will wait until the end of the script's execution and return the output (truncated) of the script as well as an HTTP code relative to the script's output code.
 
 The streaming protocol depends on the HTTP request:
 
@@ -104,7 +104,7 @@ You can change the default mode using the `WHD_HOOK_DEFAULT_MODE` environment va
 [chunked]: https://datatracker.ietf.org/doc/html/rfc2616#section-3.6.1
 
 If no streaming protocol is needed, you must set `X-Hook-Mode` HTTP header to `buffered`.
-The HTTP reponse will block until the script is over:
+The HTTP response will block until the script is over:
 
 - Sends script output limited to the last 100 lines. You can modify this limit via the HTTP header `X-Hook-MaxBufferedLines`.
 - Convert the script exit code to HTTP code as follow:
@@ -127,7 +127,7 @@ echo "bar bar bar"
 exit 118
 ```
 
-Streamed output using  `Server-sent events`:
+Streamed output using `Server-sent events`:
 
 ```bash
 $ curl -v --header "Accept: text/event-stream" -XGET http://localhost:8080/foo/bar
@@ -181,7 +181,7 @@ You have several ways to provide parameters to your webhook script:
 - HTTP headers are converted to script variables
 - Request body (depending the Media Type):
   - `application/x-www-form-urlencoded`: keys and values are converted to script variables
-  - `text/*` or `application/json`: payload is transmit to the script as first parameter.
+  - `text/*` or `application/json`: payload is transmitted to the script as first parameter.
 
 > Note: Variable name follows "snakecase" naming convention.
 Therefore the name can be altered.
@@ -337,7 +337,7 @@ To activate basic authentication, you have to create a `htpasswd` file:
 $ # create passwd file the user 'api'
 $ htpasswd -B -c .htpasswd api
 ```
-This command will ask for a password and store it in the htpawsswd file.
+This command will ask for a password and store it in the htpasswd file.
 
 By default, the daemon will try to load the `.htpasswd` file.
 But you can override this behavior by specifying the location of the file:
@@ -405,7 +405,7 @@ $ webhookd --tls-enabled
 By default webhookd is expecting a certificate and key file (`./server.pem` and `./server.key`).
 You can provide your own certificate and key with `-tls-cert-file` and `-tls-key-file`.
 
-Webhookd also support [ACME](https://ietf-wg-acme.github.io/acme/) protocol.
+Webhookd also supports [ACME](https://ietf-wg-acme.github.io/acme/) protocol.
 You can activate ACME by setting a fully qualified domain name:
 
 ```bash
