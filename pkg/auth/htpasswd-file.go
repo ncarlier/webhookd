@@ -24,6 +24,10 @@ type HtpasswdFile struct {
 
 // NewHtpasswdFromFile reads the users and passwords from a htpasswd file and returns them.
 func NewHtpasswdFromFile(path string) (*HtpasswdFile, error) {
+	if path == "" {
+		return nil, nil
+	}
+
 	r, err := os.Open(path)
 	if err != nil {
 		return nil, err

@@ -15,16 +15,18 @@ import (
 
 	"github.com/ncarlier/webhookd/pkg/config"
 	"github.com/ncarlier/webhookd/pkg/helper"
+	"github.com/ncarlier/webhookd/pkg/helper/header"
 	"github.com/ncarlier/webhookd/pkg/hook"
 	"github.com/ncarlier/webhookd/pkg/worker"
 )
 
 var (
-	defaultTimeout int
-	defaultExt     string
-	defaultMode    string
-	scriptDir      string
-	outputDir      string
+	defaultTimeout         int
+	defaultExt             string
+	defaultMode            string
+	scriptDir              string
+	outputDir              string
+	allowedUpstreamHeaders []string
 )
 
 const (
@@ -49,6 +51,7 @@ func index(conf *config.Config) http.Handler {
 	scriptDir = conf.Hook.ScriptsDir
 	outputDir = conf.Hook.LogDir
 	defaultMode = conf.Hook.DefaultMode
+	allowedUpstreamHeaders = conf.AllowedUpstreamHeaders
 	return http.HandlerFunc(webhookHandler)
 }
 
@@ -129,7 +132,9 @@ func triggerWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := HTTPParamsToShellVars(r.Form)
-	params = append(params, HTTPParamsToShellVars(r.Header)...)
+
+	filteredHeaders := header.FilterHeaders(r.Header, allowedUpstreamHeaders)
+	params = append(params, HTTPParamsToShellVars(filteredHeaders)...)
 
 	// Create hook job
 	timeout := atoiFallback(r.Header.Get("X-Hook-Timeout"), defaultTimeout)

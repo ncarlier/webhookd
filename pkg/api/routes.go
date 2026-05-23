@@ -5,6 +5,7 @@ import (
 
 	"github.com/ncarlier/webhookd/pkg/auth"
 	"github.com/ncarlier/webhookd/pkg/config"
+	"github.com/ncarlier/webhookd/pkg/helper"
 	"github.com/ncarlier/webhookd/pkg/middleware"
 	"github.com/ncarlier/webhookd/pkg/truststore"
 )
@@ -34,10 +35,13 @@ func buildMiddlewares(conf *config.Config) middleware.Middlewares {
 	// Load authenticator...
 	authenticator, err := auth.NewHtpasswdFromFile(conf.PasswdFile)
 	if err != nil {
-		slog.Debug("unable to load htpasswd file", "filename", conf.PasswdFile, "err", err)
+		slog.Warn("unable to load htpasswd file", "filename", conf.PasswdFile, "err", err)
 	}
+
 	if authenticator != nil {
 		middlewares = middlewares.UseAfter(middleware.AuthN(authenticator))
+	} else if helper.ContainsFold(conf.AllowedUpstreamHeaders, middleware.UpstreamAuthHeader) {
+		slog.Info("using upstream authentication", "header", middleware.UpstreamAuthHeader)
 	}
 	return middlewares
 }

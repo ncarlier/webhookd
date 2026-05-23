@@ -6,15 +6,15 @@ import (
 	"github.com/ncarlier/webhookd/pkg/auth"
 )
 
-const xWebAuthUser = "X-WebAuth-User"
+const UpstreamAuthHeader = "X-WebAuth-User"
 
 // AuthN is a middleware to checks HTTP request credentials
 func AuthN(authenticator auth.Authenticator) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			r.Header.Del(xWebAuthUser)
+			r.Header.Del(UpstreamAuthHeader)
 			if ok, username := authenticator.Validate(r); ok {
-				r.Header.Set(xWebAuthUser, username)
+				r.Header.Set(UpstreamAuthHeader, username)
 				next.ServeHTTP(w, r)
 				return
 			}

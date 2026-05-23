@@ -1,36 +1,41 @@
-# webhookd
+# webhookd: A Simple Webhook Server
 
 [![Build Status](https://github.com/ncarlier/webhookd/actions/workflows/build.yml/badge.svg)](https://github.com/ncarlier/webhookd/actions/workflows/build.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ncarlier/webhookd)](https://goreportcard.com/report/github.com/ncarlier/webhookd)
 [![Docker pulls](https://img.shields.io/docker/pulls/ncarlier/webhookd.svg)](https://hub.docker.com/r/ncarlier/webhookd/)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/nunux)
 
-A very simple webhook server to launch shell scripts.
+A minimalist, powerful webhook server designed to easily trigger shell scripts and run external processes via HTTP requests.
 
 ![Logo](webhookd.svg)
 
-## At a glance
+## 🚀 At a glance
 
-![Demo](demo.gif)
+![Demo GIF](demo.gif)
 
 ## Installation
 
-Run the following command:
+Choose the method that best suits your deployment environment:
 
+### 1. Go Install (Recommended)
+For developers who have Go installed:
 ```bash
 $ go install github.com/ncarlier/webhookd@latest
 ```
 
-**Or** download the binary for your architecture:
-
+### 2. Binary Download Script
+Download the binary for your architecture using one of these scripts:
+**Via `curl` and `bash`:**
 ```bash
+# Option A (General):
 $ sudo curl -s https://raw.githubusercontent.com/ncarlier/webhookd/master/install.sh | bash
-or
+
+# Option B (Gobinary):
 $ curl -sf https://gobinaries.com/ncarlier/webhookd | sh
 ```
 
-**Or** use Docker:
-
+### 3. Docker Container
+Run webhookd in a container for quick setup:
 ```bash
 $ docker run -d --name=webhookd \
   -v ${PWD}/scripts:/scripts \
@@ -38,35 +43,26 @@ $ docker run -d --name=webhookd \
   ncarlier/webhookd
 ```
 
-> Note: The official Docker image is lightweight and allows to run simple scripts but for more advanced needs you can use the `ncarlier/webhookd:edge-distrib` image.
-> For example, with this `distrib` image, you can interact with your Docker daemon using Docker CLI or Docker Compose.
+> **Note on Docker:** The official image is lightweight for simple scripts. For advanced needs (e.g., interacting with the Docker daemon), consider using `ncarlier/webhookd:edge-distrib`.
 
-**Or** use APT:
+### 4. Package Manager (APT)
+For Debian users, install via our custom repository:
+[Custom Repository Link](https://packages.azlux.fr/)
 
-Finally, it is possible to install Webhookd using the Debian packaging system through this [custom repository](https://packages.azlux.fr/).
+> **Systemd Setup:** If installing system-wide, the service is pre-configured. You only need to start it with: `systemctl start webhookd`. Custom environment variables can be set in `/etc/webhookd.env`.
 
-> Note: Custom configuration variables can be set into `/etc/webhookd.env` file.
-> Systemd service is already set and enabled, you just have to start it with `systemctl start webhookd`.
+## Configuration & Usage
 
-## Configuration
+Webhookd accepts configuration via command line flags or by setting environment variables. For a complete list, run `webhookd -h`.
 
-Webhookd can be configured by using command line parameters or by setting environment variables.
+All available parameters and environment variables are detailed in [./etc/default/webhookd.env](./etc/default/webhookd.env).
 
-Type `webhookd -h` to display all parameters and related environment variables.
+### Directory Structure (Scripts)
+Webhooks are defined as executable scripts within a specific directory structure.
+* **Default Path:** Scripts are executed by default from the `./scripts` directory.
+* **Changing Path:** You can override this using the `WHD_HOOK_SCRIPTS` environment variable or the `-hook-scripts` parameter.
 
-All configuration variables are described in [etc/default/webhookd.env](./etc/default/webhookd.env) file.
-
-## Usage
-
-### Directory structure
-
-Webhooks are simple scripts within a directory structure.
-
-By default inside the `./scripts` directory.
-You can change the default directory using the `WHD_HOOK_SCRIPTS` environment variable or `-hook-scripts` parameter.
-
-*Example:*
-
+**Example Structure:**
 ```
 /scripts
 |--> /github
@@ -76,356 +72,186 @@ You can change the default directory using the `WHD_HOOK_SCRIPTS` environment va
 |--> /echo.sh
 |--> ...
 ```
+> **Tip:** Webhookd supports any executable file type, provided it has execute rights. For example, a Node.js script requires `#!/usr/bin/env node` as its shebang line. Sample scripts are available in the [example folder](./scripts/examples), including Gitlab and Github integrations.
 
-> Note: Webhookd is able to run any type of file in this directory as long as the file is executable.
-For example, you can execute a Node.js file if you give execution rights to the file and add the appropriate `#!` header (in this case: `#!/usr/bin/env node`).
+### Webhook Calling & Mapping
+The directory structure dictates the webhook URL (`http://localhost:8080/<path>`). You can omit the script extension; by default, webhookd will look for `.sh`. This default extension can be changed via `WHD_HOOK_DEFAULT_EXT` or `-hook-default-ext`.
 
-You can find sample scripts in the [example folder](./scripts/examples).
-In particular, examples of integration with Gitlab and Github.
+#### Response Handling (Streaming vs. Blocking)
+How webhookd responds depends on your request headers:
 
-### Webhook call
+1.  **Server-Sent Events (SSE):** Used when the `Accept` header is `text/event-stream`. Provides real-time, streamed output (see [reference][sse]).
+2.  **Chunked Transfer Coding:** The default mode. Used when the `X-Hook-Mode` header is set to `chunked`. Also provides streamed output (see [reference][chunked]).
+3.  **Blocking Mode:** Use this if no streaming is required by setting the `X-Hook-Mode` header to `buffered`. The request blocks until the script finishes, returning a summary payload.
 
-The directory structure defines the webhook URL.
+#### Exit Code Mapping (Only in Blocking Mode)
+Webhookd maps the script's exit code (0-255) to an HTTP status code:
+*   **0:** `200 OK`
+*   **1 - 99:** `500 Internal Server Error`
+*   **100 - 255:** Adds 300 to the exit code (resulting in a 4xx or 5xx range).
 
-You can omit the script extension. If you do, webhookd will search by default for a `.sh` file.
-You can change the default extension using the `WHD_HOOK_DEFAULT_EXT` environment variable or `-hook-default-ext` parameter.
-If the script exists, the output will be sent to the HTTP response.
+> **Example Exit Code Calculation:** An exit status of `118` results in HTTP status `418 I'm a teapot`.
 
-Depending on the HTTP request, the HTTP response will be a HTTP `200` code with the script's output in real time (streaming), or the HTTP response will wait until the end of the script's execution and return the output (truncated) of the script as well as an HTTP code relative to the script's output code.
+**Streaming Examples:**
 
-The streaming protocol depends on the HTTP request:
+*   **Server-sent events (SSE):**
+    ```bash
+    $ curl -v --header "Accept: text/event-stream" -XGET http://localhost:8080/foo/bar
+    # ... output showing data: lines in real time ...
+    error: exit status 118
+    ```
 
-- [Server-sent events][sse] is used when `Accept` HTTP header is equal to `text/event-stream`.
-- [Chunked Transfer Coding][chunked] is used when `X-Hook-Mode` HTTP header is equal to `chunked`.
-It's the default mode.
-You can change the default mode using the `WHD_HOOK_DEFAULT_MODE` environment variable or `-hook-default-mode` parameter.
+*   **Chunked Transfer Coding (Default):**
+    ```bash
+    $ curl -v -XPOST --header "X-Hook-Mode: chunked" http://localhost:8080/foo/bar
+    # ... output showing data lines immediately ...
+    error: exit status 118
+    ```
 
-[sse]: https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
-[chunked]: https://datatracker.ietf.org/doc/html/rfc2616#section-3.6.1
+*   **Blocking Request:**
+    ```bash
+    $ curl -v -XPOST --header "X-Hook-Mode: buffered" http://localhost:8080/foo/bar
+    # HTTP/1.1 418 I m a teapot (The status code)
+    # ... script output followed by error details...
+    ```
 
-If no streaming protocol is needed, you must set `X-Hook-Mode` HTTP header to `buffered`.
-The HTTP response will block until the script is over:
+### Webhook Parameters (Input Handling)
+Webhookd automatically converts various incoming request data into script variables:
 
-- Sends script output limited to the last 100 lines. You can modify this limit via the HTTP header `X-Hook-MaxBufferedLines`.
-- Convert the script exit code to HTTP code as follow:
-  - 0: `200 OK`
-  - Between 1 and 99: `500 Internal Server Error`
-  - Between 100 and 255: Add 300 to get HTTP code between 400 and 555
+*   **Query Parameters:** Converted directly to script variables.
+*   **HTTP Headers:** Converted, following the snake\_case convention. (*e.g., `CONTENT-TYPE` becomes `content_type`*).
+*   **Request Body:**
+    *   `application/x-www-form-urlencoded`: Keys/values are mapped to variables.
+    *   `text/*` or `application/json`: The entire payload is passed as the **first script parameter (`$1`)**.
 
-> Remember: a process exit code is between 0 and 255. 0 means that the execution is successful.
+**Built-in Parameters Added by Webhookd:**
+| Variable | Description |
+| :--- | :--- |
+| `hook_id` | Unique hook ID (auto-increment) |
+| `hook_name` | Name associated with the webhook call |
+| `hook_method` | HTTP request method used |
+| `x_forwarded_for` | Client IP address |
+| `x_webauth_user` | Username if authentication is enabled |
 
-*Example:*
-
-The script: `./scripts/foo/bar.sh`
-
-```bash
-#!/bin/bash
-
-echo "foo foo foo"
-echo "bar bar bar"
-
-exit 118
-```
-
-Streamed output using `Server-sent events`:
-
-```bash
-$ curl -v --header "Accept: text/event-stream" -XGET http://localhost:8080/foo/bar
-< HTTP/1.1 200 OK
-< Content-Type: text/event-stream
-< Transfer-Encoding: chunked
-< X-Hook-Id: 8
-
-data: foo foo foo
-
-data: bar bar bar
-
-error: exit status 118
-```
-
-Streamed output using `Chunked Transfer Coding`:
-
-```bash
-$ curl -v -XPOST --header "X-Hook-Mode: chunked" http://localhost:8080/foo/bar
-< HTTP/1.1 200 OK
-< Content-Type: text/plain; charset=utf-8
-< Transfer-Encoding: chunked
-< X-Hook-Id: 7
-
-foo foo foo
-bar bar bar
-error: exit status 118
-
-```
-
-Blocking HTTP request:
-
-```bash
-$ curl -v -XPOST --header "X-Hook-Mode: buffered" http://localhost:8080/foo/bar
-< HTTP/1.1 418 I m a teapot
-< Content-Type: text/plain; charset=utf-8
-< X-Hook-Id: 9
-
-foo foo foo
-bar bar bar
-error: exit status 118
-```
-
-> Note that in this last example the HTTP response is equal to `exit code + 300` : `418 I'm a teapot`.
-
-### Webhook parameters
-
-You have several ways to provide parameters to your webhook script:
-
-- URL request parameters are converted to script variables
-- HTTP headers are converted to script variables
-- Request body (depending the Media Type):
-  - `application/x-www-form-urlencoded`: keys and values are converted to script variables
-  - `text/*` or `application/json`: payload is transmitted to the script as first parameter.
-
-> Note: Variable name follows "snakecase" naming convention.
-Therefore the name can be altered.
-*ex: `CONTENT-TYPE` will become `content_type`.*
-
-Webhookd adds some additional parameters to the script:
-
-- `hook_id`: hook ID (auto-increment)
-- `hook_name`: hook name
-- `hook_method`: HTTP request method
-- `x_forwarded_for`: client IP
-- `x_webauth_user`: username if authentication is enabled
-
-*Example:*
-
-The script:
-
-```bash
-#!/bin/bash
-
-echo "Hook information: name=$hook_name, id=$hook_id, method=$hook_method"
-echo "Query parameter: foo=$foo"
-echo "Header parameter: user-agent=$user_agent"
-echo "Script parameters: $1"
-```
-
-The result:
-
+**Example Usage:**
 ```bash
 $ curl --data @test.json -H 'Content-Type: application/json' http://localhost:8080/echo?foo=bar
+# Script output shows variables mapped correctly
 Hook information: name=echo, id=1, method=POST
 Query parameter: foo=bar
-Header parameter: user-agent=curl/7.52.1
-Script parameter: {"message": "this is a test"}
+Header parameter: user-agent=curl/...
+Script parameters: {"message": "this is a test"}
 ```
 
-### Webhook timeout configuration
+### Advanced Configuration
 
-By default a webhook has a timeout of 10 seconds.
-This timeout is globally configurable by setting the environment variable:
-`WHD_HOOK_TIMEOUT` (in seconds).
-
-You can override this global behavior per request by setting the HTTP header:
-`X-Hook-Timeout` (in seconds).
-
-*Example:*
+#### Timeout Control
+*   **Global Timeout:** Set the default timeout for all hooks using `WHD_HOOK_TIMEOUT` (seconds).
+*   **Per-Request Override:** Use the HTTP header `X-Hook-Timeout` (seconds) to override the global setting.
 
 ```bash
 $ curl -H "X-Hook-Timeout: 5" http://localhost:8080/echo?foo=bar
 ```
 
-### Webhook logs
+#### Log Retrieval
+While logs stream in real time, you can retrieve historical output using the hook ID: `http://localhost:8080/<NAME>/<ID>`.
 
-As mentioned above, web hook logs are stream in real time during the call.
-However, you can retrieve the logs of a previous call by using the hook ID: `http://localhost:8080/<NAME>/<ID>`
+The current execution's unique ID is returned via the `X-Hook-Id` header. (Logs can also be redirected to the server output using `WHD_LOG_MODULES=hook`).
 
-The hook ID is returned as an HTTP header with the Webhook response: `X-Hook-ID`
+#### Post-Hook Notifications
+The script output can be collected and sent to external notification services.
+*   **Configuration:** Set `WHD_NOTIFICATION_URI` or use `--notification-uri`.
+*   **Filtering:** Only lines prefixed with "notify:" are sent. You can override this prefix via a query parameter (e.g., `?prefix="foo:"`).
 
-*Example:*
-
-```bash
-$ # Call webhook
-$ curl -v http://localhost:8080/echo?foo=bar
-...
-< HTTP/1.1 200 OK
-< Content-Type: text/plain
-< X-Hook-Id: 2
-...
-$ # Retrieve logs afterwards
-$ curl http://localhost:8080/echo/2
-```
-
-If needed, you can also redirect hook logs to the server output (configured by the `WHD_LOG_MODULES=hook` environment variable).
-
-### Post hook notifications
-
-The output of the script is collected and stored into a log file
-(configured by the `WHD_HOOK_LOG_DIR` environment variable).
-
-Once the script is executed, you can send the result and this log file to a notification channel.
-Currently, only two channels are supported: `Email` and `HTTP`.
-
-Notifications configuration can be done as follow:
-
-```bash
-$ export WHD_NOTIFICATION_URI=http://requestb.in/v9b229v9
-$ # or
-$ webhookd --notification-uri=http://requestb.in/v9b229v9
-```
-
-> Note: Only the output of the script prefixed by "notify:" is sent to the notification channel.
-If the output does not contain a prefixed line, no notification will be sent.
-
-**Example:**
-
+**Example Script Snippet:**
 ```bash
 #!/bin/bash
 
-echo "notify: Hello World" # Will be notified
-echo "Goodbye"             # Will not be notified
+echo "notify: Success message for deployment." # Will be notified
+echo "This is debug output, will be ignored."  # Will not trigger notification
 ```
 
-You can override the notification prefix by adding `prefix` as a query parameter to the configuration URL.
+##### Supported Notification Channels
 
-**Example:** http://requestb.in/v9b229v9?prefix="foo:"
+###### Email Notification
+*   **Configuration URI:** `mailto:foo@bar.com`
+*   **Options (Query Params):**
+    *   `prefix`: Filter output log lines by this prefix.
+    *   `smtp`, `username`, `password`: Credentials for the SMTP relay.
+    *   `conn`: Connection type (`tls`, `plain`, etc.).
 
-#### HTTP notification
-
-Configuration URI: `http://example.org`
-
-Options (using query parameters):
-
-- `prefix`: Prefix to filter output log
-
-The following JSON payload is POST to the target URL:
+###### HTTP Notification
+*   **Configuration URI:** `http://example.org/endpoint`
+*   **Payload:** A JSON object is POSTed to the target URL, suitable for Mattermost, Slack, or Discord webhooks.
 
 ```json
 {
   "id": "42",
   "name": "echo",
-  "text": "foo\nbar...\n",
-  "error": "Error cause... if present",
+  "text": "Script output content...",
+  "error": "Error details..."
 }
 ```
 
-> Note: that because the payload have a `text` attribute, you can use a [Mattermost][mattermost], [Slack][slack] or [Discord][discord] webhook endpoint.
+#### Security Features
 
-[mattermost]: https://docs.mattermost.com/developer/webhooks-incoming.html
-[discord]: https://discord.com/developers/docs/resources/webhook#execute-slackcompatible-webhook
-[slack]: https://api.slack.com/messaging/webhooks
-
-#### Email notification
-
-Configuration URI: `mailto:foo@bar.com`
-
-Options (using query parameters):
-
-- `prefix`: Prefix to filter output log
-- `smtp`: SMTP host to use (by default: `localhost:25`)
-- `username`: SMTP username (not set by default)
-- `password`: SMTP password (not set by default)
-- `conn`: SMTP connection type (`tls`, `tls-insecure` or by default: `plain`)
-- `from`: Sender email (by default: `noreply@nunux.org`)
-- `subject`: Email subject (by default: `[whd-notification] {name}#{id} {status}`)
-
-### Authentication
-
-You can restrict access to webhooks using HTTP basic authentication.
-
-To activate basic authentication, you have to create a `htpasswd` file:
-
-```bash
-$ # create passwd file the user 'api'
-$ htpasswd -B -c .htpasswd api
-```
-This command will ask for a password and store it in the htpasswd file.
-
-By default, the daemon will try to load the `.htpasswd` file.
-But you can override this behavior by specifying the location of the file:
-
-```bash
-$ export WHD_PASSWD_FILE=/etc/webhookd/users.htpasswd
-$ # or
-$ webhookd --passwd-file /etc/webhookd/users.htpasswd
-```
-
-Once configured, you must call webhooks using basic authentication:
-
+##### Basic Authentication (Auth)
+Restrict access using standard HTTP basic authentication.
+1. Create the password file: `htpasswd -B -c .htpasswd api`
+2. Set/Use the path: `export WHD_PASSWD_FILE=/etc/webhookd/users.htpasswd`
+3. Usage requires credentials:
 ```bash
 $ curl -u api:test -XPOST "http://localhost:8080/echo?msg=hello"
 ```
 
-### Signature
+##### Upstream Authentication
 
-You can ensure message integrity (and authenticity) by signing HTTP requests.
+In scenarios where authentication is handled by an upstream reverse proxy or API gateway (e.g., Authelia, Pomerium, Traefik), you can configure webhookd to rely on upstream headers.
 
-Webhookd supports 2 signature methods:
+Set the allowed upstream headers using `WHD_ALLOWED_UPSTREAM_HEADERS` (or `--allowed-upstream-headers`). By default this is `Accept,Content-Type,Content-Length,User-Agent,X-Forwarded-For`.
+You can set `*` which forwards all HTTP headers to the webhook scripts.
 
-- [HTTP Signatures](https://www.ietf.org/archive/id/draft-cavage-http-signatures-12.txt)
-- [Ed25519 Signature](https://ed25519.cr.yp.to/) (used by [Discord](https://discord.com/developers/docs/interactions/receiving-and-responding#security-and-authorization))
+For instance, to accept authentication from an upstream proxy using the `x-webauthn-user` header:
 
-To activate request signature verification, you have to configure the truststore:
+```bash
+export WHD_ALLOWED_UPSTREAM_HEADERS="x-webauthn-user,content-type,user-agent"
+```
 
+##### Signature Verification (Integrity)
+Ensure message authenticity using cryptographic signatures. Webhookd supports two methods:
+
+1.  **HTTP Signatures:** Uses standards defined by IETF draft-cavage.
+2.  **Ed25519 Signature:** Used by services like Discord.
+
+To activate, set the truststore file location:
 ```bash
 $ export WHD_TRUSTSTORE_FILE=/etc/webhookd/pubkey.pem
-$ # or
-$ webhookd --truststore-file /etc/webhookd/pubkey.pem
+# Or use command flag: webhookd --truststore-file /path/to/pubkey.pem
 ```
+*Calls must include appropriate headers (e.g., `Signature:` or `X-Signature-Ed25519`).*
 
-Public key is stored in PEM format.
+#### TLS Support
+Secure communications by enabling SSL/TLS.
 
-Once configured, you must call webhooks using a valid signature:
+*   **Simple Enable:**
+    ```bash
+    export WHD_TLS_ENABLED=true
+    # Or: webhookd --tls-enabled
+    ```
+*   **Custom Certificates:** Provide specific files using flags (or environment variables for path): `-tls-cert-file` and `-tls-key-file`.
+*   **ACME Support (Automatic SSL):** Enable by specifying a fully qualified domain name:
+    ```bash
+    export WHD_TLS_ENABLED=true
+    export WHD_TLS_DOMAIN=hook.example.com
+    # Or: webhookd --tls-enabled --tls-domain=hook.example.com
+    ```
 
-```bash
-# Using HTTP Signature:
-$ curl -X POST \
-  -H 'Date: <req-date>' \
-  -H 'Signature: keyId=<key-id>,algorithm="rsa-sha256",headers="(request-target) date",signature=<signature-string>' \
-  -H 'Accept: application/json' \
-  "http://localhost:8080/echo?msg=hello"
-# or using Ed25519 Signature:
-$ curl -X POST \
-  -H 'X-Signature-Timestamp: <timestamp>' \
-  -H 'X-Signature-Ed25519: <signature-string>' \
-  -H 'Accept: application/json' \
-  "http://localhost:8080/echo?msg=hello"
-```
+**⚠️ Networking Note:** To listen on privileged ports (80/443) on Linux, remember to use `setcap` for the binary: `sudo setcap CAP_NET_BIND_SERVICE+ep webhookd`
 
-You can find a small HTTP client in the ["tooling" directory](./tooling/httpsig/README.md) that is capable of forging `HTTP signatures`.
+## License & Credits
 
-### TLS
+This project is licensed under the MIT License. See [LICENSE](./LICENSE) for details.
 
-You can activate TLS to secure communications:
 
-```bash
-$ export WHD_TLS_ENABLED=true
-$ # or
-$ webhookd --tls-enabled
-```
-
-By default webhookd is expecting a certificate and key file (`./server.pem` and `./server.key`).
-You can provide your own certificate and key with `-tls-cert-file` and `-tls-key-file`.
-
-Webhookd also supports [ACME](https://ietf-wg-acme.github.io/acme/) protocol.
-You can activate ACME by setting a fully qualified domain name:
-
-```bash
-$ export WHD_TLS_ENABLED=true
-$ export WHD_TLS_DOMAIN=hook.example.com
-$ # or
-$ webhookd --tls-enabled --tls-domain=hook.example.com
-```
-
-**Note:**
-On *nix, if you want to listen on ports 80 and 443, don't forget to use `setcap` to privilege the binary:
-
-```bash
-sudo setcap CAP_NET_BIND_SERVICE+ep webhookd
-```
-
-## License
-
-The MIT License (MIT)
-
-See [LICENSE](./LICENSE) to see the full text.
-
----
+[sse]: https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
+[chunked]: https://datatracker.ietf.org/doc/html/rfc2616#section-3.6.1

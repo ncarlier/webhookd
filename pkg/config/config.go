@@ -7,15 +7,16 @@ import (
 
 // Config store root configuration
 type Config struct {
-	ListenAddr     string             `flag:"listen-addr" desc:"HTTP listen address" default:":8080"`
-	PasswdFile     string             `flag:"passwd-file" desc:"Password file for basic HTTP authentication" default:".htpasswd"`
-	TruststoreFile string             `flag:"truststore-file" desc:"Truststore used by HTTP signature verifier (.pem or .p12)"`
-	Hook           HookConfig         `flag:"hook"`
-	Log            LogConfig          `flag:"log"`
-	Notification   NotificationConfig `flag:"notification"`
-	Static         StaticConfig       `flag:"static"`
-	TLS            TLSConfig          `flag:"tls"`
-	OldConfig      `flag:""`
+	ListenAddr             string             `flag:"listen-addr" desc:"HTTP listen address" default:":8080"`
+	PasswdFile             string             `flag:"passwd-file" desc:"Password file for basic HTTP authentication" default:".htpasswd"`
+	TruststoreFile         string             `flag:"truststore-file" desc:"Truststore used by HTTP signature verifier (.pem or .p12)"`
+	Hook                   HookConfig         `flag:"hook"`
+	Log                    LogConfig          `flag:"log"`
+	Notification           NotificationConfig `flag:"notification"`
+	Static                 StaticConfig       `flag:"static"`
+	TLS                    TLSConfig          `flag:"tls"`
+	AllowedUpstreamHeaders []string           `flag:"allowed-upstream-headers" desc:"Allowed HTTP upstream headers" default:"accept,content-type,content-length,user-agent,x-forwarded-for"`
+	OldConfig              `flag:""`
 }
 
 // HookConfig store Hook execution configuration
