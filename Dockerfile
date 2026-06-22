@@ -77,7 +77,7 @@ RUN adduser \
     "$USER"
 
 # Install deps
-RUN apk add --no-cache bash gcompat git openssl openssh-client curl jq docker-cli-compose aha
+RUN apk add --no-cache bash gcompat git openssl openssh-client curl jq docker-cli-compose aha github-cli
 
 # Install binary and entrypoint
 COPY --from=builder /go/src/$REPOSITORY/$ARTIFACT/release/$ARTIFACT /usr/local/bin/$ARTIFACT
