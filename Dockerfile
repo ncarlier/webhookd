@@ -77,7 +77,7 @@ RUN adduser \
     "$USER"
 
 # Install deps
-RUN apk add --no-cache bash gcompat git openssl openssh-client curl jq docker-cli-compose aha
+RUN apk add --no-cache bash gcompat git openssl openssh-client curl jq docker-cli-compose aha su-exec
 
 # Install binary and entrypoint
 COPY --from=builder /go/src/$REPOSITORY/$ARTIFACT/release/$ARTIFACT /usr/local/bin/$ARTIFACT
@@ -90,6 +90,8 @@ VOLUME [ "/scripts" ]
 
 EXPOSE 8080
 
-USER $USER
+# Note: no USER directive here on purpose. The entrypoint starts as root so it
+# can install WHD_EXTRA_PACKAGES, then drops to the unprivileged $USER (via
+# su-exec) before running the server. The server and hook scripts never run as root.
 
 CMD [ "webhookd" ]
