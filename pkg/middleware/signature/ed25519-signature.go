@@ -41,7 +41,7 @@ func Ed25519SignatureHandler(r *http.Request, ts truststore.TrustStore) error {
 		return errors.New("missing signature header")
 	}
 
-	sig, err := hex.DecodeString(value)
+	sig, err := base64.StdEncoding.DecodeString(value)
 	if err != nil || len(sig) != ed25519.SignatureSize || sig[63]&224 != 0 {
 		return fmt.Errorf("invalid signature format: %s", sig)
 	}
