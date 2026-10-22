@@ -8,7 +8,7 @@ import (
 )
 
 func TestResolveScript(t *testing.T) {
-	script, err := hook.ResolveScript("../../../scripts", "../scripts/echo", "sh")
+	script, err := hook.ResolveScript("../../../scripts", "echo", "sh")
 	assert.Nil(t, err, "")
 	assert.Equal(t, "../../../scripts/echo.sh", script, "")
 }
